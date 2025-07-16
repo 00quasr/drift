@@ -164,32 +164,30 @@ export default function ArtistsPage() {
               return (
                 <Link key={artist.id} href={`/artist/${artist.id}`}>
                   <Card className="group bg-zinc-900 border-zinc-800 hover:bg-zinc-800 transition-all duration-300 overflow-hidden">
-                    <div className="relative h-48 bg-gradient-to-br from-purple-900/20 to-pink-900/20 rounded-full overflow-hidden group-hover:scale-110 transition-transform duration-300 mb-4">
+                    <div className="relative h-48 bg-gradient-to-br from-purple-900/20 to-pink-900/20 rounded-full overflow-hidden group-hover:scale-110 transition-transform duration-300 mx-auto mb-4 w-48">
                       <Image
                         src={isValidImageUrl(artist.photo_url || artist.images?.[0]) ? (artist.photo_url || artist.images[0]) : getListFallbackImage('artist', index)}
                         alt={artist.name}
                         fill
-                        className="object-cover"
+                        className="object-cover rounded-full"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent rounded-full" />
                     </div>
 
                     {/* Artist Info */}
-                    <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-                      <div className="flex items-center gap-2 text-xs text-white/80 mb-2">
-                        {artist.city && artist.country && (
-                          <>
-                            <span>{artist.city}, {artist.country}</span>
-                          </>
-                        )}
-                      </div>
-                      <h3 className="font-semibold text-lg mb-2 line-clamp-1">
+                    <div className="p-4 text-white text-center">
+                      {artist.city && artist.country && (
+                        <div className="text-xs text-zinc-300 mb-2">
+                          {artist.city}, {artist.country}
+                        </div>
+                      )}
+                      <h3 className="font-semibold text-lg mb-2 line-clamp-1 text-white">
                         {artist.name}
                       </h3>
                       
                       {/* Genre Tags */}
-                      <div className="flex flex-wrap gap-1 mb-2">
+                      <div className="flex flex-wrap gap-1 justify-center">
                         {artist.genres?.slice(0, 2).map((genre: string) => (
                           <Badge 
                             key={genre} 

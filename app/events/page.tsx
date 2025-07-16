@@ -164,7 +164,7 @@ export default function EventsPage() {
               return (
                 <Link key={event.id} href={`/event/${event.id}`}>
                   <Card className="group bg-zinc-900 border-zinc-800 hover:bg-zinc-800 transition-all duration-300 overflow-hidden">
-                    <div className="relative h-64 bg-gradient-to-br from-purple-900/30 to-pink-900/30 rounded-lg overflow-hidden group-hover:scale-105 transition-transform duration-300">
+                    <div className="relative h-64 bg-gradient-to-br from-purple-900/30 to-pink-900/30 overflow-hidden group-hover:scale-105 transition-transform duration-300">
                       <Image
                         src={isValidImageUrl(event.flyer_url || event.images?.[0]) ? (event.flyer_url || event.images[0]) : getListFallbackImage('event', index)}
                         alt={event.title}
@@ -173,30 +173,30 @@ export default function EventsPage() {
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                    </div>
-
-                    {/* Status Badge */}
-                    <div className="absolute top-3 left-3">
-                      <Badge variant={isUpcoming ? "default" : "secondary"} className="text-xs">
-                        {isUpcoming ? "Upcoming" : "Past"}
-                      </Badge>
+                      
+                      {/* Status Badge */}
+                      <div className="absolute top-3 left-3">
+                        <Badge variant={isUpcoming ? "default" : "secondary"} className="text-xs">
+                          {isUpcoming ? "Upcoming" : "Past"}
+                        </Badge>
+                      </div>
                     </div>
 
                     {/* Event Info */}
-                    <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-                      <div className="flex items-center gap-2 text-xs text-white/80 mb-2">
+                    <div className="p-4 text-white">
+                      <div className="flex items-center gap-2 text-xs text-zinc-300 mb-2">
                         <Calendar className="w-3 h-3" />
                         {new Date(event.start_date).toLocaleDateString()}
                         <span>•</span>
                         <MapPin className="w-3 h-3" />
                         {event.venue?.name || 'TBA'}
                       </div>
-                      <h3 className="font-semibold text-lg mb-2 line-clamp-2">
+                      <h3 className="font-semibold text-lg mb-2 line-clamp-2 text-white">
                         {event.title}
                       </h3>
                       
                       {/* Genre Tags */}
-                      <div className="flex flex-wrap gap-1 mb-2">
+                      <div className="flex flex-wrap gap-1">
                         {event.genres?.slice(0, 2).map((genre: string) => (
                           <Badge 
                             key={genre} 

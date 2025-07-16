@@ -155,7 +155,7 @@ export default function VenuesPage() {
               return (
                 <Link key={venue.id} href={`/venue/${venue.id}`}>
                   <Card className="group bg-zinc-900 border-zinc-800 hover:bg-zinc-800 transition-all duration-300 overflow-hidden">
-                    <div className="relative h-48 bg-gradient-to-br from-purple-900/20 to-pink-900/20 rounded-lg overflow-hidden group-hover:scale-105 transition-transform duration-300">
+                    <div className="relative h-48 bg-gradient-to-br from-purple-900/20 to-pink-900/20 overflow-hidden group-hover:scale-105 transition-transform duration-300">
                       <Image
                         src={isValidImageUrl(venue.images?.[0]) ? venue.images[0] : getListFallbackImage('venue', index)}
                         alt={venue.name}
@@ -167,8 +167,8 @@ export default function VenuesPage() {
                     </div>
 
                     {/* Venue Info */}
-                    <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-                      <div className="flex items-center gap-2 text-xs text-white/80 mb-2">
+                    <div className="p-4 text-white">
+                      <div className="flex items-center gap-2 text-xs text-zinc-300 mb-2">
                         <MapPin className="w-3 h-3" />
                         {venue.city}, {venue.country}
                         {venue.capacity && (
@@ -179,12 +179,12 @@ export default function VenuesPage() {
                           </>
                         )}
                       </div>
-                      <h3 className="font-semibold text-lg mb-2 line-clamp-1">
+                      <h3 className="font-semibold text-lg mb-2 line-clamp-1 text-white">
                         {venue.name}
                       </h3>
                       
                       {/* Genre Tags */}
-                      <div className="flex flex-wrap gap-1 mb-2">
+                      <div className="flex flex-wrap gap-1">
                         {venue.genres?.slice(0, 2).map((genre: string) => (
                           <Badge 
                             key={genre} 

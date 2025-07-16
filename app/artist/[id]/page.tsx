@@ -42,7 +42,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
     const totalReviews = reviewStats?.totalReviews || 0
 
     return (
-      <div className="min-h-screen bg-black text-white">
+      <div className="min-h-screen bg-slate-950 text-white">
         {/* Hero Section */}
         <div className="relative h-[70vh] w-full overflow-hidden">
           <Image
@@ -52,7 +52,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
           
           <div className="absolute bottom-0 left-0 right-0 z-10 p-8">
             <div className="max-w-7xl mx-auto">
@@ -60,7 +60,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
                 
                 {/* Artist Image */}
                 <div className="relative">
-                  <div className="w-48 h-48 rounded-full overflow-hidden border-4 border-white/20 bg-gradient-to-br from-purple-600 to-pink-600">
+                  <div className="w-48 h-48 rounded-full overflow-hidden border-4 border-slate-800 bg-slate-900">
                     <Image
                       src={artistImage}
                       alt={artist.name}
@@ -73,17 +73,17 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
                 {/* Artist Info */}
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-4">
-                    <Badge className="bg-purple-600 text-white">Artist</Badge>
+                    <Badge className="bg-slate-900 text-white border-slate-700">Artist</Badge>
                     {artist.genres?.map((genre: string) => (
-                      <Badge key={genre} variant="outline" className="bg-white/10 text-white border-white/20">
+                      <Badge key={genre} variant="outline" className="bg-slate-900/50 text-slate-300 border-slate-700">
                         {genre}
                       </Badge>
                     ))}
                   </div>
                   
-                  <h1 className="text-5xl md:text-7xl font-bold mb-4 leading-tight">{artist.name}</h1>
+                  <h1 className="text-5xl md:text-7xl font-medium mb-4 leading-tight">{artist.name}</h1>
                   
-                  <div className="flex flex-wrap items-center gap-6 text-lg text-gray-300">
+                  <div className="flex flex-wrap items-center gap-6 text-lg text-slate-300">
                     {artist.city && artist.country && (
                       <div className="flex items-center gap-2">
                         <MapPin className="w-5 h-5" />
@@ -109,13 +109,13 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
                 
                 {/* Action Buttons */}
                 <div className="flex items-center gap-3">
-                  <Button variant="outline" size="icon" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+                  <Button variant="outline" size="icon" className="bg-slate-900/50 border-slate-700 text-white hover:bg-slate-800">
                     <Heart className="w-5 h-5" />
                   </Button>
-                  <Button variant="outline" size="icon" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+                  <Button variant="outline" size="icon" className="bg-slate-900/50 border-slate-700 text-white hover:bg-slate-800">
                     <Share2 className="w-5 h-5" />
                   </Button>
-                  <Button className="bg-purple-600 hover:bg-purple-700 text-white px-8">
+                  <Button className="bg-slate-900 hover:bg-slate-800 text-white px-8 border border-slate-700">
                     Rate Artist
                   </Button>
                 </div>
@@ -134,9 +134,9 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
               {/* Biography */}
               {artist.bio && (
                 <section>
-                  <h2 className="text-3xl font-bold mb-6">Biography</h2>
+                  <h2 className="text-3xl font-medium mb-6">Biography</h2>
                   <div className="prose prose-gray prose-invert max-w-none">
-                    <p className="text-gray-300 text-lg leading-relaxed">{artist.bio}</p>
+                    <p className="text-slate-300 text-lg leading-relaxed">{artist.bio}</p>
                   </div>
                 </section>
               )}
@@ -145,8 +145,8 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
               {upcomingEvents && upcomingEvents.length > 0 && (
                 <section>
                   <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-3xl font-bold">Upcoming Performances</h2>
-                    <Link href={`/events?artist=${artist.id}`} className="text-purple-400 hover:text-purple-300 transition-colors">
+                    <h2 className="text-3xl font-medium">Upcoming Performances</h2>
+                    <Link href={`/events?artist=${artist.id}`} className="text-slate-400 hover:text-white transition-colors">
                       View All →
                     </Link>
                   </div>
@@ -154,10 +154,10 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
                   <div className="space-y-4">
                     {upcomingEvents.map((event) => (
                       <Link key={event.id} href={`/event/${event.id}`}>
-                        <Card className="group bg-zinc-900 border-zinc-800 hover:bg-zinc-800 transition-all duration-300 p-6">
+                        <Card className="group bg-slate-900/50 border-slate-800 hover:bg-slate-800/50 transition-all duration-300 p-6">
                           <div className="flex items-center gap-6">
                             {/* Event Image */}
-                            <div className="w-20 h-20 rounded-lg bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center overflow-hidden">
+                            <div className="w-20 h-20 rounded-lg bg-slate-800 flex items-center justify-center overflow-hidden">
                               {event.flyer_url ? (
                                 <Image
                                   src={event.flyer_url}
@@ -167,17 +167,17 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
                                   className="object-cover w-full h-full"
                                 />
                               ) : (
-                                <Music2 className="w-8 h-8 text-white" />
+                                <Music2 className="w-8 h-8 text-slate-400" />
                               )}
                             </div>
                             
                             {/* Event Info */}
                             <div className="flex-1">
-                              <h3 className="text-xl font-semibold group-hover:text-purple-300 transition-colors mb-2">
+                              <h3 className="text-xl font-semibold group-hover:text-slate-300 transition-colors mb-2">
                                 {event.title}
                               </h3>
                               
-                              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400">
+                              <div className="flex flex-wrap items-center gap-4 text-sm text-slate-400">
                                 <div className="flex items-center gap-2">
                                   <Calendar className="w-4 h-4" />
                                   <span>
@@ -200,7 +200,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
                                 {event.genres && event.genres.length > 0 && (
                                   <div className="flex gap-1">
                                     {event.genres.slice(0, 2).map((genre: string) => (
-                                      <Badge key={genre} variant="outline" className="text-xs border-zinc-600">
+                                      <Badge key={genre} variant="outline" className="text-xs border-slate-700 text-slate-400">
                                         {genre}
                                       </Badge>
                                     ))}
@@ -209,7 +209,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
                               </div>
                             </div>
                             
-                            <ExternalLink className="w-5 h-5 text-gray-400 group-hover:text-purple-300 transition-colors" />
+                            <ExternalLink className="w-5 h-5 text-slate-400 group-hover:text-slate-300 transition-colors" />
                           </div>
                         </Card>
                       </Link>
@@ -222,8 +222,8 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
               {pastEvents && pastEvents.length > 0 && (
                 <section>
                   <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-3xl font-bold">Past Performances</h2>
-                    <Link href={`/events?artist=${artist.id}&past=true`} className="text-purple-400 hover:text-purple-300 transition-colors">
+                    <h2 className="text-3xl font-medium">Past Performances</h2>
+                    <Link href={`/events?artist=${artist.id}&past=true`} className="text-slate-400 hover:text-white transition-colors">
                       View All →
                     </Link>
                   </div>
@@ -231,16 +231,16 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {pastEvents.slice(0, 4).map((event) => (
                       <Link key={event.id} href={`/event/${event.id}`}>
-                        <Card className="group bg-zinc-900 border-zinc-800 hover:bg-zinc-800 transition-all duration-300 p-4">
+                        <Card className="group bg-slate-900/50 border-slate-800 hover:bg-slate-800/50 transition-all duration-300 p-4">
                           <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded bg-gradient-to-br from-gray-600 to-gray-800 flex items-center justify-center">
-                              <Music2 className="w-6 h-6 text-white" />
+                            <div className="w-12 h-12 rounded bg-slate-800 flex items-center justify-center">
+                              <Music2 className="w-6 h-6 text-slate-400" />
                             </div>
                             <div className="flex-1">
-                              <h4 className="font-semibold group-hover:text-purple-300 transition-colors line-clamp-1">
+                              <h4 className="font-semibold group-hover:text-slate-300 transition-colors line-clamp-1">
                                 {event.title}
                               </h4>
-                              <div className="text-sm text-gray-400">
+                              <div className="text-sm text-slate-400">
                                 {new Date(event.start_date).toLocaleDateString()} • {event.venue?.name}
                               </div>
                             </div>
@@ -255,15 +255,15 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
               {/* Reviews Section */}
               <section>
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-3xl font-bold">Reviews & Ratings</h2>
-                  <Button className="bg-purple-600 hover:bg-purple-700">
+                  <h2 className="text-3xl font-medium">Reviews & Ratings</h2>
+                  <Button className="bg-slate-900 hover:bg-slate-800 border border-slate-700">
                     Write Review
                   </Button>
                 </div>
 
                 {/* Rating Overview */}
                 {totalReviews > 0 && (
-                  <Card className="bg-zinc-900 border-zinc-800 p-6 mb-8">
+                  <Card className="bg-slate-900/50 border-slate-800 p-6 mb-8">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                       {/* Overall Rating */}
                       <div className="text-center">
@@ -314,15 +314,15 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
                 <div className="space-y-6">
                   {reviews && reviews.length > 0 ? (
                     reviews.map((review) => (
-                      <Card key={review.id} className="bg-zinc-900 border-zinc-800 p-6">
+                      <Card key={review.id} className="bg-slate-900/50 border-slate-800 p-6">
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-semibold">
+                            <div className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center text-white font-semibold">
                               {review.user?.full_name?.charAt(0) || 'U'}
                             </div>
                             <div>
                               <div className="font-semibold">{review.user?.full_name || 'Anonymous'}</div>
-                              <div className="text-sm text-gray-400">
+                              <div className="text-sm text-slate-400">
                                 {new Date(review.created_at).toLocaleDateString()}
                               </div>
                             </div>
@@ -332,21 +332,21 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
                               <Star
                                 key={star}
                                 className={`w-4 h-4 ${
-                                  star <= review.rating_overall ? 'fill-yellow-400 text-yellow-400' : 'text-gray-600'
+                                  star <= review.rating_overall ? 'fill-yellow-400 text-yellow-400' : 'text-slate-600'
                                 }`}
                               />
                             ))}
                           </div>
                         </div>
                         {review.comment && (
-                          <p className="text-gray-300 leading-relaxed">{review.comment}</p>
+                          <p className="text-slate-300 leading-relaxed">{review.comment}</p>
                         )}
                       </Card>
                     ))
                   ) : (
-                    <Card className="bg-zinc-900 border-zinc-800 p-8 text-center">
-                      <div className="text-gray-400 mb-4">No reviews yet</div>
-                      <Button className="bg-purple-600 hover:bg-purple-700">
+                    <Card className="bg-slate-900/50 border-slate-800 p-8 text-center">
+                      <div className="text-slate-400 mb-4">No reviews yet</div>
+                      <Button className="bg-slate-900 hover:bg-slate-800 border border-slate-700">
                         Be the first to review
                       </Button>
                     </Card>
@@ -359,17 +359,17 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
             <div className="space-y-8">
               
               {/* Artist Info Card */}
-              <Card className="bg-zinc-900 border-zinc-800 p-6">
+              <Card className="bg-slate-900/50 border-slate-800 p-6">
                 <h3 className="text-xl font-semibold mb-4">Artist Information</h3>
                 <div className="space-y-4">
                   
                   {/* Location */}
                   {artist.city && artist.country && (
                     <div className="flex items-center gap-3">
-                      <MapPin className="w-5 h-5 text-gray-400" />
+                      <MapPin className="w-5 h-5 text-slate-400" />
                       <div>
                         <div className="font-medium">Based in</div>
-                        <div className="text-gray-400 text-sm">{artist.city}, {artist.country}</div>
+                        <div className="text-slate-400 text-sm">{artist.city}, {artist.country}</div>
                       </div>
                     </div>
                   )}
@@ -377,12 +377,12 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
                   {/* Genres */}
                   {artist.genres && artist.genres.length > 0 && (
                     <div className="flex items-start gap-3">
-                      <Music2 className="w-5 h-5 text-gray-400 mt-0.5" />
+                      <Music2 className="w-5 h-5 text-slate-400 mt-0.5 flex-shrink-0" />
                       <div>
-                        <div className="font-medium">Genres</div>
-                        <div className="flex flex-wrap gap-1 mt-1">
+                        <div className="font-medium mb-2">Genres</div>
+                        <div className="flex flex-wrap gap-2">
                           {artist.genres.map((genre: string) => (
-                            <Badge key={genre} variant="outline" className="text-xs border-zinc-600">
+                            <Badge key={genre} variant="outline" className="text-xs border-slate-700 text-slate-400">
                               {genre}
                             </Badge>
                           ))}
@@ -391,76 +391,61 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
                     </div>
                   )}
 
-                  {/* Event Stats */}
-                  <div className="flex items-center gap-3">
-                    <Calendar className="w-5 h-5 text-gray-400" />
-                    <div>
-                      <div className="font-medium">Performances</div>
-                      <div className="text-gray-400 text-sm">
-                        {upcomingEvents?.length || 0} upcoming, {pastEvents?.length || 0} past
+                  {/* Social Links */}
+                  {artist.social_links && Object.keys(artist.social_links as any).length > 0 && (
+                    <div className="flex items-start gap-3">
+                      <Globe className="w-5 h-5 text-slate-400 mt-0.5" />
+                      <div>
+                        <div className="font-medium mb-2">Social Media</div>
+                        <div className="flex gap-2">
+                          {Object.entries(artist.social_links as any).map(([platform, url]: [string, any]) => {
+                            if (!url) return null
+                            const Icon = platform === 'instagram' ? Instagram : 
+                                       platform === 'facebook' ? Facebook :
+                                       platform === 'twitter' ? Twitter : Globe
+                            return (
+                              <a
+                                key={platform}
+                                href={String(url)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
+                              >
+                                <Icon className="w-4 h-4 text-slate-400" />
+                              </a>
+                            )
+                          })}
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               </Card>
 
-              {/* Social Links */}
-              {artist.social_links && Object.keys(artist.social_links).length > 0 && (
-                <Card className="bg-zinc-900 border-zinc-800 p-6">
-                  <h3 className="text-xl font-semibold mb-4">Follow {artist.name}</h3>
-                  <div className="space-y-3">
-                    {Object.entries(artist.social_links).map(([platform, url]) => {
-                      const getIcon = (platform: string) => {
-                        switch (platform.toLowerCase()) {
-                          case 'instagram': return <Instagram className="w-4 h-4" />
-                          case 'facebook': return <Facebook className="w-4 h-4" />
-                          case 'twitter': return <Twitter className="w-4 h-4" />
-                          case 'website': return <Globe className="w-4 h-4" />
-                          default: return <ExternalLink className="w-4 h-4" />
-                        }
-                      }
-                      
-                      return (
-                        <a
-                          key={platform}
-                          href={url as string}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-3 text-gray-400 hover:text-white transition-colors"
-                        >
-                          {getIcon(platform)}
-                          <span className="capitalize">{platform}</span>
-                        </a>
-                      )
-                    })}
-                  </div>
-                </Card>
-              )}
-
               {/* Quick Stats */}
-              <Card className="bg-zinc-900 border-zinc-800 p-6">
+              <Card className="bg-slate-900/50 border-slate-800 p-6">
                 <h3 className="text-xl font-semibold mb-4">Quick Stats</h3>
                 <div className="space-y-3">
                   {totalReviews > 0 && (
                     <div className="flex justify-between">
-                      <span className="text-gray-400">Average Rating</span>
+                      <span className="text-slate-400">Average Rating</span>
                       <span className="font-medium">{overallRating.toFixed(1)}/5</span>
                     </div>
                   )}
                   
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Total Reviews</span>
+                    <span className="text-slate-400">Total Reviews</span>
                     <span className="font-medium">{totalReviews}</span>
                   </div>
                   
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Upcoming Events</span>
+                    <span className="text-slate-400">Upcoming Events</span>
                     <span className="font-medium">{upcomingEvents?.length || 0}</span>
                   </div>
                   
                   {artist.genres && (
                     <div className="flex justify-between">
-                      <span className="text-gray-400">Main Genre</span>
+                      <span className="text-slate-400">Main Genre</span>
                       <span className="font-medium">{artist.genres[0]}</span>
                     </div>
                   )}

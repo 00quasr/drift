@@ -4,9 +4,9 @@ import { useState, useEffect } from 'react'
 import { Search, Calendar, MapPin, Users, Clock, SlidersHorizontal } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { EntityCard } from '@/components/ui/entity-card'
+import { EntityBento, EntityBentoGrid } from '@/components/ui/entity-bento'
 import { getEvents } from '@/lib/services/events'
-import { getListFallbackImage, isValidImageUrl } from '@/lib/utils/imageUtils'
+import { getFallbackImage, isValidImageUrl } from '@/lib/utils/imageUtils'
 
 export default function EventsPage() {
   const [events, setEvents] = useState<any[]>([])
@@ -55,9 +55,9 @@ export default function EventsPage() {
     return (
       <div className="min-h-screen bg-slate-950 pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center">
-            <div className="w-8 h-8 border-2 border-slate-600 border-t-white rounded-full animate-spin mx-auto"></div>
-            <p className="text-slate-400 mt-4">Loading events...</p>
+          <div className="text-center py-16">
+            <div className="w-8 h-8 border-2 border-slate-600 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-slate-400">Loading events...</p>
           </div>
         </div>
       </div>
@@ -68,118 +68,139 @@ export default function EventsPage() {
     <div className="min-h-screen bg-slate-950 pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
-        <div className="mb-12">
+        <div className="text-center mb-12">
           <h1 className="text-4xl font-medium text-white mb-4">
-            Events
+            Electronic Music Events
           </h1>
-          <p className="text-slate-400 max-w-2xl">
-            Discover electronic music events and festivals happening around the world
+          <p className="text-slate-400 text-lg max-w-2xl mx-auto">
+            Discover the hottest electronic music events happening around the world
           </p>
         </div>
 
         {/* Search and Filters */}
-        <div className="mb-8 space-y-4">
-          {/* Search Bar */}
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
-            <Input
-              type="text"
-              placeholder="Search events, venues, or descriptions..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-12 bg-slate-900 border-slate-800 text-white placeholder-slate-500 h-12 text-lg"
-            />
-          </div>
-
-          {/* Filter Controls */}
-          <div className="flex flex-wrap gap-4">
-            {/* Upcoming/Past Toggle */}
-            <div className="flex bg-slate-900 border border-slate-800 rounded-lg p-1">
-              <Button
-                variant={showUpcoming ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setShowUpcoming(true)}
-                className="text-sm"
-              >
-                Upcoming
-              </Button>
-              <Button
-                variant={!showUpcoming ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setShowUpcoming(false)}
-                className="text-sm"
-              >
-                Past
-              </Button>
+        <div className="mb-12">
+          <div className="flex flex-col lg:flex-row gap-4 mb-6">
+            {/* Search */}
+            <div className="relative flex-1">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+              <Input
+                type="text"
+                placeholder="Search events, artists, venues..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-12 bg-slate-900/50 border-slate-800 text-white placeholder-slate-400 focus:border-slate-600 h-12"
+              />
             </div>
 
+            {/* Toggle Filters */}
             <Button
               variant="outline"
               onClick={() => setFiltersOpen(!filtersOpen)}
-              className="flex items-center gap-2 bg-slate-900 border-slate-800 text-white hover:bg-slate-800"
+              className="border-slate-700 text-slate-300 hover:bg-slate-800 h-12 px-6"
             >
-              <SlidersHorizontal className="w-4 h-4" />
+              <SlidersHorizontal className="w-4 h-4 mr-2" />
               Filters
             </Button>
-
-            {filtersOpen && (
-              <div className="flex flex-wrap gap-4 w-full">
-                {/* Genre Filter */}
-                <select
-                  value={selectedGenre}
-                  onChange={(e) => setSelectedGenre(e.target.value)}
-                  className="px-4 py-2 bg-slate-900 border border-slate-800 rounded-lg text-white"
-                >
-                  <option value="all">All Genres</option>
-                  {allGenres.map(genre => (
-                    <option key={genre} value={genre}>{genre}</option>
-                  ))}
-                </select>
-              </div>
-            )}
           </div>
+
+          {/* Filters Panel */}
+          {filtersOpen && (
+            <div className="bg-slate-900/50 border border-slate-800 rounded-lg p-6 space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Time Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-200 mb-3">
+                    Event Time
+                  </label>
+                  <div className="flex gap-2">
+                    <Button
+                      variant={showUpcoming ? "default" : "outline"}
+                      onClick={() => setShowUpcoming(true)}
+                      className="flex-1 h-10"
+                    >
+                      <Clock className="w-4 h-4 mr-2" />
+                      Upcoming
+                    </Button>
+                    <Button
+                      variant={!showUpcoming ? "default" : "outline"}
+                      onClick={() => setShowUpcoming(false)}
+                      className="flex-1 h-10"
+                    >
+                      <Calendar className="w-4 h-4 mr-2" />
+                      Past Events
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Genre Filter */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-200 mb-3">
+                    Genre
+                  </label>
+                  <select
+                    value={selectedGenre}
+                    onChange={(e) => setSelectedGenre(e.target.value)}
+                    className="w-full h-10 px-3 bg-slate-800 border border-slate-700 rounded-md text-white focus:border-slate-600 focus:outline-none"
+                  >
+                    <option value="all">All Genres</option>
+                    {allGenres.map(genre => (
+                      <option key={genre} value={genre}>{genre}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Results Count */}
+        {/* Results */}
         <div className="mb-8">
-          <h2 className="text-2xl font-medium text-white">
-            {showUpcoming ? 'Upcoming' : 'Past'} Events ({filteredEvents.length})
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-medium text-white">
+              {showUpcoming ? 'Upcoming Events' : 'Past Events'}
+            </h2>
+            <p className="text-slate-400">
+              {filteredEvents.length} event{filteredEvents.length !== 1 ? 's' : ''} found
+            </p>
+          </div>
         </div>
 
         {/* Events Grid */}
-        {filteredEvents.length === 0 ? (
-          <div className="text-center py-12">
-            <Calendar className="w-12 h-12 text-slate-500 mx-auto mb-4" />
-            <p className="text-slate-400">No events found. Try adjusting your filters.</p>
-          </div>
+        {filteredEvents.length > 0 ? (
+          <EntityBentoGrid>
+            {filteredEvents.map((event) => (
+              <EntityBento
+                key={event.id}
+                type="event"
+                id={event.id}
+                name={event.title}
+                description={event.description || `Experience ${event.title} with amazing electronic music`}
+                href={`/event/${event.id}`}
+                imageUrl={isValidImageUrl(event.flyer_url) ? event.flyer_url! : getFallbackImage('event', event.id)}
+                artist={event.artists?.[0]?.name || 'Various Artists'}
+                date={new Date(event.start_date).toLocaleDateString()}
+                time={new Date(event.start_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                venue={event.venue?.name || 'TBA'}
+                location={event.venue?.city ? `${event.venue.city}, ${event.venue.country}` : 'Location TBA'}
+                price={event.ticket_price_min && event.ticket_price_max ? `€${event.ticket_price_min}-€${event.ticket_price_max}` : 'Free'}
+                isUpcoming={new Date(event.start_date) > new Date()}
+              />
+            ))}
+          </EntityBentoGrid>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {filteredEvents.map((event, index) => {
-              const isUpcoming = new Date(event.start_date) > new Date()
-              const eventDate = new Date(event.start_date)
-              
-              return (
-                <EntityCard
-                  key={event.id}
-                  type="event"
-                  id={event.id}
-                  title={event.title}
-                  artist={event.artists?.[0]?.name || 'Various Artists'}
-                  imageUrl={isValidImageUrl(event.flyer_url || event.images?.[0]) ? (event.flyer_url || event.images[0]) : getListFallbackImage('event', index)}
-                  category={event.genres?.[0] || 'ELECTRONIC'}
-                  href={`/event/${event.id}`}
-                  date={eventDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }).toUpperCase()}
-                  time={eventDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
-                  venue={event.venue?.name || 'TBA'}
-                  location={event.venue?.city ? `${event.venue.city}, ${event.venue.country}` : 'Location TBA'}
-                  price={event.ticket_price_min && event.ticket_price_max ? `$${event.ticket_price_min}-${event.ticket_price_max}` : undefined}
-                  attendees={event.attendees}
-                  rating={event.rating}
-                  isUpcoming={isUpcoming}
-                />
-              )
-            })}
+          <div className="text-center py-16">
+            <Calendar className="w-16 h-16 text-slate-600 mx-auto mb-4" />
+            <h3 className="text-xl font-medium text-white mb-2">
+              No events found
+            </h3>
+            <p className="text-slate-400 max-w-md mx-auto">
+              {searchTerm || selectedGenre !== 'all' 
+                ? 'Try adjusting your search criteria or filters'
+                : showUpcoming 
+                  ? 'No upcoming events scheduled yet'
+                  : 'No past events to display'
+              }
+            </p>
           </div>
         )}
       </div>

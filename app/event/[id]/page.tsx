@@ -7,404 +7,323 @@ import { getEvent } from "@/lib/services/events"
 import { getReviews, getReviewStats } from "@/lib/services/reviews"
 import { notFound } from "next/navigation"
 import Image from "next/image"
+import { isValidImageUrl, getFallbackImage } from "@/lib/utils/imageUtils"
 
 interface EventPageProps {
   params: { id: string }
 }
 
 export default async function EventPage({ params }: EventPageProps) {
-  try {
-    // Fetch event data and reviews in parallel
-    const [event, reviews, reviewStats] = await Promise.all([
-      getEvent(params.id),
-      getReviews('event', params.id, { limit: 10 }),
-      getReviewStats('event', params.id)
-    ])
+  const event = await getEvent(params.id)
+  
+  if (!event) {
+    notFound()
+  }
 
-    if (!event) {
-      notFound()
-    }
+  // Get fallback image
+  const eventFlyer = isValidImageUrl(event.flyer_url) ? event.flyer_url! : getFallbackImage('event', event.id)
 
-    // Get the primary flyer or fallback
-    const eventFlyer = event.flyer_url || 
-      (Array.isArray(event.images) && event.images.length > 0 ? String(event.images[0]) : null) ||
-      'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80'
+  // Format dates
+  const startDate = new Date(event.start_date)
+  const endDate = event.end_date ? new Date(event.end_date) : null
+  const isUpcoming = startDate > new Date()
+  const isPast = startDate < new Date()
 
-    const overallRating = reviewStats?.averageRating || 0
-    const totalReviews = reviewStats?.totalReviews || 0
-
-    // Format dates
-    const startDate = new Date(event.start_date)
-    const endDate = event.end_date ? new Date(event.end_date) : null
-    const isUpcoming = startDate > new Date()
-    const isPast = startDate < new Date()
-
-    return (
-      <div className="min-h-screen bg-slate-950 text-white">
-        {/* Hero Section */}
-        <div className="relative h-[90vh] w-full overflow-hidden">
-          <Image
-            src={eventFlyer}
-            alt={event.title}
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent" />
+  return (
+    <div className="min-h-screen bg-black text-white pt-24">
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        {/* Main Event Tile */}
+        <div className="relative overflow-hidden bg-black border-2 border-white/20 mb-12">
+          {/* Angular Corner Design */}
+          <div className="absolute top-4 right-4 w-8 h-8">
+            <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
+          </div>
           
-          <div className="absolute bottom-0 left-0 right-0 z-10 p-8">
-            <div className="max-w-7xl mx-auto">
-              <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
-                <div className="flex-1">
-                  {/* Event Status Badge */}
-                  <div className="flex items-center gap-3 mb-4">
-                    {isUpcoming && (
-                      <Badge className="bg-green-600 text-white">Upcoming</Badge>
-                    )}
-                    {isPast && (
-                      <Badge className="bg-slate-600 text-white">Past Event</Badge>
-                    )}
-                    {event.genres?.map((genre: string) => (
-                      <Badge key={genre} variant="outline" className="bg-slate-900/50 text-slate-300 border-slate-700">
-                        {genre}
-                      </Badge>
-                    ))}
-                  </div>
-                  
-                  {/* Event Title */}
-                  <h1 className="text-5xl lg:text-8xl font-medium mb-6 leading-tight">{event.title}</h1>
-                  
-                  {/* Event Details */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-lg">
-                    {/* Date & Time */}
-                    <div className="flex items-center gap-3">
-                      <Calendar className="w-6 h-6 text-slate-400" />
-                      <div>
-                        <div className="font-semibold">
-                          {startDate.toLocaleDateString('en-US', {
-                            weekday: 'long',
-                            month: 'long',
-                            day: 'numeric'
-                          })}
-                        </div>
-                        <div className="text-slate-300 text-sm">
-                          {startDate.toLocaleTimeString('en-US', {
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                          {endDate && ` - ${endDate.toLocaleTimeString('en-US', {
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}`}
+          {/* Category Tag */}
+          <div className="absolute top-4 left-4 z-20">
+            <div className="bg-black border border-white/60 px-3 py-1">
+              <span className="text-white text-xs font-bold tracking-widest uppercase font-mono">
+                {isPast ? 'PAST EVENT' : 'UPCOMING EVENT'}
+              </span>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="p-8">
+            {/* Genre Tags */}
+            <div className="flex flex-wrap gap-2 mb-6">
+              {event.genres?.map((genre: string) => (
+                <div key={genre} className="bg-white/10 border border-white/30 px-2 py-1">
+                  <span className="text-white text-xs font-bold tracking-widest uppercase">
+                    {genre}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* Event Title */}
+            <h1 className="text-4xl md:text-6xl font-bold tracking-widest uppercase mb-6 text-white">
+              {event.title}
+            </h1>
+
+            {/* Event Details Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              {/* Date & Time */}
+              <div className="bg-white/5 border border-white/20 p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Calendar className="w-4 h-4 text-white" />
+                  <span className="text-white/80 font-bold tracking-widest uppercase text-xs">DATE & TIME</span>
+                </div>
+                <div className="text-white font-bold tracking-wider uppercase">
+                  {startDate.toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    month: 'short', 
+                    day: 'numeric',
+                    year: 'numeric'
+                  })}
+                </div>
+                <div className="text-white/80 font-bold tracking-wider uppercase text-sm">
+                  {startDate.toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })} - {endDate ? endDate.toLocaleTimeString('en-US', {
+                    hour: '2-digit', 
+                    minute: '2-digit'
+                  }) : '01:00'}
+                </div>
+              </div>
+
+              {/* Venue */}
+              <div className="bg-white/5 border border-white/20 p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <MapPin className="w-4 h-4 text-white" />
+                  <span className="text-white/80 font-bold tracking-widest uppercase text-xs">VENUE</span>
+                </div>
+                <div className="text-white font-bold tracking-wider uppercase">
+                  {event.venue?.name || 'TBA'}
+                </div>
+                <div className="text-white/80 font-bold tracking-wider uppercase text-sm">
+                  {event.venue?.city}, {event.venue?.country}
+                </div>
+              </div>
+
+              {/* Price */}
+              <div className="bg-white/5 border border-white/20 p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Ticket className="w-4 h-4 text-white" />
+                  <span className="text-white/80 font-bold tracking-widest uppercase text-xs">PRICING</span>
+                </div>
+                <div className="text-white font-bold tracking-wider uppercase">
+                  {event.ticket_price_min && event.ticket_price_max 
+                    ? `€${event.ticket_price_min}-€${event.ticket_price_max}`
+                    : 'TBA'
+                  }
+                </div>
+                <div className="text-white/80 font-bold tracking-wider uppercase text-sm">
+                  ENTRY FEE
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-4">
+              <button className="p-3 bg-white/10 hover:bg-white/20 border border-white/30 hover:border-white/60 text-white transition-all duration-200">
+                <Heart className="w-5 h-5" />
+              </button>
+              <button className="p-3 bg-white/10 hover:bg-white/20 border border-white/30 hover:border-white/60 text-white transition-all duration-200">
+                <Share2 className="w-5 h-5" />
+              </button>
+              <button className="px-6 py-3 bg-white text-black hover:bg-white/90 border-2 border-white font-bold tracking-wider uppercase transition-all duration-200">
+                RATE EVENT
+              </button>
+              {event.ticket_url && isUpcoming && (
+                <button className="px-6 py-3 bg-white text-black hover:bg-white/90 border-2 border-white font-bold tracking-wider uppercase transition-all duration-200">
+                  <Ticket className="w-4 h-4 mr-2 inline" />
+                  BUY TICKETS
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* About Section */}
+            {event.description && (
+              <div className="bg-black border-2 border-white/20 p-6">
+                <div className="absolute top-4 right-4 w-6 h-6">
+                  <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
+                </div>
+                <h2 className="text-2xl font-bold tracking-widest uppercase mb-4 text-white">
+                  ABOUT THIS EVENT
+                </h2>
+                <p className="text-white/80 leading-relaxed font-medium tracking-wide">
+                  {event.description}
+                </p>
+              </div>
+            )}
+
+            {/* Lineup Section */}
+            {event.artists && event.artists.length > 0 && (
+              <div className="bg-black border-2 border-white/20 p-6">
+                <div className="absolute top-4 right-4 w-6 h-6">
+                  <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
+                </div>
+                <h2 className="text-2xl font-bold tracking-widest uppercase mb-6 text-white">
+                  LINEUP
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {event.artists.map((artist) => (
+                    <div key={artist.id} className="bg-white/5 border border-white/20 p-4 hover:bg-white/10 transition-all duration-200">
+                      <div className="flex items-center gap-3">
+                        <Music className="w-6 h-6 text-white" />
+                        <div>
+                          <div className="text-white font-bold tracking-wider uppercase">
+                            {artist.name}
+                          </div>
+                          {artist.genres && artist.genres.length > 0 && (
+                            <div className="text-white/60 text-sm font-bold tracking-widest uppercase">
+                              {artist.genres.slice(0, 2).join(', ')}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
-                    {/* Venue */}
-                    {event.venue && (
-                      <div className="flex items-center gap-3">
-                        <MapPin className="w-6 h-6 text-slate-400" />
-                        <div>
-                          <Link 
-                            href={`/venue/${event.venue.id}`}
-                            className="font-semibold hover:text-slate-300 transition-colors"
-                          >
-                            {event.venue.name}
-                          </Link>
-                          <div className="text-slate-300 text-sm">
-                            {event.venue.city}, {event.venue.country}
-                          </div>
-                        </div>
-                      </div>
-                    )}
+            {/* Reviews Section */}
+            <div className="bg-black border-2 border-white/20 p-6">
+              <div className="absolute top-4 right-4 w-6 h-6">
+                <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
+              </div>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold tracking-widest uppercase text-white">
+                  REVIEWS & RATINGS
+                </h2>
+                <button className="px-4 py-2 bg-white text-black hover:bg-white/90 border-2 border-white font-bold tracking-wider uppercase transition-all duration-200 text-sm">
+                  WRITE REVIEW
+                </button>
+              </div>
+              
+              <div className="text-center py-12">
+                <div className="w-12 h-12 bg-white border-2 border-white mx-auto mb-4 relative">
+                  <div className="absolute inset-1 bg-black" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Star className="w-4 h-4 text-white" />
+                  </div>
+                </div>
+                <h3 className="text-white font-bold tracking-widest uppercase mb-2">
+                  NO REVIEWS YET
+                </h3>
+                <p className="text-white/60 font-medium tracking-wider uppercase text-sm">
+                  BE THE FIRST TO REVIEW
+                </p>
+              </div>
+            </div>
+          </div>
 
-                    {/* Price */}
-                    {(event.ticket_price_min || event.ticket_price_max) && (
-                      <div className="flex items-center gap-3">
-                        <Ticket className="w-6 h-6 text-slate-400" />
-                        <div>
-                          <div className="font-semibold">
-                            {event.currency || '€'}{event.ticket_price_min}
-                            {event.ticket_price_max && event.ticket_price_max !== event.ticket_price_min && 
-                              ` - ${event.currency || '€'}${event.ticket_price_max}`
-                            }
-                          </div>
-                          <div className="text-slate-300 text-sm">Entry fee</div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Rating */}
-                    {totalReviews > 0 && (
-                      <div className="flex items-center gap-3">
-                        <Star className="w-6 h-6 fill-yellow-400 text-yellow-400" />
-                        <div>
-                          <div className="font-semibold">{overallRating.toFixed(1)}/5</div>
-                          <div className="text-slate-300 text-sm">{totalReviews} reviews</div>
-                        </div>
-                      </div>
-                    )}
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Event Details */}
+            <div className="bg-black border-2 border-white/20 p-6">
+              <div className="absolute top-4 right-4 w-6 h-6">
+                <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
+              </div>
+              <h3 className="text-xl font-bold tracking-widest uppercase mb-6 text-white">
+                EVENT DETAILS
+              </h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Calendar className="w-4 h-4 text-white" />
+                    <span className="text-white/80 font-bold tracking-widest uppercase text-xs">DATE & TIME</span>
+                  </div>
+                  <div className="text-white font-bold tracking-wider uppercase text-sm">
+                    {startDate.toLocaleDateString()}
+                  </div>
+                  <div className="text-white/80 font-bold tracking-wider uppercase text-xs">
+                    {startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {endDate ? endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '01:00'}
                   </div>
                 </div>
 
-                {/* Action Buttons */}
-                <div className="flex flex-col sm:flex-row items-center gap-4">
-                  <div className="flex items-center gap-3">
-                    <Button variant="outline" size="icon" className="bg-slate-900/50 border-slate-700 text-white hover:bg-slate-800">
-                      <Heart className="w-5 h-5" />
-                    </Button>
-                    <Button variant="outline" size="icon" className="bg-slate-900/50 border-slate-700 text-white hover:bg-slate-800">
-                      <Share2 className="w-5 h-5" />
-                    </Button>
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <MapPin className="w-4 h-4 text-white" />
+                    <span className="text-white/80 font-bold tracking-widest uppercase text-xs">VENUE</span>
                   </div>
-                  
-                  <div className="flex items-center gap-3">
-                    {event.ticket_url && isUpcoming && (
-                      <Button asChild className="bg-green-600 hover:bg-green-700 text-white px-8">
-                        <a href={event.ticket_url} target="_blank" rel="noopener noreferrer">
-                          <Ticket className="w-4 h-4 mr-2" />
-                          Get Tickets
-                        </a>
-                      </Button>
-                    )}
-                    <Button className="bg-slate-900 hover:bg-slate-800 text-white px-8 border border-slate-700">
-                      Rate Event
-                    </Button>
+                  <div className="text-white font-bold tracking-wider uppercase text-sm">
+                    {event.venue?.name || 'TBA'}
+                  </div>
+                  <div className="text-white/80 font-bold tracking-wider uppercase text-xs">
+                    {event.venue?.address || `${event.venue?.city}, ${event.venue?.country}`}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Ticket className="w-4 h-4 text-white" />
+                    <span className="text-white/80 font-bold tracking-widest uppercase text-xs">PRICING</span>
+                  </div>
+                  <div className="text-white font-bold tracking-wider uppercase text-sm">
+                    {event.ticket_price_min && event.ticket_price_max 
+                      ? `€${event.ticket_price_min} - €${event.ticket_price_max}`
+                      : 'FREE ENTRY'
+                    }
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Main Content */}
-        <div className="max-w-7xl mx-auto px-6 py-12">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            
-            {/* Main Content Column */}
-            <div className="lg:col-span-2 space-y-12">
-              
-              {/* Description */}
-              {event.description && (
-                <section>
-                  <h2 className="text-3xl font-medium mb-6">About This Event</h2>
-                  <div className="prose prose-gray prose-invert max-w-none">
-                    <p className="text-slate-300 text-lg leading-relaxed">{event.description}</p>
-                  </div>
-                </section>
-              )}
-
-              {/* Lineup */}
-              {event.artists && event.artists.length > 0 && (
-                <section>
-                  <h2 className="text-3xl font-medium mb-6">Lineup</h2>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {event.artists.map((artist) => (
-                      <Link key={artist.id} href={`/artist/${artist.id}`}>
-                        <Card className="group bg-slate-900/50 border-slate-800 hover:bg-slate-800/50 transition-all duration-300 overflow-hidden">
-                          <div className="flex items-center gap-4 p-6">
-                            <div className="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center overflow-hidden">
-                              {Array.isArray(artist.images) && artist.images.length > 0 ? (
-                                <Image
-                                  src={String(artist.images[0])}
-                                  alt={artist.name}
-                                  width={64}
-                                  height={64}
-                                  className="object-cover w-full h-full"
-                                />
-                              ) : (
-                                <Music className="w-8 h-8 text-slate-400" />
-                              )}
-                            </div>
-                            <div className="flex-1">
-                              <h3 className="font-semibold text-lg group-hover:text-slate-300 transition-colors">
-                                {artist.name}
-                              </h3>
-                              {artist.genres && artist.genres.length > 0 && (
-                                <div className="flex flex-wrap gap-1 mt-2">
-                                  {artist.genres.slice(0, 2).map((genre: string) => (
-                                    <Badge key={genre} variant="outline" className="text-xs border-slate-700 text-slate-400">
-                                      {genre}
-                                    </Badge>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                            <ExternalLink className="w-5 h-5 text-slate-400 group-hover:text-slate-300 transition-colors" />
-                          </div>
-                        </Card>
-                      </Link>
-                    ))}
-                  </div>
-                </section>
-              )}
-
-              {/* Reviews Section */}
-              <section>
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-3xl font-medium">Reviews & Ratings</h2>
-                  <Button className="bg-slate-900 hover:bg-slate-800 border border-slate-700">
-                    Write Review
-                  </Button>
+            {/* Artists */}
+            {event.artists && event.artists.length > 0 && (
+              <div className="bg-black border-2 border-white/20 p-6">
+                <div className="absolute top-4 right-4 w-6 h-6">
+                  <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
                 </div>
-
-                <div className="space-y-6">
-                  {reviews && reviews.length > 0 ? (
-                    reviews.map((review) => (
-                      <Card key={review.id} className="bg-slate-900/50 border-slate-800 p-6">
-                        <div className="flex items-start justify-between mb-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center text-white font-semibold">
-                              {review.user?.full_name?.charAt(0) || 'U'}
-                            </div>
-                            <div>
-                              <div className="font-semibold">{review.user?.full_name || 'Anonymous'}</div>
-                              <div className="text-sm text-slate-400">
-                                {new Date(review.created_at).toLocaleDateString()}
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <Star
-                                key={star}
-                                className={`w-4 h-4 ${
-                                  star <= review.rating_overall ? 'fill-yellow-400 text-yellow-400' : 'text-slate-600'
-                                }`}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                        {review.comment && (
-                          <p className="text-slate-300 leading-relaxed">{review.comment}</p>
-                        )}
-                      </Card>
-                    ))
-                  ) : (
-                    <Card className="bg-slate-900/50 border-slate-800 p-8 text-center">
-                      <div className="text-slate-400 mb-4">No reviews yet</div>
-                      <Button className="bg-slate-900 hover:bg-slate-800 border border-slate-700">
-                        Be the first to review
-                      </Button>
-                    </Card>
-                  )}
+                <h3 className="text-xl font-bold tracking-widest uppercase mb-4 text-white">
+                  ARTISTS
+                </h3>
+                <div className="flex items-center gap-3">
+                  <Music className="w-5 h-5 text-white" />
+                  <div>
+                    <div className="font-bold text-white tracking-wider uppercase">
+                      {event.artists.length} PERFORMING
+                    </div>
+                    <div className="text-white/60 text-sm font-bold tracking-widest uppercase">
+                      {event.artists.slice(0, 3).map(a => a.name).join(', ')}
+                      {event.artists.length > 3 && ` +${event.artists.length - 3} MORE`}
+                    </div>
+                  </div>
                 </div>
-              </section>
-            </div>
+              </div>
+            )}
 
-            {/* Sidebar */}
-            <div className="space-y-8">
-              
-              {/* Event Info Card */}
-              <Card className="bg-slate-900/50 border-slate-800 p-6">
-                <h3 className="text-xl font-semibold mb-4">Event Details</h3>
-                <div className="space-y-4">
-                  
-                  {/* Full Date & Time */}
-                  <div className="flex items-start gap-3">
-                    <Calendar className="w-5 h-5 text-slate-400 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <div className="font-medium">Date & Time</div>
-                      <div className="text-slate-400 text-sm">
-                        {startDate.toLocaleDateString('en-US', {
-                          weekday: 'long',
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
-                        })}<br />
-                        {startDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-                        {endDate && ` - ${endDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Venue */}
-                  {event.venue && (
-                    <div className="flex items-start gap-3">
-                      <MapPin className="w-5 h-5 text-slate-400 mt-0.5 flex-shrink-0" />
-                      <div>
-                        <div className="font-medium">Venue</div>
-                        <Link 
-                          href={`/venue/${event.venue.id}`}
-                          className="text-slate-400 hover:text-white text-sm transition-colors"
-                        >
-                          {event.venue.name}
-                        </Link>
-                        <div className="text-slate-400 text-sm">
-                          {event.venue.address}<br />
-                          {event.venue.city}, {event.venue.country}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Pricing */}
-                  {(event.ticket_price_min || event.ticket_price_max) && (
-                    <div className="flex items-center gap-3">
-                      <Ticket className="w-5 h-5 text-slate-400" />
-                      <div>
-                        <div className="font-medium">Pricing</div>
-                        <div className="text-slate-400 text-sm">
-                          {event.currency || '€'}{event.ticket_price_min}
-                          {event.ticket_price_max && event.ticket_price_max !== event.ticket_price_min && 
-                            ` - ${event.currency || '€'}${event.ticket_price_max}`
-                          }
-                        </div>
-                      </div>
-                    </div>
-                  )}
+            {/* More at Venue */}
+            {event.venue && (
+              <div className="bg-black border-2 border-white/20 p-6">
+                <div className="absolute top-4 right-4 w-6 h-6">
+                  <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
                 </div>
-
-                {/* Ticket Button */}
-                {event.ticket_url && isUpcoming && (
-                  <div className="mt-6 pt-6 border-t border-slate-800">
-                    <Button asChild className="w-full bg-green-600 hover:bg-green-700">
-                      <a href={event.ticket_url} target="_blank" rel="noopener noreferrer">
-                        <Ticket className="w-4 h-4 mr-2" />
-                        Buy Tickets
-                      </a>
-                    </Button>
-                  </div>
-                )}
-              </Card>
-
-              {/* Artist Count */}
-              {event.artists && event.artists.length > 0 && (
-                <Card className="bg-slate-900/50 border-slate-800 p-6">
-                  <h3 className="text-xl font-semibold mb-4">Artists</h3>
-                  <div className="flex items-center gap-3">
-                    <Music className="w-5 h-5 text-slate-400" />
-                    <div>
-                      <div className="font-medium">{event.artists.length} Performing</div>
-                      <div className="text-slate-400 text-sm">
-                        {event.artists.slice(0, 3).map(a => a.name).join(', ')}
-                        {event.artists.length > 3 && ` +${event.artists.length - 3} more`}
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              )}
-
-              {/* Related Events */}
-              {event.venue && (
-                <Card className="bg-slate-900/50 border-slate-800 p-6">
-                  <h3 className="text-xl font-semibold mb-4">More at {event.venue.name}</h3>
-                  <Link 
-                    href={`/venue/${event.venue.id}`}
-                    className="text-slate-400 hover:text-white text-sm transition-colors"
-                  >
-                    View all events at this venue →
-                  </Link>
-                </Card>
-              )}
-            </div>
+                <h3 className="text-xl font-bold tracking-widest uppercase mb-4 text-white">
+                  MORE AT {event.venue.name}
+                </h3>
+                <Link 
+                  href={`/venue/${event.venue.id}`}
+                  className="text-white/80 hover:text-white text-sm transition-colors font-bold tracking-wider uppercase"
+                >
+                  VIEW ALL EVENTS AT THIS VENUE →
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </div>
-    )
-  } catch (error) {
-    console.error('Error loading event:', error)
-    notFound()
-  }
+    </div>
+  )
 } 

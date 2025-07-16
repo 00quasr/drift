@@ -13,451 +13,347 @@ interface ArtistPageProps {
 }
 
 export default async function ArtistPage({ params }: ArtistPageProps) {
-  try {
-    // Fetch artist data and reviews in parallel
-    const [artist, reviews, reviewStats] = await Promise.all([
-      getArtistById(params.id),
-      getReviews('artist', params.id, { limit: 10 }),
-      getReviewStats('artist', params.id)
-    ])
-    
-    // For now, we'll set empty arrays for events until we implement artist event filtering
-    const upcomingEvents: any[] = []
-    const pastEvents: any[] = []
+  const artist = await getArtistById(params.id)
+  
+  if (!artist) {
+    notFound()
+  }
 
-    if (!artist) {
-      notFound()
-    }
+  // Get upcoming and past events for this artist
+  const upcomingEvents = artist.events?.filter((event: any) => 
+    new Date(event.start_date) > new Date()
+  ).slice(0, 6) || []
 
-    // Get the primary image or fallback
-    const artistImage = Array.isArray(artist.images) && artist.images.length > 0 
-      ? String(artist.images[0])
-      : 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+  const pastEvents = artist.events?.filter((event: any) => 
+    new Date(event.start_date) < new Date()
+  ).slice(0, 6) || []
 
-    const coverImage = Array.isArray(artist.images) && artist.images.length > 1
-      ? String(artist.images[1])
-      : 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80'
-
-    const overallRating = reviewStats?.averageRating || 0
-    const totalReviews = reviewStats?.totalReviews || 0
-
-    return (
-      <div className="min-h-screen bg-slate-950 text-white">
-        {/* Hero Section */}
-        <div className="relative h-[70vh] w-full overflow-hidden">
-          <Image
-            src={coverImage}
-            alt={`${artist.name} cover`}
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
+  return (
+    <div className="min-h-screen bg-black text-white pt-24">
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        {/* Main Artist Tile */}
+        <div className="relative overflow-hidden bg-black border-2 border-white/20 mb-12">
+          {/* Angular Corner Design */}
+          <div className="absolute top-4 right-4 w-8 h-8">
+            <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
+          </div>
           
-          <div className="absolute bottom-0 left-0 right-0 z-10 p-8">
-            <div className="max-w-7xl mx-auto">
-              <div className="flex flex-col md:flex-row md:items-end gap-8">
-                
-                {/* Artist Image */}
-                <div className="relative">
-                  <div className="w-48 h-48 rounded-full overflow-hidden border-4 border-slate-800 bg-slate-900">
-                    <Image
-                      src={artistImage}
-                      alt={artist.name}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
+          {/* Category Tag */}
+          <div className="absolute top-4 left-4 z-20">
+            <div className="bg-black border border-white/60 px-3 py-1">
+              <span className="text-white text-xs font-bold tracking-widest uppercase font-mono">
+                ARTIST
+              </span>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="p-8">
+            {/* Genre Tags */}
+            <div className="flex flex-wrap gap-2 mb-6">
+              {artist.genres?.map((genre: string) => (
+                <div key={genre} className="bg-white/10 border border-white/30 px-2 py-1">
+                  <span className="text-white text-xs font-bold tracking-widest uppercase">
+                    {genre}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* Artist Title */}
+            <h1 className="text-4xl md:text-6xl font-bold tracking-widest uppercase mb-6 text-white">
+              {artist.name}
+            </h1>
+
+            {/* Artist Details Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              {/* Location */}
+              <div className="bg-white/5 border border-white/20 p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <MapPin className="w-4 h-4 text-white" />
+                  <span className="text-white/80 font-bold tracking-widest uppercase text-xs">LOCATION</span>
+                </div>
+                <div className="text-white font-bold tracking-wider uppercase">
+                  {artist.city && artist.country ? `${artist.city}, ${artist.country}` : 'GLOBAL'}
+                </div>
+                <div className="text-white/80 font-bold tracking-wider uppercase text-sm">
+                  BASE LOCATION
+                </div>
+              </div>
+
+              {/* Events */}
+              <div className="bg-white/5 border border-white/20 p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Calendar className="w-4 h-4 text-white" />
+                  <span className="text-white/80 font-bold tracking-widest uppercase text-xs">EVENTS</span>
+                </div>
+                <div className="text-white font-bold tracking-wider uppercase">
+                  {(upcomingEvents?.length || 0) + (pastEvents?.length || 0)}
+                </div>
+                <div className="text-white/80 font-bold tracking-wider uppercase text-sm">
+                  TOTAL PERFORMANCES
+                </div>
+              </div>
+
+              {/* Rating */}
+              <div className="bg-white/5 border border-white/20 p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Star className="w-4 h-4 text-white" />
+                  <span className="text-white/80 font-bold tracking-widest uppercase text-xs">RATING</span>
+                </div>
+                <div className="text-white font-bold tracking-wider uppercase">
+                  {artist.average_rating ? artist.average_rating.toFixed(1) : 'N/A'}
+                </div>
+                <div className="text-white/80 font-bold tracking-wider uppercase text-sm">
+                  COMMUNITY SCORE
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-4">
+              <button className="p-3 bg-white/10 hover:bg-white/20 border border-white/30 hover:border-white/60 text-white transition-all duration-200">
+                <Heart className="w-5 h-5" />
+              </button>
+              <button className="p-3 bg-white/10 hover:bg-white/20 border border-white/30 hover:border-white/60 text-white transition-all duration-200">
+                <Share2 className="w-5 h-5" />
+              </button>
+              <button className="px-6 py-3 bg-white text-black hover:bg-white/90 border-2 border-white font-bold tracking-wider uppercase transition-all duration-200">
+                RATE ARTIST
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Biography Section */}
+            {artist.bio && (
+              <div className="relative bg-black border-2 border-white/20 p-6">
+                <div className="absolute top-4 right-4 w-6 h-6">
+                  <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
+                </div>
+                <h2 className="text-2xl font-bold tracking-widest uppercase mb-4 text-white">
+                  BIOGRAPHY
+                </h2>
+                <p className="text-white/80 leading-relaxed font-medium tracking-wide">
+                  {artist.bio}
+                </p>
+              </div>
+            )}
+
+            {/* Upcoming Performances Section */}
+            {upcomingEvents && upcomingEvents.length > 0 && (
+              <div className="relative bg-black border-2 border-white/20 p-6">
+                <div className="absolute top-4 right-4 w-6 h-6">
+                  <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
+                </div>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold tracking-widest uppercase text-white">
+                    UPCOMING PERFORMANCES
+                  </h2>
+                  <Link href={`/events?artist=${artist.id}`} className="text-white/80 hover:text-white transition-colors font-bold tracking-wider uppercase text-sm">
+                    VIEW ALL →
+                  </Link>
                 </div>
                 
-                {/* Artist Info */}
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Badge className="bg-slate-900 text-white border-slate-700">Artist</Badge>
-                    {artist.genres?.map((genre: string) => (
-                      <Badge key={genre} variant="outline" className="bg-slate-900/50 text-slate-300 border-slate-700">
-                        {genre}
-                      </Badge>
-                    ))}
-                  </div>
-                  
-                  <h1 className="text-5xl md:text-7xl font-medium mb-4 leading-tight">{artist.name}</h1>
-                  
-                  <div className="flex flex-wrap items-center gap-6 text-lg text-slate-300">
-                    {artist.city && artist.country && (
-                      <div className="flex items-center gap-2">
-                        <MapPin className="w-5 h-5" />
-                        <span>{artist.city}, {artist.country}</span>
+                <div className="space-y-4">
+                  {upcomingEvents.map((event: any) => (
+                    <Link key={event.id} href={`/event/${event.id}`}>
+                      <div className="bg-white/5 border border-white/20 p-4 hover:bg-white/10 transition-all duration-200">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 bg-white/10 border border-white/20 flex items-center justify-center">
+                            <Music2 className="w-6 h-6 text-white" />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="font-bold text-white mb-1 tracking-wider uppercase">
+                              {event.title}
+                            </h3>
+                            <div className="text-sm text-white/80 font-bold tracking-wider uppercase">
+                              {new Date(event.start_date).toLocaleDateString()} • {event.venue?.name}
+                            </div>
+                            <div className="text-xs text-white/60 font-bold tracking-widest uppercase">
+                              {event.venue?.city}, {event.venue?.country}
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                    )}
-                    
-                    {totalReviews > 0 && (
-                      <div className="flex items-center gap-2">
-                        <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                        <span>{overallRating.toFixed(1)} ({totalReviews} reviews)</span>
-                      </div>
-                    )}
-                    
-                    {(upcomingEvents?.length || 0) + (pastEvents?.length || 0) > 0 && (
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-5 h-5" />
-                        <span>{(upcomingEvents?.length || 0) + (pastEvents?.length || 0)} events</span>
-                      </div>
-                    )}
-                  </div>
+                    </Link>
+                  ))}
                 </div>
+              </div>
+            )}
+
+            {/* Past Performances Section */}
+            {pastEvents && pastEvents.length > 0 && (
+              <div className="relative bg-black border-2 border-white/20 p-6">
+                <div className="absolute top-4 right-4 w-6 h-6">
+                  <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
+                </div>
+                <h2 className="text-2xl font-bold tracking-widest uppercase mb-6 text-white">
+                  PAST PERFORMANCES
+                </h2>
                 
-                {/* Action Buttons */}
-                <div className="flex items-center gap-3">
-                  <Button variant="outline" size="icon" className="bg-slate-900/50 border-slate-700 text-white hover:bg-slate-800">
-                    <Heart className="w-5 h-5" />
-                  </Button>
-                  <Button variant="outline" size="icon" className="bg-slate-900/50 border-slate-700 text-white hover:bg-slate-800">
-                    <Share2 className="w-5 h-5" />
-                  </Button>
-                  <Button className="bg-slate-900 hover:bg-slate-800 text-white px-8 border border-slate-700">
-                    Rate Artist
-                  </Button>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {pastEvents.slice(0, 4).map((event: any) => (
+                    <Link key={event.id} href={`/event/${event.id}`}>
+                      <div className="bg-white/5 border border-white/20 p-4 hover:bg-white/10 transition-all duration-200">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 bg-white/10 border border-white/20 flex items-center justify-center">
+                            <Music2 className="w-6 h-6 text-white/60" />
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-bold text-white mb-1 tracking-wider uppercase line-clamp-1">
+                              {event.title}
+                            </h4>
+                            <div className="text-sm text-white/60 font-bold tracking-wider uppercase">
+                              {new Date(event.start_date).toLocaleDateString()} • {event.venue?.name}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
                 </div>
+              </div>
+            )}
+
+            {/* Reviews Section */}
+            <div className="relative bg-black border-2 border-white/20 p-6">
+              <div className="absolute top-4 right-4 w-6 h-6">
+                <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
+              </div>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold tracking-widest uppercase text-white">
+                  REVIEWS & RATINGS
+                </h2>
+                <button className="px-4 py-2 bg-white text-black hover:bg-white/90 border-2 border-white font-bold tracking-wider uppercase transition-all duration-200 text-sm">
+                  WRITE REVIEW
+                </button>
+              </div>
+              
+              <div className="text-center py-12">
+                <div className="w-12 h-12 bg-white border-2 border-white mx-auto mb-4 relative">
+                  <div className="absolute inset-1 bg-black" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Star className="w-4 h-4 text-white" />
+                  </div>
+                </div>
+                <h3 className="text-white font-bold tracking-widest uppercase mb-2">
+                  NO REVIEWS YET
+                </h3>
+                <p className="text-white/60 font-medium tracking-wider uppercase text-sm">
+                  BE THE FIRST TO REVIEW
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Artist Information */}
+            <div className="relative bg-black border-2 border-white/20 p-6">
+              <div className="absolute top-4 right-4 w-6 h-6">
+                <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
+              </div>
+              <h3 className="text-xl font-bold tracking-widest uppercase mb-6 text-white">
+                ARTIST INFORMATION
+              </h3>
+              
+              <div className="space-y-4">
+                {artist.city && artist.country && (
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <MapPin className="w-4 h-4 text-white" />
+                      <span className="text-white/80 font-bold tracking-widest uppercase text-xs">LOCATION</span>
+                    </div>
+                    <div className="text-white font-bold tracking-wider uppercase text-sm">
+                      {artist.city}, {artist.country}
+                    </div>
+                  </div>
+                )}
+
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Calendar className="w-4 h-4 text-white" />
+                    <span className="text-white/80 font-bold tracking-widest uppercase text-xs">EVENTS</span>
+                  </div>
+                  <div className="text-white font-bold tracking-wider uppercase text-sm">
+                    {(upcomingEvents?.length || 0) + (pastEvents?.length || 0)} TOTAL
+                  </div>
+                </div>
+
+                {artist.average_rating && (
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Star className="w-4 h-4 text-white" />
+                      <span className="text-white/80 font-bold tracking-widest uppercase text-xs">RATING</span>
+                    </div>
+                    <div className="text-white font-bold tracking-wider uppercase text-sm">
+                      {artist.average_rating.toFixed(1)}/5.0
+                    </div>
+                    {artist.review_count && (
+                      <div className="text-white/60 text-xs font-bold tracking-widest uppercase">
+                        {artist.review_count} REVIEWS
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Performance Stats */}
+            <div className="relative bg-black border-2 border-white/20 p-6">
+              <div className="absolute top-4 right-4 w-6 h-6">
+                <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
+              </div>
+              <h3 className="text-xl font-bold tracking-widest uppercase mb-4 text-white">
+                PERFORMANCE STATS
+              </h3>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-white/80 font-bold tracking-wider uppercase text-sm">UPCOMING</span>
+                  <span className="text-white font-bold tracking-wider uppercase">
+                    {upcomingEvents?.length || 0}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-white/80 font-bold tracking-wider uppercase text-sm">PAST</span>
+                  <span className="text-white font-bold tracking-wider uppercase">
+                    {pastEvents?.length || 0}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between border-t border-white/20 pt-3">
+                  <span className="text-white/80 font-bold tracking-wider uppercase text-sm">TOTAL</span>
+                  <span className="text-white font-bold tracking-wider uppercase">
+                    {(upcomingEvents?.length || 0) + (pastEvents?.length || 0)}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Follow Section */}
+            <div className="relative bg-black border-2 border-white/20 p-6">
+              <div className="absolute top-4 right-4 w-6 h-6">
+                <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
+              </div>
+              <h3 className="text-xl font-bold tracking-widest uppercase mb-4 text-white">
+                FOLLOW {artist.name}
+              </h3>
+              <div className="space-y-3">
+                <button className="w-full p-3 bg-white/5 border border-white/20 hover:bg-white/10 transition-all duration-200 text-white font-bold tracking-wider uppercase text-sm">
+                  GET NOTIFICATIONS
+                </button>
+                <button className="w-full p-3 bg-white/5 border border-white/20 hover:bg-white/10 transition-all duration-200 text-white font-bold tracking-wider uppercase text-sm">
+                  SAVE ARTIST
+                </button>
               </div>
             </div>
           </div>
         </div>
-
-        {/* Main Content */}
-        <div className="max-w-7xl mx-auto px-6 py-12">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            
-            {/* Main Content Column */}
-            <div className="lg:col-span-2 space-y-12">
-              
-              {/* Biography */}
-              {artist.bio && (
-                <section>
-                  <h2 className="text-3xl font-medium mb-6">Biography</h2>
-                  <div className="prose prose-gray prose-invert max-w-none">
-                    <p className="text-slate-300 text-lg leading-relaxed">{artist.bio}</p>
-                  </div>
-                </section>
-              )}
-
-              {/* Upcoming Events */}
-              {upcomingEvents && upcomingEvents.length > 0 && (
-                <section>
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-3xl font-medium">Upcoming Performances</h2>
-                    <Link href={`/events?artist=${artist.id}`} className="text-slate-400 hover:text-white transition-colors">
-                      View All →
-                    </Link>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    {upcomingEvents.map((event) => (
-                      <Link key={event.id} href={`/event/${event.id}`}>
-                        <Card className="group bg-slate-900/50 border-slate-800 hover:bg-slate-800/50 transition-all duration-300 p-6">
-                          <div className="flex items-center gap-6">
-                            {/* Event Image */}
-                            <div className="w-20 h-20 rounded-lg bg-slate-800 flex items-center justify-center overflow-hidden">
-                              {event.flyer_url ? (
-                                <Image
-                                  src={event.flyer_url}
-                                  alt={event.title}
-                                  width={80}
-                                  height={80}
-                                  className="object-cover w-full h-full"
-                                />
-                              ) : (
-                                <Music2 className="w-8 h-8 text-slate-400" />
-                              )}
-                            </div>
-                            
-                            {/* Event Info */}
-                            <div className="flex-1">
-                              <h3 className="text-xl font-semibold group-hover:text-slate-300 transition-colors mb-2">
-                                {event.title}
-                              </h3>
-                              
-                              <div className="flex flex-wrap items-center gap-4 text-sm text-slate-400">
-                                <div className="flex items-center gap-2">
-                                  <Calendar className="w-4 h-4" />
-                                  <span>
-                                    {new Date(event.start_date).toLocaleDateString('en-US', {
-                                      weekday: 'short',
-                                      month: 'short',
-                                      day: 'numeric',
-                                      year: 'numeric'
-                                    })}
-                                  </span>
-                                </div>
-                                
-                                {event.venue && (
-                                  <div className="flex items-center gap-2">
-                                    <MapPin className="w-4 h-4" />
-                                    <span>{event.venue.name}, {event.venue.city}</span>
-                                  </div>
-                                )}
-                                
-                                {event.genres && event.genres.length > 0 && (
-                                  <div className="flex gap-1">
-                                    {event.genres.slice(0, 2).map((genre: string) => (
-                                      <Badge key={genre} variant="outline" className="text-xs border-slate-700 text-slate-400">
-                                        {genre}
-                                      </Badge>
-                                    ))}
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                            
-                            <ExternalLink className="w-5 h-5 text-slate-400 group-hover:text-slate-300 transition-colors" />
-                          </div>
-                        </Card>
-                      </Link>
-                    ))}
-                  </div>
-                </section>
-              )}
-
-              {/* Past Events */}
-              {pastEvents && pastEvents.length > 0 && (
-                <section>
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-3xl font-medium">Past Performances</h2>
-                    <Link href={`/events?artist=${artist.id}&past=true`} className="text-slate-400 hover:text-white transition-colors">
-                      View All →
-                    </Link>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {pastEvents.slice(0, 4).map((event) => (
-                      <Link key={event.id} href={`/event/${event.id}`}>
-                        <Card className="group bg-slate-900/50 border-slate-800 hover:bg-slate-800/50 transition-all duration-300 p-4">
-                          <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded bg-slate-800 flex items-center justify-center">
-                              <Music2 className="w-6 h-6 text-slate-400" />
-                            </div>
-                            <div className="flex-1">
-                              <h4 className="font-semibold group-hover:text-slate-300 transition-colors line-clamp-1">
-                                {event.title}
-                              </h4>
-                              <div className="text-sm text-slate-400">
-                                {new Date(event.start_date).toLocaleDateString()} • {event.venue?.name}
-                              </div>
-                            </div>
-                          </div>
-                        </Card>
-                      </Link>
-                    ))}
-                  </div>
-                </section>
-              )}
-
-              {/* Reviews Section */}
-              <section>
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-3xl font-medium">Reviews & Ratings</h2>
-                  <Button className="bg-slate-900 hover:bg-slate-800 border border-slate-700">
-                    Write Review
-                  </Button>
-                </div>
-
-                {/* Rating Overview */}
-                {totalReviews > 0 && (
-                  <Card className="bg-slate-900/50 border-slate-800 p-6 mb-8">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                      {/* Overall Rating */}
-                      <div className="text-center">
-                        <div className="text-4xl font-bold text-yellow-400 mb-2">
-                          {overallRating.toFixed(1)}
-                        </div>
-                        <div className="flex justify-center mb-2">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <Star
-                              key={star}
-                              className={`w-5 h-5 ${
-                                star <= overallRating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-600'
-                              }`}
-                            />
-                          ))}
-                        </div>
-                        <div className="text-sm text-gray-400">{totalReviews} reviews</div>
-                      </div>
-
-                      {/* Sub-ratings */}
-                      {reviewStats && (
-                        <>
-                          <div className="text-center">
-                            <div className="text-2xl font-semibold mb-1">
-                              {reviewStats.soundRating?.toFixed(1) || 'N/A'}
-                            </div>
-                            <div className="text-sm text-gray-400">Sound</div>
-                          </div>
-                          <div className="text-center">
-                            <div className="text-2xl font-semibold mb-1">
-                              {reviewStats.vibeRating?.toFixed(1) || 'N/A'}
-                            </div>
-                            <div className="text-sm text-gray-400">Vibe</div>
-                          </div>
-                          <div className="text-center">
-                            <div className="text-2xl font-semibold mb-1">
-                              {reviewStats.crowdRating?.toFixed(1) || 'N/A'}
-                            </div>
-                            <div className="text-sm text-gray-400">Crowd</div>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </Card>
-                )}
-
-                {/* Individual Reviews */}
-                <div className="space-y-6">
-                  {reviews && reviews.length > 0 ? (
-                    reviews.map((review) => (
-                      <Card key={review.id} className="bg-slate-900/50 border-slate-800 p-6">
-                        <div className="flex items-start justify-between mb-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center text-white font-semibold">
-                              {review.user?.full_name?.charAt(0) || 'U'}
-                            </div>
-                            <div>
-                              <div className="font-semibold">{review.user?.full_name || 'Anonymous'}</div>
-                              <div className="text-sm text-slate-400">
-                                {new Date(review.created_at).toLocaleDateString()}
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <Star
-                                key={star}
-                                className={`w-4 h-4 ${
-                                  star <= review.rating_overall ? 'fill-yellow-400 text-yellow-400' : 'text-slate-600'
-                                }`}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                        {review.comment && (
-                          <p className="text-slate-300 leading-relaxed">{review.comment}</p>
-                        )}
-                      </Card>
-                    ))
-                  ) : (
-                    <Card className="bg-slate-900/50 border-slate-800 p-8 text-center">
-                      <div className="text-slate-400 mb-4">No reviews yet</div>
-                      <Button className="bg-slate-900 hover:bg-slate-800 border border-slate-700">
-                        Be the first to review
-                      </Button>
-                    </Card>
-                  )}
-                </div>
-              </section>
-            </div>
-
-            {/* Sidebar */}
-            <div className="space-y-8">
-              
-              {/* Artist Info Card */}
-              <Card className="bg-slate-900/50 border-slate-800 p-6">
-                <h3 className="text-xl font-semibold mb-4">Artist Information</h3>
-                <div className="space-y-4">
-                  
-                  {/* Location */}
-                  {artist.city && artist.country && (
-                    <div className="flex items-center gap-3">
-                      <MapPin className="w-5 h-5 text-slate-400" />
-                      <div>
-                        <div className="font-medium">Based in</div>
-                        <div className="text-slate-400 text-sm">{artist.city}, {artist.country}</div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Genres */}
-                  {artist.genres && artist.genres.length > 0 && (
-                    <div className="flex items-start gap-3">
-                      <Music2 className="w-5 h-5 text-slate-400 mt-0.5 flex-shrink-0" />
-                      <div>
-                        <div className="font-medium mb-2">Genres</div>
-                        <div className="flex flex-wrap gap-2">
-                          {artist.genres.map((genre: string) => (
-                            <Badge key={genre} variant="outline" className="text-xs border-slate-700 text-slate-400">
-                              {genre}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Social Links */}
-                  {artist.social_links && Object.keys(artist.social_links as any).length > 0 && (
-                    <div className="flex items-start gap-3">
-                      <Globe className="w-5 h-5 text-slate-400 mt-0.5" />
-                      <div>
-                        <div className="font-medium mb-2">Social Media</div>
-                        <div className="flex gap-2">
-                          {Object.entries(artist.social_links as any).map(([platform, url]: [string, any]) => {
-                            if (!url) return null
-                            const Icon = platform === 'instagram' ? Instagram : 
-                                       platform === 'facebook' ? Facebook :
-                                       platform === 'twitter' ? Twitter : Globe
-                            return (
-                              <a
-                                key={platform}
-                                href={String(url)}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="p-2 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
-                              >
-                                <Icon className="w-4 h-4 text-slate-400" />
-                              </a>
-                            )
-                          })}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </Card>
-
-              {/* Quick Stats */}
-              <Card className="bg-slate-900/50 border-slate-800 p-6">
-                <h3 className="text-xl font-semibold mb-4">Quick Stats</h3>
-                <div className="space-y-3">
-                  {totalReviews > 0 && (
-                    <div className="flex justify-between">
-                      <span className="text-slate-400">Average Rating</span>
-                      <span className="font-medium">{overallRating.toFixed(1)}/5</span>
-                    </div>
-                  )}
-                  
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">Total Reviews</span>
-                    <span className="font-medium">{totalReviews}</span>
-                  </div>
-                  
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">Upcoming Events</span>
-                    <span className="font-medium">{upcomingEvents?.length || 0}</span>
-                  </div>
-                  
-                  {artist.genres && (
-                    <div className="flex justify-between">
-                      <span className="text-slate-400">Main Genre</span>
-                      <span className="font-medium">{artist.genres[0]}</span>
-                    </div>
-                  )}
-                </div>
-              </Card>
-            </div>
-          </div>
-        </div>
       </div>
-    )
-  } catch (error) {
-    console.error('Error loading artist:', error)
-    notFound()
-  }
+    </div>
+  )
 } 

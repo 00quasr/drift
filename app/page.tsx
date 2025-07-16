@@ -1,264 +1,570 @@
-import Link from "next/link"
-import { ArrowRight, Play, Headphones, MapPin, Users, Star, ChevronRight } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { EntityBento, EntityBentoGrid } from "@/components/ui/entity-bento"
-import { getUpcomingEvents } from "@/lib/services/events"
-import { getVenues } from "@/lib/services/venues"
-import { getTopRatedArtists } from "@/lib/services/artists"
-import { getFallbackImage, isValidImageUrl } from "@/lib/utils/imageUtils"
+'use client'
 
-export default async function HomePage() {
-  try {
-    const [upcomingEvents, venues, topArtists] = await Promise.all([
-      getUpcomingEvents(4),
-      getVenues({ limit: 6 }),
-      getTopRatedArtists(6)
-    ])
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
 
-    // If all data is empty, show setup instructions
-    if ((!upcomingEvents || upcomingEvents.length === 0) && 
-        (!venues || venues.length === 0) && 
-        (!topArtists || topArtists.length === 0)) {
-      return (
-        <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-          <div className="text-center space-y-6">
-            <h1 className="text-4xl font-medium text-white">Welcome to Drift</h1>
-            <p className="text-slate-400 max-w-md">
-              Your platform is set up! Add some venues, events, and artists to see them displayed here.
-            </p>
-            <div className="flex gap-4 justify-center">
-              <Link href="/explore">
-                <Button className="bg-slate-900 hover:bg-slate-800 text-white border-slate-800">Explore Platform</Button>
-              </Link>
-              <Link href="/auth/register">
-                <Button variant="outline" className="border-slate-700 text-slate-300 hover:bg-slate-900">Get Started</Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      )
+interface MatrixRainProps {
+  fontSize?: number;
+  color?: string;
+  characters?: string;
+  fadeOpacity?: number;
+  speed?: number;
+}
+
+const MatrixRain: React.FC<MatrixRainProps> = ({
+  fontSize = 20,
+  color = '#ffffff',
+  characters = '01',
+  fadeOpacity = 0.1,
+  speed = 1
+}) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    const chars = characters.split('');
+    const drops: number[] = [];
+    const columnCount = Math.floor(canvas.width / fontSize);
+
+    for (let i = 0; i < columnCount; i++) {
+      drops[i] = Math.random() * -100;
     }
 
-    return (
-      <div className="min-h-screen bg-slate-950">
-        {/* Hero Section */}
-        <section className="relative min-h-screen flex items-center overflow-hidden">
-          <div className="absolute inset-0 bg-slate-950" />
-          
-          <div className="relative z-10 max-w-7xl mx-auto px-6">
-            <div className="text-center max-w-4xl mx-auto space-y-8">
-              {/* Main heading */}
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-medium tracking-tight text-white">
-                Discover Electronic Music{' '}
-                <span className="text-slate-400">
-                  Communities
+    const draw = () => {
+      ctx.fillStyle = `rgba(0, 0, 0, ${fadeOpacity})`;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = color;
+      ctx.font = `${fontSize}px monospace`;
+
+      for (let i = 0; i < drops.length; i++) {
+        const char = chars[Math.floor(Math.random() * chars.length)];
+        ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i] += speed;
+      }
+    };
+
+    const interval = setInterval(draw, 33 / speed);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('resize', resizeCanvas);
+    };
+  }, [fontSize, color, characters, fadeOpacity, speed]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="fixed top-0 left-0 w-full h-full z-0"
+    />
+  );
+};
+
+interface AnimatedTextCycleProps {
+  words: string[];
+  interval?: number;
+  className?: string;
+}
+
+const AnimatedTextCycle: React.FC<AnimatedTextCycleProps> = ({
+  words,
+  interval = 3000,
+  className = "",
+}) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [width, setWidth] = useState("auto");
+  const measureRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (measureRef.current) {
+      const elements = measureRef.current.children;
+      if (elements.length > currentIndex) {
+        const newWidth = elements[currentIndex].getBoundingClientRect().width;
+        setWidth(`${newWidth}px`);
+      }
+    }
+  }, [currentIndex]);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % words.length);
+    }, interval);
+
+    return () => clearInterval(timer);
+  }, [interval, words.length]);
+
+  const containerVariants = {
+    hidden: { 
+      y: -20,
+      opacity: 0,
+      filter: "blur(8px)"
+    },
+    visible: {
+      y: 0,
+      opacity: 1,
+      filter: "blur(0px)"
+    },
+    exit: { 
+      y: 20,
+      opacity: 0,
+      filter: "blur(8px)"
+    },
+  };
+
+  return (
+    <>
+      <div 
+        ref={measureRef} 
+        aria-hidden="true"
+        className="absolute opacity-0 pointer-events-none"
+        style={{ visibility: "hidden" }}
+      >
+        {words.map((word, i) => (
+          <span key={i} className={`font-bold ${className}`}>
+            {word}
+          </span>
+        ))}
+      </div>
+
+      <motion.span 
+        className="relative inline-block"
+        animate={{ 
+          width,
+          transition: { 
+            type: "spring",
+            stiffness: 150,
+            damping: 15,
+            mass: 1.2,
+          }
+        }}
+      >
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.span
+            key={currentIndex}
+            className={`inline-block font-bold ${className}`}
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            style={{ whiteSpace: "nowrap" }}
+          >
+            {words[currentIndex]}
+          </motion.span>
+        </AnimatePresence>
+      </motion.span>
+    </>
+  );
+};
+
+interface Dot {
+  x: number;
+  y: number;
+  baseOpacity: number;
+  currentOpacity: number;
+  opacitySpeed: number;
+  baseRadius: number;
+  currentRadius: number;
+}
+
+const GeometricGrid: React.FC = () => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animationFrameId = useRef<number | null>(null);
+  const dotsRef = useRef<Dot[]>([]);
+  const mousePositionRef = useRef<{ x: number | null; y: number | null }>({ x: null, y: null });
+
+  const DOT_SPACING = 30;
+  const BASE_OPACITY_MIN = 0.1;
+  const BASE_OPACITY_MAX = 0.3;
+  const BASE_RADIUS = 1;
+  const INTERACTION_RADIUS = 100;
+
+  const handleMouseMove = useCallback((event: globalThis.MouseEvent) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const canvasX = event.clientX - rect.left;
+    const canvasY = event.clientY - rect.top;
+    mousePositionRef.current = { x: canvasX, y: canvasY };
+  }, []);
+
+  const createDots = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const { width, height } = canvas;
+    const newDots: Dot[] = [];
+    const cols = Math.ceil(width / DOT_SPACING);
+    const rows = Math.ceil(height / DOT_SPACING);
+
+    for (let i = 0; i < cols; i++) {
+      for (let j = 0; j < rows; j++) {
+        const x = i * DOT_SPACING + DOT_SPACING / 2;
+        const y = j * DOT_SPACING + DOT_SPACING / 2;
+        const baseOpacity = Math.random() * (BASE_OPACITY_MAX - BASE_OPACITY_MIN) + BASE_OPACITY_MIN;
+        
+        newDots.push({
+          x,
+          y,
+          baseOpacity,
+          currentOpacity: baseOpacity,
+          opacitySpeed: (Math.random() * 0.005) + 0.002,
+          baseRadius: BASE_RADIUS,
+          currentRadius: BASE_RADIUS,
+        });
+      }
+    }
+    dotsRef.current = newDots;
+  }, []);
+
+  const animateDots = useCallback(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext('2d');
+    const dots = dotsRef.current;
+
+    if (!ctx || !dots || !canvas) {
+      animationFrameId.current = requestAnimationFrame(animateDots);
+      return;
+    }
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const { x: mouseX, y: mouseY } = mousePositionRef.current;
+
+    dots.forEach((dot) => {
+      dot.currentOpacity += dot.opacitySpeed;
+      if (dot.currentOpacity >= BASE_OPACITY_MAX || dot.currentOpacity <= BASE_OPACITY_MIN) {
+        dot.opacitySpeed = -dot.opacitySpeed;
+        dot.currentOpacity = Math.max(BASE_OPACITY_MIN, Math.min(dot.currentOpacity, BASE_OPACITY_MAX));
+      }
+
+      let interactionFactor = 0;
+      dot.currentRadius = dot.baseRadius;
+
+      if (mouseX !== null && mouseY !== null) {
+        const dx = dot.x - mouseX;
+        const dy = dot.y - mouseY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < INTERACTION_RADIUS) {
+          interactionFactor = Math.max(0, 1 - distance / INTERACTION_RADIUS);
+          interactionFactor = interactionFactor * interactionFactor;
+        }
+      }
+
+      const finalOpacity = Math.min(1, dot.currentOpacity + interactionFactor * 0.7);
+      dot.currentRadius = dot.baseRadius + interactionFactor * 3;
+
+      ctx.beginPath();
+      ctx.fillStyle = `rgba(255, 255, 255, ${finalOpacity})`;
+      ctx.arc(dot.x, dot.y, dot.currentRadius, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    animationFrameId.current = requestAnimationFrame(animateDots);
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      createDots();
+    };
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    window.addEventListener('mousemove', handleMouseMove);
+
+    animationFrameId.current = requestAnimationFrame(animateDots);
+
+    return () => {
+      window.removeEventListener('resize', resizeCanvas);
+      window.removeEventListener('mousemove', handleMouseMove);
+      if (animationFrameId.current) {
+        cancelAnimationFrame(animationFrameId.current);
+      }
+    };
+  }, [createDots, handleMouseMove, animateDots]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 z-10 pointer-events-none"
+    />
+  );
+};
+
+const PulsingElement: React.FC<{ children: React.ReactNode; className?: string; delay?: number }> = ({ 
+  children, 
+  className = "", 
+  delay = 0 
+}) => {
+  return (
+    <motion.div
+      className={className}
+      animate={{
+        scale: [1, 1.02, 1],
+        opacity: [0.8, 1, 0.8],
+      }}
+      transition={{
+        duration: 3,
+        repeat: Infinity,
+        delay,
+        ease: "easeInOut"
+      }}
+    >
+      {children}
+    </motion.div>
+  );
+};
+
+export default function HomePage() {
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    setIsLoaded(true);
+  }, []);
+
+  return (
+    <div className="relative min-h-screen bg-black text-white overflow-hidden">
+
+
+      {/* Geometric Grid Overlay */}
+      <GeometricGrid />
+
+      {/* Gradient Overlays */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/80 z-20" />
+      <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-black/30 z-20" />
+
+      {/* Grid Pattern Overlay */}
+      <div 
+        className="absolute inset-0 z-20 opacity-10"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
+          `,
+          backgroundSize: '50px 50px',
+        }}
+      />
+
+      {/* Main Content */}
+      <div className="relative z-30 flex flex-col items-center justify-center min-h-screen px-4">
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 50 }}
+          transition={{ duration: 1, delay: 0.5 }}
+          className="text-center max-w-6xl mx-auto"
+        >
+          {/* Main Headline */}
+          <motion.h1 
+            className="text-6xl md:text-8xl lg:text-9xl font-black mb-8 leading-none"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1.2, delay: 0.8 }}
+          >
+            <PulsingElement delay={0}>
+              <span className="block bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent">
+                DISCOVER
+              </span>
+            </PulsingElement>
+            <PulsingElement delay={0.5}>
+              <span className="block bg-gradient-to-r from-gray-300 via-white to-gray-300 bg-clip-text text-transparent">
+                ELECTRONIC
+              </span>
+            </PulsingElement>
+            <PulsingElement delay={1}>
+              <span className="block bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent">
+                MUSIC
+              </span>
+            </PulsingElement>
+          </motion.h1>
+
+          {/* Animated Subtitle */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 1.5 }}
+            className="text-xl md:text-2xl lg:text-3xl font-light mb-12 text-gray-300"
+          >
+            <span>Connect with venues, events, and artists in the </span>
+            <AnimatedTextCycle 
+              words={["global underground scene", "electronic music world", "cyber music community", "digital sound space"]}
+              className="text-white font-bold"
+              interval={2500}
+            />
+          </motion.div>
+
+          {/* CTA Buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 2 }}
+            className="flex flex-col sm:flex-row gap-6 justify-center items-center"
+          >
+            <Link href="/explore">
+              <motion.button
+                className="group relative px-8 py-4 bg-white text-black font-bold text-lg border-2 border-white overflow-hidden uppercase tracking-wider"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <motion.div
+                  className="absolute inset-0 bg-black"
+                  initial={{ x: "-100%" }}
+                  whileHover={{ x: "0%" }}
+                  transition={{ duration: 0.3 }}
+                />
+                <span className="relative z-10 group-hover:text-white transition-colors duration-300">
+                  START EXPLORING
                 </span>
-              </h1>
-              
-              <p className="text-xl md:text-2xl text-slate-400 max-w-3xl mx-auto leading-relaxed font-light">
-                Connect with venues, events, and artists in the global underground scene. 
-                Rate experiences and discover your next favorite destination.
-              </p>
-              
-              {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6">
-                <Link href="/explore">
-                  <Button 
-                    size="lg" 
-                    className="bg-slate-900 hover:bg-slate-800 text-white border-0 rounded-lg px-8 h-12 text-base font-medium"
-                  >
-                    <Play className="w-4 h-4 mr-2" />
-                    Start Exploring
-                  </Button>
-                </Link>
-                <Link href="/auth/register">
-                  <Button 
-                    size="lg" 
-                    variant="outline" 
-                    className="border-slate-700 text-slate-300 hover:bg-slate-900 rounded-lg px-8 h-12 text-base font-medium"
-                  >
-                    Join Community
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </Link>
-              </div>
-            </div>
+              </motion.button>
+            </Link>
+
+            <Link href="/auth/register">
+              <motion.button
+                className="group relative px-8 py-4 border-2 border-white text-white font-bold text-lg bg-transparent overflow-hidden uppercase tracking-wider"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <motion.div
+                  className="absolute inset-0 bg-white"
+                  initial={{ x: "-100%" }}
+                  whileHover={{ x: "0%" }}
+                  transition={{ duration: 0.3 }}
+                />
+                <span className="relative z-10 group-hover:text-black transition-colors duration-300">
+                  JOIN COMMUNITY
+                </span>
+              </motion.button>
+            </Link>
+          </motion.div>
+
+          {/* Geometric Decorations */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, delay: 2.5 }}
+            className="mt-16 flex justify-center space-x-8"
+          >
+            {[...Array(5)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="w-2 h-2 bg-white"
+                animate={{
+                  scale: [1, 1.5, 1],
+                  opacity: [0.3, 1, 0.3],
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  delay: i * 0.2,
+                }}
+              />
+            ))}
+          </motion.div>
+        </motion.div>
+
+        {/* Bottom Navigation */}
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 3 }}
+          className="absolute bottom-8 left-0 right-0 flex justify-center"
+        >
+          <div className="flex space-x-8 text-sm font-mono uppercase tracking-wider">
+            <Link href="/artists">
+              <motion.span 
+                className="text-gray-400 hover:text-white transition-colors border-b border-transparent hover:border-white pb-1 cursor-pointer"
+                whileHover={{ y: -2 }}
+              >
+                Artists
+              </motion.span>
+            </Link>
+            <Link href="/events">
+              <motion.span 
+                className="text-gray-400 hover:text-white transition-colors border-b border-transparent hover:border-white pb-1 cursor-pointer"
+                whileHover={{ y: -2 }}
+              >
+                Events
+              </motion.span>
+            </Link>
+            <Link href="/venues">
+              <motion.span 
+                className="text-gray-400 hover:text-white transition-colors border-b border-transparent hover:border-white pb-1 cursor-pointer"
+                whileHover={{ y: -2 }}
+              >
+                Venues
+              </motion.span>
+            </Link>
+            <Link href="/explore">
+              <motion.span 
+                className="text-gray-400 hover:text-white transition-colors border-b border-transparent hover:border-white pb-1 cursor-pointer"
+                whileHover={{ y: -2 }}
+              >
+                Explore
+              </motion.span>
+            </Link>
           </div>
-        </section>
-
-        {/* Upcoming Events Section */}
-        {upcomingEvents && upcomingEvents.length > 0 && (
-          <section className="py-24">
-            <div className="max-w-7xl mx-auto px-6">
-              <div className="flex items-center justify-between mb-12">
-                <div>
-                  <h2 className="text-3xl font-medium text-white mb-2">
-                    Upcoming Events
-                  </h2>
-                  <p className="text-slate-400">
-                    Don't miss these electronic music experiences
-                  </p>
-                </div>
-                <Link href="/events">
-                  <Button variant="outline" className="border-slate-700 text-slate-300 hover:bg-slate-900">
-                    View All Events
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </Link>
-              </div>
-
-              <EntityBentoGrid>
-                {upcomingEvents.map((event) => (
-                  <EntityBento
-                    key={event.id}
-                    type="event"
-                    id={event.id}
-                    name={event.title}
-                    description={event.description || `Experience ${event.title} with amazing electronic music`}
-                    href={`/event/${event.id}`}
-                    imageUrl={isValidImageUrl(event.flyer_url) ? event.flyer_url! : getFallbackImage('event', event.id)}
-                    artist={event.artists?.[0]?.name || 'Various Artists'}
-                    date={new Date(event.start_date).toLocaleDateString()}
-                    time={new Date(event.start_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    venue={event.venue?.name || 'TBA'}
-                    location={event.venue?.city ? `${event.venue.city}, ${event.venue.country}` : 'Location TBA'}
-                    price={event.ticket_price_min && event.ticket_price_max ? `$${event.ticket_price_min}-${event.ticket_price_max}` : undefined}
-                    isUpcoming={new Date(event.start_date) > new Date()}
-                  />
-                ))}
-              </EntityBentoGrid>
-            </div>
-          </section>
-        )}
-
-        {/* Trending Venues Section */}
-        {venues && venues.length > 0 && (
-          <section className="py-24">
-            <div className="max-w-7xl mx-auto px-6">
-              <div className="flex items-center justify-between mb-12">
-                <div>
-                  <h2 className="text-3xl font-medium text-white mb-2">
-                    Trending Venues
-                  </h2>
-                  <p className="text-slate-400">
-                    Discover the hottest venues in the scene
-                  </p>
-                </div>
-                <Link href="/venues">
-                  <Button variant="outline" className="border-slate-700 text-slate-300 hover:bg-slate-900">
-                    Explore Venues
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </Link>
-              </div>
-
-              <EntityBentoGrid>
-                {venues.map((venue) => (
-                  <EntityBento
-                    key={venue.id}
-                    type="venue"
-                    id={venue.id}
-                    name={venue.name}
-                    description={venue.description || `Experience electronic music at ${venue.name}`}
-                    href={`/venue/${venue.id}`}
-                    imageUrl={venue.images && Array.isArray(venue.images) && venue.images.length > 0 ? venue.images[0] : getFallbackImage('venue', venue.id)}
-                    city={venue.city || 'Unknown'}
-                    country={venue.country || 'Unknown'}
-                    capacity={venue.capacity}
-                    genres={venue.genres || []}
-                  />
-                ))}
-              </EntityBentoGrid>
-            </div>
-          </section>
-        )}
-
-        {/* Top Rated Artists Section */}
-        {topArtists && topArtists.length > 0 && (
-          <section className="py-24">
-            <div className="max-w-7xl mx-auto px-6">
-              <div className="flex items-center justify-between mb-12">
-                <div>
-                  <h2 className="text-3xl font-medium text-white mb-2">
-                    Top Rated Artists
-                  </h2>
-                  <p className="text-slate-400">
-                    Connect with the community's favorite artists
-                  </p>
-                </div>
-                <Link href="/artists">
-                  <Button variant="outline" className="border-slate-700 text-slate-300 hover:bg-slate-900">
-                    View All Artists
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </Link>
-              </div>
-
-              <EntityBentoGrid>
-                {topArtists.map((artist) => (
-                  <EntityBento
-                    key={artist.id}
-                    type="artist"
-                    id={artist.id}
-                    name={artist.name}
-                    description={artist.bio || `Discover the music of ${artist.name}`}
-                    href={`/artist/${artist.id}`}
-                    imageUrl={artist.images && Array.isArray(artist.images) && artist.images.length > 0 ? artist.images[0] : getFallbackImage('artist', artist.id)}
-                    bio={artist.bio}
-                    city={artist.city}
-                    country={artist.country}
-                    genres={artist.genres || []}
-                    rating={artist.average_rating}
-                    reviewCount={artist.review_count}
-                  />
-                ))}
-              </EntityBentoGrid>
-            </div>
-          </section>
-        )}
-
-        {/* Call to Action Section */}
-        <section className="py-24">
-          <div className="max-w-4xl mx-auto px-6 text-center">
-            <h2 className="text-3xl md:text-5xl font-medium text-white mb-6">
-              Ready to explore?
-            </h2>
-            <p className="text-xl text-slate-400 mb-8 max-w-2xl mx-auto">
-              Join thousands of electronic music enthusiasts discovering their next favorite event, venue, or artist.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/auth/register">
-                <Button 
-                  size="lg" 
-                  className="bg-slate-900 hover:bg-slate-800 text-white border-0 rounded-lg px-8 h-12 text-base font-medium"
-                >
-                  Get Started
-                </Button>
-              </Link>
-              <Link href="/explore">
-                <Button 
-                  size="lg" 
-                  variant="outline" 
-                  className="border-slate-700 text-slate-300 hover:bg-slate-900 rounded-lg px-8 h-12 text-base font-medium"
-                >
-                  Browse Platform
-                  <ChevronRight className="w-4 h-4 ml-2" />
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </section>
+        </motion.div>
       </div>
-    )
-  } catch (error) {
-    console.error('Error loading homepage data:', error)
-    return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <h1 className="text-2xl font-medium text-white">Something went wrong</h1>
-          <p className="text-slate-400">Please try again later</p>
-        </div>
-      </div>
-    )
-  }
+
+      {/* Corner Decorations */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 1, delay: 3.5 }}
+        className="absolute top-8 left-8 z-30"
+      >
+        <div className="w-16 h-16 border-l-2 border-t-2 border-white" />
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 1, delay: 3.7 }}
+        className="absolute top-8 right-8 z-30"
+      >
+        <div className="w-16 h-16 border-r-2 border-t-2 border-white" />
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 1, delay: 3.9 }}
+        className="absolute bottom-8 left-8 z-30"
+      >
+        <div className="w-16 h-16 border-l-2 border-b-2 border-white" />
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 1, delay: 4.1 }}
+        className="absolute bottom-8 right-8 z-30"
+      >
+        <div className="w-16 h-16 border-r-2 border-b-2 border-white" />
+      </motion.div>
+    </div>
+  );
 }

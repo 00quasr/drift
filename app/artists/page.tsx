@@ -1,10 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Search, Music, Star, SlidersHorizontal } from 'lucide-react'
+import { Search, Music, Star, SlidersHorizontal, Mic, Zap } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { EntityBento, EntityBentoGrid } from '@/components/ui/entity-bento'
+import { EntityCard } from '@/components/ui/entity-card'
 import { getArtists } from '@/lib/services/artists'
 import { getFallbackImage, isValidImageUrl } from '@/lib/utils/imageUtils'
 
@@ -53,7 +53,7 @@ export default function ArtistsPage() {
         return a.name.localeCompare(b.name)
       case 'rating':
         return (b.average_rating || 0) - (a.average_rating || 0)
-      case 'reviews':
+      case 'popularity':
         return (b.review_count || 0) - (a.review_count || 0)
       default:
         return 0
@@ -62,11 +62,16 @@ export default function ArtistsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 pt-24 pb-16">
+      <div className="min-h-screen bg-black pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center py-16">
-            <div className="w-8 h-8 border-2 border-slate-600 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-slate-400">Loading artists...</p>
+          <div className="text-center py-32">
+            <div className="w-16 h-16 bg-white border-2 border-white mx-auto mb-8 relative">
+              <div className="absolute inset-2 bg-black" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-4 h-4 bg-white animate-pulse" />
+              </div>
+            </div>
+            <p className="text-white/80 font-bold tracking-widest uppercase text-sm">LOADING ARTISTS...</p>
           </div>
         </div>
       </div>
@@ -74,97 +79,114 @@ export default function ArtistsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 pt-24 pb-16">
+    <div className="min-h-screen bg-black pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-medium text-white mb-4">
-            Electronic Music Artists
+        <div className="text-center mb-16">
+          <h1 className="text-5xl md:text-7xl font-bold text-white tracking-widest uppercase mb-6">
+            DISCOVER ARTISTS
           </h1>
-          <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-            Discover talented DJs and producers shaping the electronic music scene
+          <p className="text-white/80 text-lg max-w-3xl mx-auto font-medium tracking-wider uppercase">
+            FROM RISING STARS TO LEGENDARY DJS, EXPLORE THE ARTISTS SHAPING ELECTRONIC MUSIC CULTURE ACROSS THE GLOBE
           </p>
         </div>
 
         {/* Search and Filters */}
         <div className="mb-12">
-          <div className="flex flex-col lg:flex-row gap-4 mb-6">
+          <div className="flex flex-col lg:flex-row gap-6 mb-8">
             {/* Search */}
-            <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+            <div className="flex-1 relative">
+              <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-white w-6 h-6" />
               <Input
                 type="text"
-                placeholder="Search artists, genres, bios..."
+                placeholder="SEARCH ARTISTS..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-12 bg-slate-900/50 border-slate-800 text-white placeholder-slate-400 focus:border-slate-600 h-12"
+                                  className="pl-16 pr-6 py-4 bg-black border-2 border-white/30 text-white placeholder-white/60 focus:border-white transition-colors duration-200 h-14 text-lg font-bold tracking-wider uppercase"
               />
             </div>
 
-            {/* Toggle Filters */}
+            {/* Filter Toggle */}
             <Button
-              variant="outline"
               onClick={() => setFiltersOpen(!filtersOpen)}
-              className="border-slate-700 text-slate-300 hover:bg-slate-800 h-12 px-6"
+              variant="outline"
+              className="border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/60 font-bold tracking-wider uppercase px-6 h-14"
             >
-              <SlidersHorizontal className="w-4 h-4 mr-2" />
-              Filters
+              <SlidersHorizontal className="w-5 h-5 mr-2" />
+              FILTERS
             </Button>
           </div>
 
-          {/* Filters Panel */}
+          {/* Expandable Filters */}
           {filtersOpen && (
-            <div className="bg-slate-900/50 border border-slate-800 rounded-lg p-6 space-y-6">
+            <div className="bg-white/5 border border-white/20 p-6 mb-8">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Genre Filter */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-200 mb-3">
-                    Genre
+                  <label className="block text-white font-bold tracking-widest uppercase text-sm mb-3">
+                    GENRE
                   </label>
                   <select
                     value={selectedGenre}
                     onChange={(e) => setSelectedGenre(e.target.value)}
-                    className="w-full h-10 px-3 bg-slate-800 border border-slate-700 rounded-md text-white focus:border-slate-600 focus:outline-none"
+                    className="w-full bg-black border-2 border-white/30 text-white font-bold tracking-wider uppercase text-sm px-4 py-3 focus:border-white transition-colors"
                   >
-                    <option value="all">All Genres</option>
+                    <option value="all">ALL GENRES</option>
                     {allGenres.map(genre => (
-                      <option key={genre} value={genre}>{genre}</option>
+                      <option key={genre} value={genre}>{genre.toUpperCase()}</option>
                     ))}
                   </select>
                 </div>
 
                 {/* Country Filter */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-200 mb-3">
-                    Country
+                  <label className="block text-white font-bold tracking-widest uppercase text-sm mb-3">
+                    COUNTRY
                   </label>
                   <select
                     value={selectedCountry}
                     onChange={(e) => setSelectedCountry(e.target.value)}
-                    className="w-full h-10 px-3 bg-slate-800 border border-slate-700 rounded-md text-white focus:border-slate-600 focus:outline-none"
+                    className="w-full bg-black border-2 border-white/30 text-white font-bold tracking-wider uppercase text-sm px-4 py-3 focus:border-white transition-colors"
                   >
-                    <option value="all">All Countries</option>
+                    <option value="all">ALL COUNTRIES</option>
                     {allCountries.map(country => (
-                      <option key={country} value={country}>{country}</option>
+                      <option key={country} value={country}>{country.toUpperCase()}</option>
                     ))}
                   </select>
                 </div>
 
-                {/* Sort By */}
+                {/* Sort Filter */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-200 mb-3">
-                    Sort By
+                  <label className="block text-white font-bold tracking-widest uppercase text-sm mb-3">
+                    SORT BY
                   </label>
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
-                    className="w-full h-10 px-3 bg-slate-800 border border-slate-700 rounded-md text-white focus:border-slate-600 focus:outline-none"
+                    className="w-full bg-black border-2 border-white/30 text-white font-bold tracking-wider uppercase text-sm px-4 py-3 focus:border-white transition-colors"
                   >
-                    <option value="name">Name (A-Z)</option>
-                    <option value="rating">Highest Rated</option>
-                    <option value="reviews">Most Reviewed</option>
+                    <option value="name">NAME (A-Z)</option>
+                    <option value="rating">HIGHEST RATED</option>
+                    <option value="popularity">MOST POPULAR</option>
                   </select>
                 </div>
+              </div>
+
+              <div className="mt-6 flex justify-between items-center">
+                <p className="text-white/60 font-bold tracking-widest uppercase text-sm">
+                  {filteredArtists.length} ARTISTS FOUND
+                </p>
+                <Button
+                  onClick={() => {
+                    setSelectedGenre('all')
+                    setSelectedCountry('all')
+                    setSortBy('name')
+                  }}
+                  variant="outline"
+                  className="border-white/30 text-white hover:bg-white/10 font-bold tracking-wider uppercase text-sm px-6"
+                >
+                  CLEAR ALL
+                </Button>
               </div>
             </div>
           )}
@@ -172,28 +194,29 @@ export default function ArtistsPage() {
 
         {/* Results */}
         <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-medium text-white">
-              Artists
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-white font-bold tracking-widest uppercase text-sm flex items-center gap-3">
+              <div className="w-2 h-2 bg-white" />
+              ARTISTS
             </h2>
-            <p className="text-slate-400">
-              {filteredArtists.length} artist{filteredArtists.length !== 1 ? 's' : ''} found
+            <p className="text-white/60 font-bold tracking-widest uppercase text-sm">
+              {filteredArtists.length} ARTISTS FOUND
             </p>
           </div>
         </div>
 
         {/* Artists Grid */}
         {filteredArtists.length > 0 ? (
-          <EntityBentoGrid>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {filteredArtists.map((artist) => (
-              <EntityBento
+              <EntityCard
                 key={artist.id}
                 type="artist"
                 id={artist.id}
-                name={artist.name}
-                description={artist.bio || `Discover the music of ${artist.name}`}
+                title={artist.name}
+                imageUrl={isValidImageUrl(artist.image_url) ? artist.image_url : getFallbackImage('artist', artist.id)}
+                category={artist.genres?.[0] || 'Electronic'}
                 href={`/artist/${artist.id}`}
-                imageUrl={artist.images && Array.isArray(artist.images) && artist.images.length > 0 ? artist.images[0] : getFallbackImage('artist', artist.id)}
                 bio={artist.bio}
                 city={artist.city}
                 country={artist.country}
@@ -202,18 +225,20 @@ export default function ArtistsPage() {
                 reviewCount={artist.review_count}
               />
             ))}
-          </EntityBentoGrid>
+          </div>
         ) : (
-          <div className="text-center py-16">
-            <Music className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-            <h3 className="text-xl font-medium text-white mb-2">
-              No artists found
+          <div className="text-center py-32">
+            <div className="w-16 h-16 bg-white border-2 border-white mx-auto mb-8 relative">
+              <div className="absolute inset-2 bg-black" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Music className="w-6 h-6 text-white" />
+              </div>
+            </div>
+            <h3 className="text-white font-bold tracking-widest uppercase text-lg mb-4">
+              NO ARTISTS FOUND
             </h3>
-            <p className="text-slate-400 max-w-md mx-auto">
-              {searchTerm || selectedGenre !== 'all' || selectedCountry !== 'all'
-                ? 'Try adjusting your search criteria or filters'
-                : 'No artists available at the moment'
-              }
+            <p className="text-white/60 font-medium tracking-wider uppercase">
+              TRY ADJUSTING YOUR SEARCH OR FILTERS
             </p>
           </div>
         )}

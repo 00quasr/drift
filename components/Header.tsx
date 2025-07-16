@@ -20,45 +20,50 @@ export default function Header() {
 
   return (
     <header 
-      className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled 
-          ? 'bg-slate-900/95 backdrop-blur-md border-b border-slate-700/40' 
-          : 'bg-slate-900/90 border-b border-slate-800/20'
+          ? 'bg-black/95 backdrop-blur-md border-b-2 border-white/20' 
+          : 'bg-black/90 border-b-2 border-white/10'
       }`}
     >
+
+      
       <div className="max-w-7xl mx-auto px-6">
-        <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="flex items-center">
-            <span className="text-xl font-medium tracking-tight text-white">
+        <div className="flex items-center justify-between h-16">
+          
+          {/* Brand Name Only */}
+          <Link href="/" className="group">
+            <span className="text-xl font-bold tracking-widest text-white uppercase hover:text-white/80 transition-colors duration-200">
               DRIFT
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
+          {/* Navigation */}
           <nav className="hidden lg:flex items-center space-x-8">
             {[
-              { href: '/events', label: 'Events' },
-              { href: '/venues', label: 'Venues' },
-              { href: '/artists', label: 'Artists' },
-              { href: '/explore', label: 'Explore' }
+              { href: '/', label: 'HOME' },
+              { href: '/explore', label: 'EXPLORE' },
+              { href: '/events', label: 'EVENTS' },
+              { href: '/venues', label: 'VENUES' },
+              { href: '/artists', label: 'ARTISTS' }
             ].map(({ href, label }) => (
               <Link 
                 key={href}
                 href={href} 
-                className="text-sm font-medium text-slate-400 hover:text-white transition-colors duration-200"
+                className="relative group text-sm font-bold tracking-wider text-white/80 hover:text-white transition-colors duration-200 uppercase"
               >
                 {label}
+                <div className="absolute -bottom-1 left-0 w-0 h-0.5 bg-cyan-400 group-hover:w-full transition-all duration-300" />
               </Link>
             ))}
           </nav>
 
-          {/* Right side actions */}
+          {/* Actions */}
           <div className="flex items-center space-x-3">
             {/* Search Button */}
             <button
               onClick={() => setSearchOpen(!searchOpen)}
-              className="p-2 text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-lg transition-all duration-200"
+              className="p-2 text-white/80 hover:text-white hover:bg-white/10 border border-white/20 hover:border-white/50 transition-all duration-200"
               aria-label="Search"
             >
               <Search className="w-5 h-5" />
@@ -66,32 +71,32 @@ export default function Header() {
             
             {/* Notifications */}
             <button
-              className="p-2 text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-lg transition-all duration-200 relative"
+              className="p-2 text-white/80 hover:text-white hover:bg-white/10 border border-white/20 hover:border-white/50 transition-all duration-200 relative"
               aria-label="Notifications"
             >
               <Bell className="w-5 h-5" />
-              <div className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
+              <div className="absolute top-1.5 right-1.5 w-2 h-2 bg-white border border-black animate-pulse" />
             </button>
             
             <div className="hidden lg:flex items-center space-x-3">
               <Link 
                 href="/auth/login" 
-                className="px-3 py-1.5 text-sm font-medium text-slate-400 hover:text-white transition-colors duration-200"
+                className="px-4 py-2 text-sm font-bold tracking-wider text-white/80 hover:text-white border border-white/30 hover:border-white/60 transition-all duration-200 uppercase h-10 flex items-center"
               >
-                Sign In
+                SIGN IN
               </Link>
               <Link 
                 href="/auth/register" 
-                className="px-4 py-1.5 bg-white text-black text-sm font-medium rounded-lg hover:bg-slate-100 transition-colors duration-200"
+                className="px-4 py-2 bg-white text-black text-sm font-bold tracking-wider hover:bg-cyan-400 hover:text-black transition-all duration-200 uppercase border-2 border-white hover:border-cyan-400 h-10 flex items-center"
               >
-                Register
+                REGISTER
               </Link>
             </div>
 
             {/* Mobile menu button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-lg transition-all duration-200"
+              className="lg:hidden p-2 text-white/80 hover:text-white hover:bg-white/10 border border-white/20 transition-all duration-200"
               aria-label="Menu"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -102,24 +107,27 @@ export default function Header() {
 
       {/* Search overlay */}
       {searchOpen && (
-        <div className="absolute top-full left-0 right-0 bg-slate-950/95 border-b border-slate-800">
+        <div className="absolute top-full left-0 right-0 bg-black/95 border-b-2 border-white/20">
           <div className="max-w-7xl mx-auto px-6 py-6">
             <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white w-5 h-5" />
               <input
                 type="text"
-                placeholder="Search events, venues, artists..."
-                className="w-full pl-12 pr-4 py-3 bg-slate-900 border border-slate-800 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-slate-600 transition-colors duration-200"
+                placeholder="SEARCH EVENTS, VENUES, ARTISTS..."
+                className="w-full pl-12 pr-4 py-3 bg-black border-2 border-white/30 text-white placeholder-white/60 focus:outline-none focus:border-white transition-colors duration-200 font-bold tracking-wider uppercase"
                 autoFocus
               />
+              <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                <div className="w-2 h-2 bg-white animate-pulse" />
+              </div>
             </div>
             
             {/* Quick suggestions */}
             <div className="mt-4 flex flex-wrap gap-2">
-              {['Techno Events', 'Berlin Venues', 'Top Artists', 'This Weekend'].map((suggestion) => (
+              {['TECHNO EVENTS', 'BERLIN VENUES', 'TOP ARTISTS', 'THIS WEEKEND'].map((suggestion) => (
                 <button
                   key={suggestion}
-                  className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-full text-sm text-slate-300 transition-colors duration-200"
+                  className="px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/30 hover:border-white/50 text-sm text-white font-bold tracking-wider transition-all duration-200 uppercase"
                 >
                   {suggestion}
                 </button>
@@ -131,41 +139,42 @@ export default function Header() {
 
       {/* Mobile menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden absolute top-full left-0 right-0 bg-slate-950/95 border-b border-slate-800">
-          <nav className="max-w-7xl mx-auto px-6 py-6 space-y-1">
+        <div className="lg:hidden absolute top-full left-0 right-0 bg-black/95 border-b-2 border-white/20">
+          <div className="px-6 py-6 space-y-4">
             {[
-              { href: '/events', label: 'Events' },
-              { href: '/venues', label: 'Venues' },
-              { href: '/artists', label: 'Artists' },
-              { href: '/explore', label: 'Explore' }
+              { href: '/', label: 'HOME' },
+              { href: '/explore', label: 'EXPLORE' },
+              { href: '/events', label: 'EVENTS' },
+              { href: '/venues', label: 'VENUES' },
+              { href: '/artists', label: 'ARTISTS' }
             ].map(({ href, label }) => (
               <Link 
                 key={href}
                 href={href} 
-                className="block px-3 py-2 text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-all duration-200"
+                className="block text-lg font-bold tracking-wider text-white/80 hover:text-cyan-400 transition-colors duration-200 uppercase py-2 border-l-2 border-transparent hover:border-cyan-400 pl-4"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {label}
               </Link>
             ))}
             
-            <div className="pt-4 mt-4 border-t border-slate-800 space-y-1">
+            <div className="pt-4 border-t border-white/20 space-y-3">
               <Link 
                 href="/auth/login" 
-                className="block px-3 py-2 text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-all duration-200"
+                className="block w-full text-center px-4 py-2 text-sm font-bold tracking-wider text-white/80 hover:text-white border border-white/30 hover:border-white/60 transition-all duration-200 uppercase"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Sign In
+                SIGN IN
               </Link>
               <Link 
                 href="/auth/register" 
-                className="block px-3 py-2 text-sm font-medium bg-white text-black rounded-lg transition-colors duration-200"
+                className="block w-full text-center px-4 py-2 bg-white text-black text-sm font-bold tracking-wider hover:bg-cyan-400 hover:text-black transition-all duration-200 uppercase"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Register
+                REGISTER
               </Link>
             </div>
-          </nav>
+          </div>
         </div>
       )}
     </header>

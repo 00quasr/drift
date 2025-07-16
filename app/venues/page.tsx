@@ -1,10 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Search, MapPin, Users, Star, SlidersHorizontal } from 'lucide-react'
+import { Search, MapPin, Users, Star, SlidersHorizontal, Building, Zap } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { EntityBento, EntityBentoGrid } from '@/components/ui/entity-bento'
+import { EntityCard } from '@/components/ui/entity-card'
 import { getVenues } from '@/lib/services/venues'
 import { getFallbackImage, isValidImageUrl } from '@/lib/utils/imageUtils'
 
@@ -51,11 +51,16 @@ export default function VenuesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 pt-24 pb-16">
+      <div className="min-h-screen bg-black pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center py-16">
-            <div className="w-8 h-8 border-2 border-slate-600 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-slate-400">Loading venues...</p>
+          <div className="text-center py-32">
+            <div className="w-16 h-16 bg-white border-2 border-white mx-auto mb-8 relative">
+              <div className="absolute inset-2 bg-black" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-4 h-4 bg-white animate-pulse" />
+              </div>
+            </div>
+            <p className="text-white/80 font-bold tracking-widest uppercase text-sm">LOADING VENUES...</p>
           </div>
         </div>
       </div>
@@ -63,81 +68,97 @@ export default function VenuesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 pt-24 pb-16">
+    <div className="min-h-screen bg-black pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-medium text-white mb-4">
-            Electronic Music Venues
+        <div className="text-center mb-16">
+          <h1 className="text-5xl md:text-7xl font-bold text-white tracking-widest uppercase mb-6">
+            DISCOVER VENUES
           </h1>
-          <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-            Explore the world's best clubs and venues for electronic music
+          <p className="text-white/80 text-lg max-w-3xl mx-auto font-medium tracking-wider uppercase">
+            FROM UNDERGROUND WAREHOUSES TO ICONIC CLUBS, EXPLORE THE VENUES THAT DEFINE ELECTRONIC MUSIC CULTURE WORLDWIDE
           </p>
         </div>
 
         {/* Search and Filters */}
         <div className="mb-12">
-          <div className="flex flex-col lg:flex-row gap-4 mb-6">
+          <div className="flex flex-col lg:flex-row gap-6 mb-8">
             {/* Search */}
-            <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+            <div className="flex-1 relative">
+              <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-white w-6 h-6" />
               <Input
                 type="text"
-                placeholder="Search venues, cities, descriptions..."
+                placeholder="SEARCH VENUES..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-12 bg-slate-900/50 border-slate-800 text-white placeholder-slate-400 focus:border-slate-600 h-12"
+                                  className="pl-16 pr-6 py-4 bg-black border-2 border-white/30 text-white placeholder-white/60 focus:border-white transition-colors duration-200 h-14 text-lg font-bold tracking-wider uppercase"
               />
             </div>
 
-            {/* Toggle Filters */}
+            {/* Filter Toggle */}
             <Button
-              variant="outline"
               onClick={() => setFiltersOpen(!filtersOpen)}
-              className="border-slate-700 text-slate-300 hover:bg-slate-800 h-12 px-6"
+              variant="outline"
+              className="border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/60 font-bold tracking-wider uppercase px-6 h-14"
             >
-              <SlidersHorizontal className="w-4 h-4 mr-2" />
-              Filters
+              <SlidersHorizontal className="w-5 h-5 mr-2" />
+              FILTERS
             </Button>
           </div>
 
-          {/* Filters Panel */}
+          {/* Expandable Filters */}
           {filtersOpen && (
-            <div className="bg-slate-900/50 border border-slate-800 rounded-lg p-6 space-y-6">
+            <div className="bg-white/5 border border-white/20 p-6 mb-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Country Filter */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-200 mb-3">
-                    Country
+                  <label className="block text-white font-bold tracking-widest uppercase text-sm mb-3">
+                    COUNTRY
                   </label>
                   <select
                     value={selectedCountry}
                     onChange={(e) => setSelectedCountry(e.target.value)}
-                    className="w-full h-10 px-3 bg-slate-800 border border-slate-700 rounded-md text-white focus:border-slate-600 focus:outline-none"
+                    className="w-full bg-black border-2 border-white/30 text-white font-bold tracking-wider uppercase text-sm px-4 py-3 focus:border-white transition-colors"
                   >
-                    <option value="all">All Countries</option>
+                    <option value="all">ALL COUNTRIES</option>
                     {allCountries.map(country => (
-                      <option key={country} value={country}>{country}</option>
+                      <option key={country} value={country}>{country.toUpperCase()}</option>
                     ))}
                   </select>
                 </div>
 
                 {/* Genre Filter */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-200 mb-3">
-                    Genre
+                  <label className="block text-white font-bold tracking-widest uppercase text-sm mb-3">
+                    GENRE
                   </label>
                   <select
                     value={selectedGenre}
                     onChange={(e) => setSelectedGenre(e.target.value)}
-                    className="w-full h-10 px-3 bg-slate-800 border border-slate-700 rounded-md text-white focus:border-slate-600 focus:outline-none"
+                    className="w-full bg-black border-2 border-white/30 text-white font-bold tracking-wider uppercase text-sm px-4 py-3 focus:border-white transition-colors"
                   >
-                    <option value="all">All Genres</option>
+                    <option value="all">ALL GENRES</option>
                     {allGenres.map(genre => (
-                      <option key={genre} value={genre}>{genre}</option>
+                      <option key={genre} value={genre}>{genre.toUpperCase()}</option>
                     ))}
                   </select>
                 </div>
+              </div>
+
+              <div className="mt-6 flex justify-between items-center">
+                <p className="text-white/60 font-bold tracking-widest uppercase text-sm">
+                  {filteredVenues.length} VENUES FOUND
+                </p>
+                <Button
+                  onClick={() => {
+                    setSelectedCountry('all')
+                    setSelectedGenre('all')
+                  }}
+                  variant="outline"
+                  className="border-white/30 text-white hover:bg-white/10 font-bold tracking-wider uppercase text-sm px-6"
+                >
+                  CLEAR ALL
+                </Button>
               </div>
             </div>
           )}
@@ -145,46 +166,49 @@ export default function VenuesPage() {
 
         {/* Results */}
         <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-medium text-white">
-              Venues
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-white font-bold tracking-widest uppercase text-sm flex items-center gap-3">
+              <div className="w-2 h-2 bg-white" />
+              VENUES
             </h2>
-            <p className="text-slate-400">
-              {filteredVenues.length} venue{filteredVenues.length !== 1 ? 's' : ''} found
+            <p className="text-white/60 font-bold tracking-widest uppercase text-sm">
+              {filteredVenues.length} VENUES FOUND
             </p>
           </div>
         </div>
 
         {/* Venues Grid */}
         {filteredVenues.length > 0 ? (
-          <EntityBentoGrid>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredVenues.map((venue) => (
-              <EntityBento
+              <EntityCard
                 key={venue.id}
                 type="venue"
                 id={venue.id}
-                name={venue.name}
-                description={venue.description || `Experience electronic music at ${venue.name}`}
+                title={venue.name}
+                imageUrl={isValidImageUrl(venue.image_url) ? venue.image_url : getFallbackImage('venue', venue.id)}
+                category={venue.city || 'Unknown Location'}
                 href={`/venue/${venue.id}`}
-                imageUrl={venue.images && Array.isArray(venue.images) && venue.images.length > 0 ? venue.images[0] : getFallbackImage('venue', venue.id)}
                 city={venue.city || 'Unknown'}
                 country={venue.country || 'Unknown'}
                 capacity={venue.capacity}
                 genres={venue.genres || []}
               />
             ))}
-          </EntityBentoGrid>
+          </div>
         ) : (
-          <div className="text-center py-16">
-            <MapPin className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-            <h3 className="text-xl font-medium text-white mb-2">
-              No venues found
+          <div className="text-center py-32">
+            <div className="w-16 h-16 bg-white border-2 border-white mx-auto mb-8 relative">
+              <div className="absolute inset-2 bg-black" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <MapPin className="w-6 h-6 text-white" />
+              </div>
+            </div>
+            <h3 className="text-white font-bold tracking-widest uppercase text-lg mb-4">
+              NO VENUES FOUND
             </h3>
-            <p className="text-slate-400 max-w-md mx-auto">
-              {searchTerm || selectedCountry !== 'all' || selectedGenre !== 'all'
-                ? 'Try adjusting your search criteria or filters'
-                : 'No venues available at the moment'
-              }
+            <p className="text-white/60 font-medium tracking-wider uppercase">
+              TRY ADJUSTING YOUR SEARCH OR FILTERS
             </p>
           </div>
         )}

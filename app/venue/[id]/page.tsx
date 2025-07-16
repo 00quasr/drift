@@ -15,358 +15,303 @@ interface VenuePageProps {
 }
 
 export default async function VenuePage({ params }: VenuePageProps) {
-  try {
-    // Fetch venue data, related events, and reviews in parallel
-    const [venue, upcomingEvents, pastEvents, reviews, reviewStats] = await Promise.all([
-      getVenueById(params.id),
-      getEvents({ venue_id: params.id, start_date: new Date().toISOString(), limit: 6 }),
-      getEvents({ venue_id: params.id, end_date: new Date().toISOString(), limit: 4 }),
-      getReviews('venue', params.id, { limit: 10 }),
-      getReviewStats('venue', params.id)
-    ])
+  const venue = await getVenueById(params.id)
+  
+  if (!venue) {
+    notFound()
+  }
 
-    if (!venue) {
-      notFound()
-    }
+  // Get upcoming events at this venue
+  const upcomingEvents = venue.events?.filter((event: any) => 
+    new Date(event.start_date) > new Date()
+  ).slice(0, 6) || []
 
-    const primaryImage = isValidImageUrl(venue.images?.[0]) ? venue.images[0] : getFallbackImage('venue', venue.id)
-
-    const overallRating = reviewStats?.averageRating || 0
-    const totalReviews = reviewStats?.totalReviews || 0
-
-    return (
-      <div className="min-h-screen bg-slate-950 text-white">
-        {/* Hero Section */}
-        <div className="relative h-[80vh] w-full overflow-hidden">
-          <Image
-            src={primaryImage}
-            alt={venue.name}
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent" />
+  return (
+    <div className="min-h-screen bg-black text-white pt-24">
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        {/* Main Venue Tile */}
+        <div className="relative overflow-hidden bg-black border-2 border-white/20 mb-12">
+          {/* Angular Corner Design */}
+          <div className="absolute top-4 right-4 w-8 h-8">
+            <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
+          </div>
           
-          <div className="absolute bottom-0 left-0 right-0 z-10 p-8">
-            <div className="max-w-7xl mx-auto">
-              <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
-                <div className="flex-1">
-                  {/* Genre Tags */}
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {venue.genres?.map((genre: string) => (
-                      <Badge key={genre} variant="outline" className="bg-white/10 text-white border-white/20">
-                        {genre}
-                      </Badge>
-                    ))}
-                  </div>
-                  
-                  {/* Venue Name & Location */}
-                  <h1 className="text-5xl md:text-7xl font-medium mb-4 leading-tight">{venue.name}</h1>
-                  
-                  <div className="flex flex-wrap items-center gap-6 text-slate-300">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-5 h-5" />
-                      <span className="text-lg">{venue.city}, {venue.country}</span>
-                    </div>
-                    {venue.capacity && (
-                      <div className="flex items-center gap-2">
-                        <Users className="w-5 h-5" />
-                        <span className="text-lg">{venue.capacity.toLocaleString()} capacity</span>
-                      </div>
-                    )}
-                    {overallRating > 0 && (
-                      <div className="flex items-center gap-2">
-                        <Star className="w-5 h-5 text-yellow-400 fill-current" />
-                        <span className="text-lg">{overallRating.toFixed(1)} ({totalReviews} reviews)</span>
-                      </div>
-                    )}
-                  </div>
+          {/* Category Tag */}
+          <div className="absolute top-4 left-4 z-20">
+            <div className="bg-black border border-white/60 px-3 py-1">
+              <span className="text-white text-xs font-bold tracking-widest uppercase font-mono">
+                VENUE
+              </span>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="p-8">
+            {/* Genre Tags */}
+            <div className="flex flex-wrap gap-2 mb-6">
+              {venue.genres?.map((genre: string) => (
+                <div key={genre} className="bg-white/10 border border-white/30 px-2 py-1">
+                  <span className="text-white text-xs font-bold tracking-widest uppercase">
+                    {genre}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* Venue Title */}
+            <h1 className="text-4xl md:text-6xl font-bold tracking-widest uppercase mb-6 text-white">
+              {venue.name}
+            </h1>
+
+            {/* Venue Details Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              {/* Location */}
+              <div className="bg-white/5 border border-white/20 p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <MapPin className="w-4 h-4 text-white" />
+                  <span className="text-white/80 font-bold tracking-widest uppercase text-xs">LOCATION</span>
+                </div>
+                <div className="text-white font-bold tracking-wider uppercase">
+                  {venue.city}, {venue.country}
+                </div>
+                <div className="text-white/80 font-bold tracking-wider uppercase text-sm">
+                  {venue.address || 'ADDRESS TBA'}
+                </div>
+              </div>
+
+              {/* Capacity */}
+              <div className="bg-white/5 border border-white/20 p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Users className="w-4 h-4 text-white" />
+                  <span className="text-white/80 font-bold tracking-widest uppercase text-xs">CAPACITY</span>
+                </div>
+                <div className="text-white font-bold tracking-wider uppercase">
+                  {venue.capacity ? venue.capacity.toLocaleString() : 'TBA'}
+                </div>
+                <div className="text-white/80 font-bold tracking-wider uppercase text-sm">
+                  PEOPLE
+                </div>
+              </div>
+
+              {/* Contact */}
+              <div className="bg-white/5 border border-white/20 p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Globe className="w-4 h-4 text-white" />
+                  <span className="text-white/80 font-bold tracking-widest uppercase text-xs">WEBSITE</span>
+                </div>
+                <div className="text-white font-bold tracking-wider uppercase">
+                  {venue.website ? 'AVAILABLE' : 'TBA'}
+                </div>
+                <div className="text-white/80 font-bold tracking-wider uppercase text-sm">
+                  VISIT WEBSITE
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-4">
+              <button className="p-3 bg-white/10 hover:bg-white/20 border border-white/30 hover:border-white/60 text-white transition-all duration-200">
+                <Heart className="w-5 h-5" />
+              </button>
+              <button className="p-3 bg-white/10 hover:bg-white/20 border border-white/30 hover:border-white/60 text-white transition-all duration-200">
+                <Share2 className="w-5 h-5" />
+              </button>
+              <button className="px-6 py-3 bg-white text-black hover:bg-white/90 border-2 border-white font-bold tracking-wider uppercase transition-all duration-200">
+                RATE VENUE
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* About Section */}
+            {venue.description && (
+              <div className="relative bg-black border-2 border-white/20 p-6">
+                <div className="absolute top-4 right-4 w-6 h-6">
+                  <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
+                </div>
+                <h2 className="text-2xl font-bold tracking-widest uppercase mb-4 text-white">
+                  ABOUT {venue.name}
+                </h2>
+                <p className="text-white/80 leading-relaxed font-medium tracking-wide">
+                  {venue.description}
+                </p>
+              </div>
+            )}
+
+            {/* Upcoming Events Section */}
+            {upcomingEvents && upcomingEvents.length > 0 && (
+              <div className="relative bg-black border-2 border-white/20 p-6">
+                <div className="absolute top-4 right-4 w-6 h-6">
+                  <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
+                </div>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold tracking-widest uppercase text-white">
+                    UPCOMING EVENTS
+                  </h2>
+                  <Link href={`/events?venue=${venue.id}`} className="text-white/80 hover:text-white transition-colors font-bold tracking-wider uppercase text-sm">
+                    VIEW ALL →
+                  </Link>
                 </div>
                 
-                {/* Action Buttons */}
-                <div className="flex gap-3">
-                  <Button variant="outline" size="icon" className="bg-slate-950/80 border-slate-700 text-white hover:bg-slate-900">
-                    <Heart className="w-5 h-5" />
-                  </Button>
-                  <Button variant="outline" size="icon" className="bg-slate-950/80 border-slate-700 text-white hover:bg-slate-900">
-                    <Share2 className="w-5 h-5" />
-                  </Button>
-                  <Button className="bg-white text-slate-950 hover:bg-slate-100">
-                    Rate Venue
-                  </Button>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {upcomingEvents.map((event: any) => (
+                    <Link key={event.id} href={`/event/${event.id}`}>
+                      <div className="bg-white/5 border border-white/20 p-4 hover:bg-white/10 transition-all duration-200">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm text-white/80 font-bold tracking-wider uppercase">
+                            {new Date(event.start_date).toLocaleDateString('en-US', {
+                              weekday: 'short',
+                              month: 'short',
+                              day: 'numeric'
+                            })}
+                          </span>
+                          <span className="text-sm text-white/80 font-bold tracking-wider uppercase">
+                            {new Date(event.start_date).toLocaleTimeString('en-US', {
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </span>
+                        </div>
+                        <h3 className="font-bold text-white mb-1 tracking-wider uppercase">
+                          {event.title}
+                        </h3>
+                        {event.artists && event.artists.length > 0 && (
+                          <p className="text-sm text-white/60 font-bold tracking-widest uppercase">
+                            {event.artists[0].name}
+                          </p>
+                        )}
+                      </div>
+                    </Link>
+                  ))}
                 </div>
+              </div>
+            )}
+
+            {/* Reviews Section */}
+            <div className="relative bg-black border-2 border-white/20 p-6">
+              <div className="absolute top-4 right-4 w-6 h-6">
+                <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
+              </div>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold tracking-widest uppercase text-white">
+                  REVIEWS & RATINGS
+                </h2>
+                <button className="px-4 py-2 bg-white text-black hover:bg-white/90 border-2 border-white font-bold tracking-wider uppercase transition-all duration-200 text-sm">
+                  WRITE REVIEW
+                </button>
+              </div>
+              
+              <div className="text-center py-12">
+                <div className="w-12 h-12 bg-white border-2 border-white mx-auto mb-4 relative">
+                  <div className="absolute inset-1 bg-black" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Star className="w-4 h-4 text-white" />
+                  </div>
+                </div>
+                <h3 className="text-white font-bold tracking-widest uppercase mb-2">
+                  NO REVIEWS YET
+                </h3>
+                <p className="text-white/60 font-medium tracking-wider uppercase text-sm">
+                  BE THE FIRST TO REVIEW
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Venue Information */}
+            <div className="relative bg-black border-2 border-white/20 p-6">
+              <div className="absolute top-4 right-4 w-6 h-6">
+                <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
+              </div>
+              <h3 className="text-xl font-bold tracking-widest uppercase mb-6 text-white">
+                VENUE INFORMATION
+              </h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <MapPin className="w-4 h-4 text-white" />
+                    <span className="text-white/80 font-bold tracking-widest uppercase text-xs">ADDRESS</span>
+                  </div>
+                  <div className="text-white font-bold tracking-wider uppercase text-sm">
+                    {venue.address || `${venue.city}, ${venue.country}`}
+                  </div>
+                  <div className="text-white/80 font-bold tracking-wider uppercase text-xs">
+                    {venue.city}, {venue.country}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Users className="w-4 h-4 text-white" />
+                    <span className="text-white/80 font-bold tracking-widest uppercase text-xs">CAPACITY</span>
+                  </div>
+                  <div className="text-white font-bold tracking-wider uppercase text-sm">
+                    {venue.capacity ? `${venue.capacity.toLocaleString()} PEOPLE` : 'TBA'}
+                  </div>
+                </div>
+
+                {venue.website && (
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Globe className="w-4 h-4 text-white" />
+                      <span className="text-white/80 font-bold tracking-widest uppercase text-xs">WEBSITE</span>
+                    </div>
+                    <a 
+                      href={venue.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-white/80 hover:text-white text-sm transition-colors font-bold tracking-wider uppercase"
+                    >
+                      VISIT WEBSITE →
+                    </a>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Map Section */}
+            <div className="relative bg-black border-2 border-white/20 p-6">
+              <div className="absolute top-4 right-4 w-6 h-6">
+                <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
+              </div>
+              <h3 className="text-xl font-bold tracking-widest uppercase mb-4 text-white">
+                LOCATION
+              </h3>
+              <div className="bg-white/5 border border-white/20 p-8 text-center">
+                <MapPin className="w-12 h-12 text-white/60 mx-auto mb-4" />
+                <div className="text-white/80 font-bold tracking-wider uppercase text-sm">
+                  MAP COMING SOON
+                </div>
+              </div>
+            </div>
+
+            {/* Follow Section */}
+            <div className="relative bg-black border-2 border-white/20 p-6">
+              <div className="absolute top-4 right-4 w-6 h-6">
+                <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
+              </div>
+              <h3 className="text-xl font-bold tracking-widest uppercase mb-4 text-white">
+                FOLLOW {venue.name}
+              </h3>
+              <div className="space-y-3">
+                <button className="w-full p-3 bg-white/5 border border-white/20 hover:bg-white/10 transition-all duration-200 text-white font-bold tracking-wider uppercase text-sm">
+                  GET NOTIFICATIONS
+                </button>
+                <button className="w-full p-3 bg-white/5 border border-white/20 hover:bg-white/10 transition-all duration-200 text-white font-bold tracking-wider uppercase text-sm">
+                  SAVE VENUE
+                </button>
               </div>
             </div>
           </div>
         </div>
-
-        {/* Main Content */}
-        <div className="max-w-7xl mx-auto px-6 py-12">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            
-            {/* Main Content Column */}
-            <div className="lg:col-span-2 space-y-12">
-              
-              {/* Description */}
-              {venue.description && (
-                <section>
-                  <h2 className="text-3xl font-medium mb-6">About {venue.name}</h2>
-                  <div className="prose prose-gray prose-invert max-w-none">
-                    <p className="text-slate-300 text-lg leading-relaxed">{venue.description}</p>
-                  </div>
-                </section>
-              )}
-
-              {/* Upcoming Events */}
-              {upcomingEvents && upcomingEvents.length > 0 && (
-                <section>
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-3xl font-medium">Upcoming Events</h2>
-                    <Link href={`/events?venue=${venue.id}`} className="text-slate-400 hover:text-white transition-colors">
-                      View All →
-                    </Link>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {upcomingEvents.map((event: any) => (
-                      <Link key={event.id} href={`/event/${event.id}`}>
-                        <Card className="bg-slate-900 border-slate-800 hover:bg-slate-800 transition-colors duration-200 overflow-hidden">
-                          <div className="aspect-video relative">
-                            {event.flyer_url || event.images?.[0] ? (
-                              <Image
-                                src={event.flyer_url || event.images[0]}
-                                alt={event.title}
-                                fill
-                                className="object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full bg-slate-800 flex items-center justify-center">
-                                <Calendar className="w-12 h-12 text-slate-600" />
-                              </div>
-                            )}
-                          </div>
-                          <div className="p-4">
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="text-sm text-slate-400">
-                                {new Date(event.start_date).toLocaleDateString('en-US', {
-                                  weekday: 'short',
-                                  month: 'short',
-                                  day: 'numeric'
-                                })}
-                              </span>
-                              <span className="text-sm text-slate-400">
-                                {new Date(event.start_date).toLocaleTimeString('en-US', {
-                                  hour: '2-digit',
-                                  minute: '2-digit'
-                                })}
-                              </span>
-                            </div>
-                            <h3 className="font-medium text-white mb-1">{event.title}</h3>
-                            {event.artists && event.artists.length > 0 && (
-                              <p className="text-sm text-slate-400">{event.artists[0].name}</p>
-                            )}
-                          </div>
-                        </Card>
-                      </Link>
-                    ))}
-                  </div>
-                </section>
-              )}
-
-              {/* Reviews */}
-              <section>
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-3xl font-medium">Reviews & Ratings</h2>
-                  <Button className="bg-slate-900 hover:bg-slate-800 text-white border-slate-800">
-                    Write Review
-                  </Button>
-                </div>
-
-                {/* Review Summary */}
-                {overallRating > 0 && (
-                  <div className="bg-slate-900 rounded-lg p-6 mb-6">
-                    <div className="flex items-center gap-6">
-                      <div className="text-center">
-                        <div className="text-4xl font-medium text-white">{overallRating.toFixed(1)}</div>
-                        <div className="flex items-center gap-1 mt-1">
-                          {[...Array(5)].map((_, i) => (
-                            <Star 
-                              key={i} 
-                              className={`w-4 h-4 ${i < Math.floor(overallRating) ? 'text-yellow-400 fill-current' : 'text-slate-600'}`} 
-                            />
-                          ))}
-                        </div>
-                        <div className="text-sm text-slate-400 mt-1">{totalReviews} reviews</div>
-                      </div>
-                      
-                      {reviewStats && (
-                        <div className="flex-1 space-y-2">
-                          {[
-                            { label: 'Sound', value: reviewStats.soundRating },
-                            { label: 'Vibe', value: reviewStats.vibeRating },
-                            { label: 'Crowd', value: reviewStats.crowdRating }
-                          ].map(({ label, value }) => (
-                            <div key={label} className="flex items-center justify-between">
-                              <span className="text-sm text-slate-400">{label}</span>
-                              <div className="flex items-center gap-2">
-                                <div className="w-20 h-2 bg-slate-800 rounded-full">
-                                  <div 
-                                    className="h-full bg-yellow-400 rounded-full" 
-                                    style={{ width: `${(value / 5) * 100}%` }}
-                                  />
-                                </div>
-                                <span className="text-sm text-white w-8">{value.toFixed(1)}</span>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Individual Reviews */}
-                {reviews && reviews.length > 0 ? (
-                  <div className="space-y-6">
-                    {reviews.map((review: any) => (
-                      <div key={review.id} className="bg-slate-900 rounded-lg p-6">
-                        <div className="flex items-start justify-between mb-4">
-                          <div>
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="font-medium text-white">Anonymous User</span>
-                              <div className="flex items-center">
-                                {[...Array(5)].map((_, i) => (
-                                  <Star 
-                                    key={i} 
-                                    className={`w-4 h-4 ${i < review.rating ? 'text-yellow-400 fill-current' : 'text-slate-600'}`} 
-                                  />
-                                ))}
-                              </div>
-                            </div>
-                            <div className="text-sm text-slate-400">
-                              {new Date(review.created_at).toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric'
-                              })}
-                            </div>
-                          </div>
-                        </div>
-                        {review.comment && (
-                          <p className="text-slate-300 leading-relaxed">{review.comment}</p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-12 bg-slate-900 rounded-lg">
-                    <Star className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-white mb-2">No reviews yet</h3>
-                    <p className="text-slate-400 mb-6">Be the first to review {venue.name}</p>
-                    <Button className="bg-slate-800 hover:bg-slate-700 text-white">
-                      Be the first to review
-                    </Button>
-                  </div>
-                )}
-              </section>
-            </div>
-
-            {/* Sidebar */}
-            <div className="space-y-8">
-              {/* Venue Information */}
-              <Card className="bg-slate-900 border-slate-800 p-6">
-                <h3 className="text-xl font-medium text-white mb-6">Venue Information</h3>
-                
-                <div className="space-y-4">
-                  {/* Address */}
-                  <div>
-                    <div className="flex items-start gap-3">
-                      <MapPin className="w-5 h-5 text-slate-400 mt-0.5" />
-                      <div>
-                        <div className="font-medium text-white">Address</div>
-                        <div className="text-slate-400 text-sm">
-                          {venue.address || 'Address not available'}<br />
-                          {venue.city}, {venue.country}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Capacity */}
-                  {venue.capacity && (
-                    <div>
-                      <div className="flex items-start gap-3">
-                        <Users className="w-5 h-5 text-slate-400 mt-0.5" />
-                        <div>
-                          <div className="font-medium text-white">Capacity</div>
-                          <div className="text-slate-400 text-sm">{venue.capacity.toLocaleString()} people</div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Website */}
-                  {venue.website && (
-                    <div>
-                      <div className="flex items-start gap-3">
-                        <Globe className="w-5 h-5 text-slate-400 mt-0.5" />
-                        <div>
-                          <div className="font-medium text-white">Website</div>
-                          <a 
-                            href={venue.website} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-slate-400 hover:text-white text-sm transition-colors"
-                          >
-                            Visit Website ↗
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </Card>
-
-              {/* Social Media */}
-              {venue.social_links && Object.keys(venue.social_links).length > 0 && (
-                <Card className="bg-slate-900 border-slate-800 p-6">
-                  <h3 className="text-xl font-medium text-white mb-6">Follow {venue.name}</h3>
-                  
-                  <div className="space-y-3">
-                    {Object.entries(venue.social_links).map(([platform, url]) => (
-                      <a
-                        key={platform}
-                        href={url as string}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-3 text-slate-400 hover:text-white transition-colors"
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                        <span className="capitalize">{platform}</span>
-                      </a>
-                    ))}
-                  </div>
-                </Card>
-              )}
-            </div>
-          </div>
-        </div>
       </div>
-    )
-  } catch (error) {
-    console.error('Error loading venue:', error)
-    return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-medium text-white mb-4">Venue not found</h1>
-          <p className="text-slate-400 mb-6">The venue you're looking for doesn't exist or has been removed.</p>
-          <Link href="/venues">
-            <Button className="bg-slate-900 hover:bg-slate-800 text-white">
-              Browse All Venues
-            </Button>
-          </Link>
-        </div>
-      </div>
-    )
-  }
+    </div>
+  )
 } 

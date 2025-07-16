@@ -33,52 +33,52 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center px-6">
+    <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-6">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">Welcome Back</h1>
-          <p className="text-gray-400">Sign in to your Drift account</p>
+          <h1 className="text-3xl font-medium mb-2">Welcome Back</h1>
+          <p className="text-slate-400">Sign in to your Drift account</p>
         </div>
 
-        <Card className="bg-zinc-900 border-zinc-800 p-8">
+        <Card className="bg-slate-900/50 border-slate-800 p-8 backdrop-blur-sm">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium">
+              <Label htmlFor="email" className="text-sm font-medium text-slate-200">
                 Email
               </Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <Input
                   id="email"
                   type="email"
                   placeholder="Enter your email"
                   value={email}
-                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-                   className="pl-10 bg-zinc-800 border-zinc-700 text-white placeholder:text-gray-400"
-                   required
-                 />
-               </div>
-             </div>
- 
-             <div className="space-y-2">
-               <Label htmlFor="password" className="text-sm font-medium">
-                 Password
-               </Label>
-               <div className="relative">
-                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                 <Input
-                   id="password"
-                   type={showPassword ? "text" : "password"}
-                   placeholder="Enter your password"
-                   value={password}
-                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-                  className="pl-10 pr-10 bg-zinc-800 border-zinc-700 text-white placeholder:text-gray-400"
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+                  className="pl-10 bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-slate-600"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-sm font-medium text-slate-200">
+                Password
+              </Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+                  className="pl-10 pr-10 bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-slate-600"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -87,17 +87,17 @@ export default function LoginPage() {
 
             <div className="flex items-center justify-between">
               <label className="flex items-center">
-                <input type="checkbox" className="rounded border-zinc-700 bg-zinc-800" />
-                <span className="ml-2 text-sm text-gray-400">Remember me</span>
+                <input type="checkbox" className="rounded border-slate-700 bg-slate-800/50 text-slate-200" />
+                <span className="ml-2 text-sm text-slate-400">Remember me</span>
               </label>
-              <Link href="/auth/forgot-password" className="text-sm text-red-400 hover:text-red-300">
+              <Link href="/auth/forgot-password" className="text-sm text-slate-300 hover:text-white transition-colors">
                 Forgot password?
               </Link>
             </div>
 
             <Button 
               type="submit" 
-              className="w-full bg-red-600 hover:bg-red-700"
+              className="w-full bg-slate-900 hover:bg-slate-800 border border-slate-700 text-white"
               disabled={isLoading}
             >
               {isLoading ? (
@@ -117,10 +117,10 @@ export default function LoginPage() {
           <div className="mt-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-zinc-700" />
+                <div className="w-full border-t border-slate-700" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-zinc-900 text-gray-400">Or continue with</span>
+                <span className="px-2 bg-slate-900/50 text-slate-400">Or continue with</span>
               </div>
             </div>
 
@@ -128,7 +128,7 @@ export default function LoginPage() {
               <Button
                 variant="outline"
                 onClick={() => handleSocialLogin("google")}
-                className="border-zinc-700 hover:bg-zinc-800"
+                className="border-slate-700 hover:bg-slate-800/50 text-slate-200"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24">
                   <path
@@ -154,7 +154,7 @@ export default function LoginPage() {
               <Button
                 variant="outline"
                 onClick={() => handleSocialLogin("facebook")}
-                className="border-zinc-700 hover:bg-zinc-800"
+                className="border-slate-700 hover:bg-slate-800/50 text-slate-200"
               >
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
@@ -165,9 +165,9 @@ export default function LoginPage() {
           </div>
 
           <div className="mt-6 text-center">
-            <p className="text-gray-400">
+            <p className="text-slate-400">
               Don't have an account?{" "}
-              <Link href="/auth/register" className="text-red-400 hover:text-red-300 font-medium">
+              <Link href="/auth/register" className="text-slate-300 hover:text-white font-medium transition-colors">
                 Sign up
               </Link>
             </p>

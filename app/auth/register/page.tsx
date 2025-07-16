@@ -53,70 +53,70 @@ export default function RegisterPage() {
   const selectedRole = roles.find(role => role.id === formData.role)
 
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center px-6 py-12">
+    <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-6 py-12">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">Join Drift</h1>
-          <p className="text-gray-400">Create your account and start exploring</p>
+          <h1 className="text-3xl font-medium mb-2">Join Drift</h1>
+          <p className="text-slate-400">Create your account and start exploring</p>
         </div>
 
-        <Card className="bg-zinc-900 border-zinc-800 p-8">
+        <Card className="bg-slate-900/50 border-slate-800 p-8 backdrop-blur-sm">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-sm font-medium">
+              <Label htmlFor="name" className="text-sm font-medium text-slate-200">
                 Full Name
               </Label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <Input
                   id="name"
                   type="text"
                   placeholder="Enter your full name"
                   value={formData.name}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange("name", e.target.value)}
-                  className="pl-10 bg-zinc-800 border-zinc-700 text-white placeholder:text-gray-400"
+                  className="pl-10 bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-slate-600"
                   required
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium">
+              <Label htmlFor="email" className="text-sm font-medium text-slate-200">
                 Email
               </Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <Input
                   id="email"
                   type="email"
                   placeholder="Enter your email"
                   value={formData.email}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange("email", e.target.value)}
-                  className="pl-10 bg-zinc-800 border-zinc-700 text-white placeholder:text-gray-400"
+                  className="pl-10 bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-slate-600"
                   required
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-medium">
+              <Label htmlFor="password" className="text-sm font-medium text-slate-200">
                 Password
               </Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="Create a password"
                   value={formData.password}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange("password", e.target.value)}
-                  className="pl-10 pr-10 bg-zinc-800 border-zinc-700 text-white placeholder:text-gray-400"
+                  className="pl-10 pr-10 bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-slate-600"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -124,24 +124,24 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword" className="text-sm font-medium">
+              <Label htmlFor="confirmPassword" className="text-sm font-medium text-slate-200">
                 Confirm Password
               </Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
                 <Input
                   id="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="Confirm your password"
                   value={formData.confirmPassword}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange("confirmPassword", e.target.value)}
-                  className="pl-10 pr-10 bg-zinc-800 border-zinc-700 text-white placeholder:text-gray-400"
+                  className="pl-10 pr-10 bg-slate-800/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-slate-600"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
                 >
                   {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -149,15 +149,15 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-3">
-              <Label className="text-sm font-medium">Account Type</Label>
+              <Label className="text-sm font-medium text-slate-200">Account Type</Label>
               <div className="grid grid-cols-1 gap-3">
                 {roles.map((role) => (
                   <div
                     key={role.id}
                     className={`relative cursor-pointer rounded-lg border p-4 transition-colors ${
                       formData.role === role.id
-                        ? "border-red-600 bg-red-600/10"
-                        : "border-zinc-700 hover:border-zinc-600"
+                        ? "border-slate-600 bg-slate-800/70"
+                        : "border-slate-700 hover:border-slate-600 hover:bg-slate-800/30"
                     }`}
                     onClick={() => handleInputChange("role", role.id)}
                   >
@@ -168,18 +168,18 @@ export default function RegisterPage() {
                         value={role.id}
                         checked={formData.role === role.id}
                         onChange={() => handleInputChange("role", role.id)}
-                        className="h-4 w-4 text-red-600 focus:ring-red-600 border-zinc-700 bg-zinc-800"
+                        className="h-4 w-4 text-slate-600 focus:ring-slate-600 border-slate-700 bg-slate-800"
                       />
                       <div className="ml-3 flex-1">
                         <div className="flex items-center gap-2">
-                          <Label className="font-medium">{role.name}</Label>
+                          <Label className="font-medium text-slate-200">{role.name}</Label>
                           {role.requiresVerification && (
-                            <Badge variant="outline" className="border-yellow-600 text-yellow-400 text-xs">
+                            <Badge variant="outline" className="border-slate-600 text-slate-400 text-xs">
                               Requires Verification
                             </Badge>
                           )}
                         </div>
-                        <p className="text-sm text-gray-400">{role.description}</p>
+                        <p className="text-sm text-slate-400">{role.description}</p>
                       </div>
                     </div>
                   </div>
@@ -188,10 +188,10 @@ export default function RegisterPage() {
             </div>
 
             {selectedRole?.requiresVerification && (
-              <div className="p-4 bg-zinc-800 rounded-lg border border-zinc-700">
+              <div className="p-4 bg-slate-800/50 rounded-lg border border-slate-700">
                 <div className="text-sm">
-                  <div className="font-medium text-yellow-400 mb-2">Verification Required</div>
-                  <p className="text-gray-400">
+                  <div className="font-medium text-slate-300 mb-2">Verification Required</div>
+                  <p className="text-slate-400">
                     This account type requires manual verification. After registration, you'll need to submit 
                     documentation and wait for admin approval before you can create content.
                   </p>
@@ -200,14 +200,14 @@ export default function RegisterPage() {
             )}
 
             <div className="flex items-center">
-              <input type="checkbox" className="rounded border-zinc-700 bg-zinc-800" required />
-              <span className="ml-2 text-sm text-gray-400">
+              <input type="checkbox" className="rounded border-slate-700 bg-slate-800/50 text-slate-200" required />
+              <span className="ml-2 text-sm text-slate-400">
                 I agree to the{" "}
-                <Link href="/terms" className="text-red-400 hover:text-red-300">
+                <Link href="/terms" className="text-slate-300 hover:text-white transition-colors">
                   Terms of Service
                 </Link>{" "}
                 and{" "}
-                <Link href="/privacy" className="text-red-400 hover:text-red-300">
+                <Link href="/privacy" className="text-slate-300 hover:text-white transition-colors">
                   Privacy Policy
                 </Link>
               </span>
@@ -215,7 +215,7 @@ export default function RegisterPage() {
 
             <Button 
               type="submit" 
-              className="w-full bg-red-600 hover:bg-red-700"
+              className="w-full bg-slate-900 hover:bg-slate-800 border border-slate-700 text-white"
               disabled={isLoading}
             >
               {isLoading ? (
@@ -235,10 +235,10 @@ export default function RegisterPage() {
           <div className="mt-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-zinc-700" />
+                <div className="w-full border-t border-slate-700" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-zinc-900 text-gray-400">Or continue with</span>
+                <span className="px-2 bg-slate-900/50 text-slate-400">Or continue with</span>
               </div>
             </div>
 
@@ -246,7 +246,7 @@ export default function RegisterPage() {
               <Button
                 variant="outline"
                 onClick={() => handleSocialLogin("google")}
-                className="border-zinc-700 hover:bg-zinc-800"
+                className="border-slate-700 hover:bg-slate-800/50 text-slate-200"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24">
                   <path
@@ -272,7 +272,7 @@ export default function RegisterPage() {
               <Button
                 variant="outline"
                 onClick={() => handleSocialLogin("facebook")}
-                className="border-zinc-700 hover:bg-zinc-800"
+                className="border-slate-700 hover:bg-slate-800/50 text-slate-200"
               >
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
@@ -283,9 +283,9 @@ export default function RegisterPage() {
           </div>
 
           <div className="mt-6 text-center">
-            <p className="text-gray-400">
+            <p className="text-slate-400">
               Already have an account?{" "}
-              <Link href="/auth/login" className="text-red-400 hover:text-red-300 font-medium">
+              <Link href="/auth/login" className="text-slate-300 hover:text-white font-medium transition-colors">
                 Sign in
               </Link>
             </p>

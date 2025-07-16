@@ -1,11 +1,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Search, SlidersHorizontal, X, Calendar, MapPin, Star } from 'lucide-react'
+import { Search, SlidersHorizontal, X, Calendar, MapPin, Star, Zap, TrendingUp, Clock } from 'lucide-react'
 import Link from 'next/link'
 import { getEvents } from '@/lib/services/events'
 import { getVenues } from '@/lib/services/venues'  
 import { getArtists } from '@/lib/services/artists'
+import { EntityCard } from '@/components/ui/entity-card'
+import { getFallbackImage, isValidImageUrl } from '@/lib/utils/imageUtils'
+import Image from 'next/image'
 
 const genreTags = ['All', 'Techno', 'House', 'Trance', 'Drum & Bass', 'Dubstep', 'Ambient', 'Minimal', 'Progressive']
 const cities = ['All Cities', 'Berlin', 'London', 'Amsterdam', 'Barcelona', 'Paris', 'New York', 'Los Angeles', 'Tokyo']
@@ -29,9 +32,9 @@ export default function ExplorePage() {
       try {
         setLoading(true)
         const [eventsData, venuesData, artistsData] = await Promise.all([
-          getEvents({ limit: 20 }),
-          getVenues({ limit: 20 }),
-          getArtists({ limit: 20 })
+          getEvents({ limit: 50 }),
+          getVenues({ limit: 30 }),
+          getArtists({ limit: 30 })
         ])
         setEvents(eventsData || [])
         setVenues(venuesData || [])
@@ -74,330 +77,341 @@ export default function ExplorePage() {
     return matchesSearch && matchesGenre
   })
 
-  const getDisplayData = () => {
-    switch (selectedType) {
-      case 'events': return filteredEvents
-      case 'venues': return filteredVenues  
-      case 'artists': return filteredArtists
-      default: return [...filteredEvents, ...filteredVenues, ...filteredArtists]
-    }
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-950 pt-24 pb-16">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center">
+            <div className="w-8 h-8 border-2 border-slate-600 border-t-white rounded-full animate-spin mx-auto"></div>
+            <p className="text-slate-400 mt-4">Discovering amazing content...</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
-  const displayData = getDisplayData()
-
   return (
-    <div className="min-h-screen">
-      {/* Search Header */}
-      <div className="border-b border-drift-border">
-        <div className="container mx-auto px-4 py-6">
-          <div className="max-w-3xl mx-auto">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-drift-muted" />
-              <input
-                type="text"
-                placeholder="Search events, venues, or artists..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 bg-transparent border border-drift-border text-lg placeholder-drift-muted focus:outline-none focus:border-drift-primary transition-colors"
-              />
-            </div>
+    <div className="min-h-screen bg-slate-950 pt-24 pb-16">
+      <div className="max-w-7xl mx-auto px-6">
+        {/* Search Header */}
+        <div className="mb-12">
+          <div className="max-w-3xl mx-auto text-center mb-8">
+            <h1 className="text-4xl font-medium text-white mb-4">
+              Explore
+            </h1>
+            <p className="text-slate-400 text-lg">
+              Discover the best electronic music experiences around the world
+            </p>
+          </div>
+
+          <div className="relative max-w-2xl mx-auto">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search events, venues, or artists..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-12 pr-4 py-4 bg-slate-900 border border-slate-800 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:border-slate-600 transition-colors text-lg"
+            />
           </div>
         </div>
-      </div>
 
-      {/* Filters Bar */}
-      <div className="border-b border-drift-border sticky top-16 bg-black z-30">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between py-4">
-            <div className="flex items-center gap-6">
-              {/* Type Filter */}
-              <div className="flex gap-4">
-                {(['all', 'events', 'venues', 'artists'] as const).map((type) => (
-                  <button
-                    key={type}
-                    onClick={() => setSelectedType(type)}
-                    className={`text-sm capitalize pb-1 border-b-2 transition-colors ${
-                      selectedType === type
-                        ? 'text-drift-primary border-drift-primary'
-                        : 'text-drift-text-secondary border-transparent hover:text-white'
-                    }`}
-                  >
-                    {type === 'all' ? 'Everything' : type}
-                  </button>
-                ))}
-              </div>
-
-              {/* Quick Filters */}
-              <div className="hidden md:flex items-center gap-4 pl-6 border-l border-drift-border">
-                <select
-                  value={selectedGenre}
-                  onChange={(e) => setSelectedGenre(e.target.value)}
-                  className="bg-transparent text-sm text-drift-text-secondary focus:text-white focus:outline-none cursor-pointer"
-                >
-                  {genreTags.map((genre) => (
-                    <option key={genre} value={genre} className="bg-black">
-                      {genre}
-                    </option>
-                  ))}
-                </select>
-
-                <select
-                  value={selectedCity}
-                  onChange={(e) => setSelectedCity(e.target.value)}
-                  className="bg-transparent text-sm text-drift-text-secondary focus:text-white focus:outline-none cursor-pointer"
-                >
-                  {cities.map((city) => (
-                    <option key={city} value={city} className="bg-black">
-                      {city}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2 text-sm text-drift-text-secondary hover:text-white transition-colors"
-            >
-              <SlidersHorizontal className="w-4 h-4" />
-              <span className="hidden sm:inline">Filters</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Advanced Filters Panel */}
-      {showFilters && (
-        <div className="border-b border-drift-border bg-drift-surface">
-          <div className="container mx-auto px-4 py-6">
-            <div className="flex justify-between items-start mb-6">
-              <h3 className="text-lg font-semibold">Filters</h3>
+        {/* Filter Tabs */}
+        <div className="flex justify-center mb-8">
+          <div className="flex bg-slate-900 border border-slate-800 rounded-lg p-1">
+            {[
+              { id: 'all', label: 'Everything' },
+              { id: 'events', label: 'Events' },
+              { id: 'venues', label: 'Venues' },
+              { id: 'artists', label: 'Artists' }
+            ].map(({ id, label }) => (
               <button
-                onClick={() => setShowFilters(false)}
-                className="p-1 hover:bg-drift-border rounded transition-colors"
+                key={id}
+                onClick={() => setSelectedType(id as any)}
+                className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${
+                  selectedType === id
+                    ? 'bg-white text-slate-950'
+                    : 'text-slate-400 hover:text-white'
+                }`}
               >
-                <X className="w-5 h-5" />
+                {label}
               </button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Date Range */}
-              <div>
-                <label className="text-sm text-drift-text-secondary mb-2 block">Date Range</label>
-                <div className="space-y-2">
-                  <input
-                    type="date"
-                    className="w-full px-3 py-2 bg-black border border-drift-border text-sm focus:outline-none focus:border-drift-primary transition-colors"
-                  />
-                  <input
-                    type="date"
-                    className="w-full px-3 py-2 bg-black border border-drift-border text-sm focus:outline-none focus:border-drift-primary transition-colors"
-                  />
-                </div>
-              </div>
-
-              {/* Price Range */}
-              <div>
-                <label className="text-sm text-drift-text-secondary mb-2 block">Price Range</label>
-                <div className="flex gap-2 items-center">
-                  <input
-                    type="number"
-                    placeholder="Min"
-                    className="w-full px-3 py-2 bg-black border border-drift-border text-sm focus:outline-none focus:border-drift-primary transition-colors"
-                  />
-                  <span className="text-drift-muted">-</span>
-                  <input
-                    type="number"
-                    placeholder="Max"
-                    className="w-full px-3 py-2 bg-black border border-drift-border text-sm focus:outline-none focus:border-drift-primary transition-colors"
-                  />
-                </div>
-              </div>
-
-              {/* Additional Options */}
-              <div>
-                <label className="text-sm text-drift-text-secondary mb-2 block">Options</label>
-                <div className="space-y-2">
-                  <label className="flex items-center gap-2 text-sm cursor-pointer">
-                    <input type="checkbox" className="w-4 h-4" />
-                    <span>Free Events Only</span>
-                  </label>
-                  <label className="flex items-center gap-2 text-sm cursor-pointer">
-                    <input type="checkbox" className="w-4 h-4" />
-                    <span>This Weekend</span>
-                  </label>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
-      )}
 
-      {/* Results */}
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-6">
-          <p className="text-sm text-drift-text-secondary">
-            {loading ? 'Loading...' : `Showing ${displayData.length} results`} {selectedGenre !== 'All' && `for ${selectedGenre}`} {selectedCity !== 'All Cities' && `in ${selectedCity}`}
+        {/* Quick Filters */}
+        <div className="flex flex-wrap justify-center gap-4 mb-12">
+          <div className="flex flex-wrap gap-2">
+            {genreTags.slice(0, 6).map((genre) => (
+              <button
+                key={genre}
+                onClick={() => setSelectedGenre(genre)}
+                className={`px-4 py-2 rounded-full text-sm transition-colors ${
+                  selectedGenre === genre
+                    ? 'bg-white text-slate-950'
+                    : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                }`}
+              >
+                {genre}
+              </button>
+            ))}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {cities.slice(0, 5).map((city) => (
+              <button
+                key={city}
+                onClick={() => setSelectedCity(city)}
+                className={`px-4 py-2 rounded-full text-sm transition-colors ${
+                  selectedCity === city
+                    ? 'bg-white text-slate-950'
+                    : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                }`}
+              >
+                {city}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Results Count */}
+        <div className="text-center mb-8">
+          <p className="text-slate-400">
+            Showing {filteredEvents.length + filteredVenues.length + filteredArtists.length} results
           </p>
         </div>
 
-        {/* Results Grid */}
-        {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {Array.from({ length: 12 }).map((_, i) => (
-              <div key={i} className="animate-pulse">
-                <div className="aspect-[4/3] bg-zinc-800 mb-3 rounded-lg"></div>
-                <div className="h-4 bg-zinc-800 rounded mb-2"></div>
-                <div className="h-3 bg-zinc-800 rounded w-2/3"></div>
-              </div>
-            ))}
-          </div>
-        ) : displayData.length === 0 ? (
-          <div className="text-center py-12">
-            <Search className="w-12 h-12 text-gray-500 mx-auto mb-4" />
-            <p className="text-gray-400">No results found. Try adjusting your filters.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {/* Events */}
-            {(selectedType === 'all' || selectedType === 'events') && filteredEvents.map((event: any) => (
-              <Link key={`event-${event.id}`} href={`/event/${event.id}`} className="group cursor-pointer">
-                <div className="relative overflow-hidden rounded-lg mb-3">
-                  <div className="aspect-[4/3] bg-gradient-to-br from-zinc-800 to-zinc-900">
-                    {event.images && event.images[0] ? (
-                      <img 
-                        src={event.images[0]} 
-                        alt={event.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
-                        <Calendar className="w-8 h-8 text-white/50" />
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                    <div className="absolute top-3 left-3">
-                      <span className="text-xs uppercase tracking-wider text-purple-400 bg-black/50 px-2 py-1 rounded">
-                        Event
-                      </span>
-                    </div>
-                    <div className="absolute bottom-3 left-3 right-3">
-                      <div className="flex items-center gap-2 text-xs text-white/80 mb-1">
-                        <Calendar className="w-3 h-3" />
-                        {new Date(event.start_date).toLocaleDateString('en-US', { 
-                          month: 'short', 
-                          day: 'numeric' 
-                        })}
-                        {event.venue && (
-                          <>
-                            <span>•</span>
-                            <MapPin className="w-3 h-3" />
-                            {event.venue.name}
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <h3 className="font-semibold text-white mb-1 group-hover:text-purple-300 transition-colors line-clamp-2">
-                  {event.title}
-                </h3>
-                <p className="text-sm text-gray-400 line-clamp-1">
-                  {event.venue?.city}, {event.venue?.country}
-                </p>
-              </Link>
-            ))}
+        {/* Featured Content - Hero Grid */}
+        {selectedType === 'all' && searchQuery === '' && selectedGenre === 'All' && selectedCity === 'All Cities' && (
+          <div className="mb-16">
+            <div className="flex items-center gap-3 mb-8">
+              <Zap className="w-6 h-6 text-white" />
+              <h2 className="text-2xl font-medium text-white">Featured</h2>
+            </div>
             
-            {/* Venues */}
-            {(selectedType === 'all' || selectedType === 'venues') && filteredVenues.map((venue: any) => (
-              <Link key={`venue-${venue.id}`} href={`/venue/${venue.id}`} className="group cursor-pointer">
-                <div className="relative overflow-hidden rounded-lg mb-3">
-                  <div className="aspect-[4/3] bg-gradient-to-br from-zinc-800 to-zinc-900">
-                    {venue.images && venue.images[0] ? (
-                      <img 
-                        src={venue.images[0]} 
-                        alt={venue.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
-                        <MapPin className="w-8 h-8 text-white/50" />
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+              {/* Large featured event */}
+              {filteredEvents[0] && (
+                <div className="md:col-span-2 md:row-span-2">
+                  <Link href={`/event/${filteredEvents[0].id}`}>
+                    <div className="group relative h-96 bg-slate-900 rounded-xl overflow-hidden">
+                      <div className="absolute inset-0">
+                        <Image
+                          src={isValidImageUrl(filteredEvents[0].flyer_url || filteredEvents[0].images?.[0]) 
+                            ? (filteredEvents[0].flyer_url || filteredEvents[0].images[0]) 
+                            : getFallbackImage('event', filteredEvents[0].id)}
+                          alt={filteredEvents[0].title}
+                          fill
+                          className="object-cover opacity-40 group-hover:opacity-50 transition-opacity duration-300"
+                        />
                       </div>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                    <div className="absolute top-3 left-3">
-                      <span className="text-xs uppercase tracking-wider text-blue-400 bg-black/50 px-2 py-1 rounded">
-                        Venue
-                      </span>
-                    </div>
-                    <div className="absolute bottom-3 left-3 right-3">
-                      <div className="flex items-center gap-2 text-xs text-white/80 mb-1">
-                        <MapPin className="w-3 h-3" />
-                        {venue.city}, {venue.country}
-                        {venue.capacity && (
-                          <>
-                            <span>•</span>
-                            <Star className="w-3 h-3" />
-                            {venue.capacity} cap
-                          </>
-                        )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
+                      <div className="absolute top-4 right-4">
+                        <span className="bg-white/10 backdrop-blur-sm px-3 py-1 rounded-full text-white text-sm font-mono">
+                          EVENT
+                        </span>
+                      </div>
+                      <div className="absolute bottom-6 left-6 right-6">
+                        <h3 className="text-2xl font-medium text-white mb-2">{filteredEvents[0].title}</h3>
+                        <div className="flex items-center gap-4 text-slate-300 text-sm">
+                          <span>{new Date(filteredEvents[0].start_date).toLocaleDateString()}</span>
+                          <span>•</span>
+                          <span>{filteredEvents[0].venue?.name || 'TBA'}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 </div>
-                <h3 className="font-semibold text-white mb-1 group-hover:text-purple-300 transition-colors line-clamp-1">
-                  {venue.name}
-                </h3>
-                <p className="text-sm text-gray-400 line-clamp-1">
-                  {venue.genres?.join(', ') || 'Electronic Music Venue'}
-                </p>
-              </Link>
-            ))}
-            
-            {/* Artists */}
-            {(selectedType === 'all' || selectedType === 'artists') && filteredArtists.map((artist: any) => (
-              <Link key={`artist-${artist.id}`} href={`/artist/${artist.id}`} className="group cursor-pointer">
-                <div className="relative overflow-hidden rounded-lg mb-3">
-                  <div className="aspect-[4/3] bg-gradient-to-br from-zinc-800 to-zinc-900">
-                    {artist.images && artist.images[0] ? (
-                      <img 
-                        src={artist.images[0]} 
-                        alt={artist.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-pink-600 to-orange-600 flex items-center justify-center">
-                        <Star className="w-8 h-8 text-white/50" />
+              )}
+
+              {/* Two medium cards */}
+              {filteredVenues[0] && (
+                <div className="md:col-span-2">
+                  <Link href={`/venue/${filteredVenues[0].id}`}>
+                    <div className="group relative h-44 bg-slate-900 rounded-xl overflow-hidden">
+                      <div className="absolute inset-0">
+                        <Image
+                          src={isValidImageUrl(filteredVenues[0].images?.[0]) 
+                            ? filteredVenues[0].images[0] 
+                            : getFallbackImage('venue', filteredVenues[0].id)}
+                          alt={filteredVenues[0].name}
+                          fill
+                          className="object-cover opacity-30 group-hover:opacity-40 transition-opacity duration-300"
+                        />
                       </div>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                    <div className="absolute top-3 left-3">
-                      <span className="text-xs uppercase tracking-wider text-pink-400 bg-black/50 px-2 py-1 rounded">
-                        Artist
-                      </span>
-                    </div>
-                    <div className="absolute bottom-3 left-3 right-3">
-                      <div className="flex items-center gap-2 text-xs text-white/80 mb-1">
-                        {artist.city && (
-                          <>
-                            <MapPin className="w-3 h-3" />
-                            {artist.city}, {artist.country}
-                          </>
-                        )}
+                      <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 to-transparent" />
+                      <div className="absolute top-4 right-4">
+                        <span className="bg-white/10 backdrop-blur-sm px-3 py-1 rounded-full text-white text-sm font-mono">
+                          VENUE
+                        </span>
+                      </div>
+                      <div className="absolute bottom-4 left-4 right-4">
+                        <h3 className="text-xl font-medium text-white mb-1">{filteredVenues[0].name}</h3>
+                        <p className="text-slate-300 text-sm">{filteredVenues[0].city}, {filteredVenues[0].country}</p>
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 </div>
-                <h3 className="font-semibold text-white mb-1 group-hover:text-purple-300 transition-colors line-clamp-1">
-                  {artist.name}
-                </h3>
-                <p className="text-sm text-gray-400 line-clamp-1">
-                  {artist.genres?.join(', ') || 'Electronic Artist'}
-                </p>
-              </Link>
-            ))}
+              )}
+
+              {/* Artist spotlight */}
+              {filteredArtists[0] && (
+                <div className="md:col-span-2">
+                  <Link href={`/artist/${filteredArtists[0].id}`}>
+                    <div className="group relative h-44 bg-slate-900 rounded-xl overflow-hidden">
+                      <div className="absolute inset-0">
+                        <Image
+                          src={isValidImageUrl(filteredArtists[0].photo_url || filteredArtists[0].images?.[0]) 
+                            ? (filteredArtists[0].photo_url || filteredArtists[0].images[0]) 
+                            : getFallbackImage('artist', filteredArtists[0].id)}
+                          alt={filteredArtists[0].name}
+                          fill
+                          className="object-cover opacity-30 group-hover:opacity-40 transition-opacity duration-300"
+                        />
+                      </div>
+                      <div className="absolute inset-0 bg-gradient-to-l from-slate-950/80 to-transparent" />
+                      <div className="absolute top-4 right-4">
+                        <span className="bg-white/10 backdrop-blur-sm px-3 py-1 rounded-full text-white text-sm font-mono">
+                          ARTIST
+                        </span>
+                      </div>
+                      <div className="absolute bottom-4 left-4 right-4">
+                        <h3 className="text-xl font-medium text-white mb-1">{filteredArtists[0].name}</h3>
+                        <p className="text-slate-300 text-sm">{filteredArtists[0].genres?.[0] || 'Electronic'}</p>
+                      </div>
+                    </div>
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
         )}
+
+        {/* Dynamic Content Grid */}
+        <div className="space-y-16">
+          {/* Events Section */}
+          {(selectedType === 'all' || selectedType === 'events') && filteredEvents.length > 0 && (
+            <section>
+              <div className="flex items-center gap-3 mb-8">
+                <Calendar className="w-6 h-6 text-white" />
+                <h2 className="text-2xl font-medium text-white">
+                  {selectedType === 'events' ? 'Events' : 'Upcoming Events'}
+                </h2>
+                <div className="text-slate-400">({filteredEvents.length})</div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {filteredEvents.slice(selectedType === 'all' ? 1 : 0, selectedType === 'events' ? undefined : 9).map((event: any, index: number) => {
+                  const eventDate = new Date(event.start_date);
+                  const isUpcoming = eventDate > new Date();
+                  
+                  return (
+                    <EntityCard
+                      key={event.id}
+                      type="event"
+                      id={event.id}
+                      title={event.title}
+                      artist={event.artists?.[0]?.name || 'Various Artists'}
+                      imageUrl={isValidImageUrl(event.flyer_url || event.images?.[0]) ? (event.flyer_url || event.images[0]) : getFallbackImage('event', event.id)}
+                      category={event.genres?.[0] || 'ELECTRONIC'}
+                      href={`/event/${event.id}`}
+                      date={eventDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }).toUpperCase()}
+                      time={eventDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
+                      venue={event.venue?.name || 'TBA'}
+                      location={event.venue?.city ? `${event.venue.city}, ${event.venue.country}` : 'Location TBA'}
+                      price={event.ticket_price_min && event.ticket_price_max ? `$${event.ticket_price_min}-${event.ticket_price_max}` : undefined}
+                      attendees={event.attendees}
+                      rating={event.rating}
+                      isUpcoming={isUpcoming}
+                    />
+                  );
+                })}
+              </div>
+            </section>
+          )}
+
+          {/* Venues Section */}
+          {(selectedType === 'all' || selectedType === 'venues') && filteredVenues.length > 0 && (
+            <section>
+              <div className="flex items-center gap-3 mb-8">
+                <MapPin className="w-6 h-6 text-white" />
+                <h2 className="text-2xl font-medium text-white">
+                  {selectedType === 'venues' ? 'Venues' : 'Featured Venues'}
+                </h2>
+                <div className="text-slate-400">({filteredVenues.length})</div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredVenues.slice(selectedType === 'all' ? 1 : 0, selectedType === 'venues' ? undefined : 6).map((venue: any, index: number) => (
+                  <EntityCard
+                    key={venue.id}
+                    type="venue"
+                    id={venue.id}
+                    title={venue.name}
+                    imageUrl={isValidImageUrl(venue.images?.[0]) ? venue.images[0] : getFallbackImage('venue', venue.id)}
+                    category={venue.genres?.[0] || 'CLUB'}
+                    href={`/venue/${venue.id}`}
+                    city={venue.city}
+                    country={venue.country}
+                    capacity={venue.capacity}
+                    genres={venue.genres}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Artists Section */}
+          {(selectedType === 'all' || selectedType === 'artists') && filteredArtists.length > 0 && (
+            <section>
+              <div className="flex items-center gap-3 mb-8">
+                <Star className="w-6 h-6 text-white" />
+                <h2 className="text-2xl font-medium text-white">
+                  {selectedType === 'artists' ? 'Artists' : 'Rising Artists'}
+                </h2>
+                <div className="text-slate-400">({filteredArtists.length})</div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {filteredArtists.slice(selectedType === 'all' ? 1 : 0, selectedType === 'artists' ? undefined : 8).map((artist: any, index: number) => (
+                  <EntityCard
+                    key={artist.id}
+                    type="artist"
+                    id={artist.id}
+                    title={artist.name}
+                    imageUrl={isValidImageUrl(artist.photo_url || artist.images?.[0]) ? (artist.photo_url || artist.images[0]) : getFallbackImage('artist', artist.id)}
+                    category={artist.genres?.[0] || 'ELECTRONIC'}
+                    href={`/artist/${artist.id}`}
+                    bio={artist.bio}
+                    city={artist.city}
+                    country={artist.country}
+                    genres={artist.genres}
+                    rating={artist.average_rating}
+                    reviewCount={artist.review_count}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+        </div>
+
+        {/* Load More CTA */}
+        <div className="text-center mt-16">
+          <div className="text-slate-400 mb-6">
+            Want to see more? Check out our dedicated pages
+          </div>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/events" className="px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-lg transition-colors">
+              Browse All Events
+            </Link>
+            <Link href="/venues" className="px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-lg transition-colors">
+              Explore Venues
+            </Link>
+            <Link href="/artists" className="px-6 py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-lg transition-colors">
+              Discover Artists
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   )

@@ -2,14 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { Search, MapPin, Users, Star, SlidersHorizontal } from 'lucide-react'
-import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { EntityCard } from '@/components/ui/entity-card'
 import { getVenues } from '@/lib/services/venues'
 import { getListFallbackImage, isValidImageUrl } from '@/lib/utils/imageUtils'
-import Image from 'next/image'
-import Link from 'next/link'
 
 export default function VenuesPage() {
   const [venues, setVenues] = useState<any[]>([])
@@ -57,11 +54,11 @@ export default function VenuesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black pt-24 pb-16">
+      <div className="min-h-screen bg-slate-950 pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center">
-            <div className="w-8 h-8 border-2 border-zinc-600 border-t-white rounded-full animate-spin mx-auto"></div>
-            <p className="text-zinc-400 mt-4">Loading venues...</p>
+            <div className="w-8 h-8 border-2 border-slate-600 border-t-white rounded-full animate-spin mx-auto"></div>
+            <p className="text-slate-400 mt-4">Loading venues...</p>
           </div>
         </div>
       </div>
@@ -69,14 +66,14 @@ export default function VenuesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black pt-24 pb-16">
+    <div className="min-h-screen bg-slate-950 pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
         <div className="mb-12">
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
+          <h1 className="text-4xl font-medium text-white mb-4">
             Venues
           </h1>
-          <p className="text-xl text-zinc-400 max-w-3xl">
+          <p className="text-slate-400 max-w-2xl">
             Discover electronic music venues and clubs from around the globe
           </p>
         </div>
@@ -85,13 +82,13 @@ export default function VenuesPage() {
         <div className="mb-8 space-y-4">
           {/* Search Bar */}
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-zinc-400 w-5 h-5" />
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
             <Input
               type="text"
               placeholder="Search venues, cities, or descriptions..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-12 bg-zinc-900 border-zinc-800 text-white placeholder-zinc-500 h-12 text-lg"
+              className="pl-12 bg-slate-900 border-slate-800 text-white placeholder-slate-500 h-12 text-lg"
             />
           </div>
 
@@ -100,7 +97,7 @@ export default function VenuesPage() {
             <Button
               variant="outline"
               onClick={() => setFiltersOpen(!filtersOpen)}
-              className="flex items-center gap-2 bg-zinc-900 border-zinc-800 text-white hover:bg-zinc-800"
+              className="flex items-center gap-2 bg-slate-900 border-slate-800 text-white hover:bg-slate-800"
             >
               <SlidersHorizontal className="w-4 h-4" />
               Filters
@@ -112,7 +109,7 @@ export default function VenuesPage() {
                 <select
                   value={selectedGenre}
                   onChange={(e) => setSelectedGenre(e.target.value)}
-                  className="px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-white"
+                  className="px-4 py-2 bg-slate-900 border border-slate-800 rounded-lg text-white"
                 >
                   <option value="all">All Genres</option>
                   {allGenres.map(genre => (
@@ -124,7 +121,7 @@ export default function VenuesPage() {
                 <select
                   value={selectedCity}
                   onChange={(e) => setSelectedCity(e.target.value)}
-                  className="px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-white"
+                  className="px-4 py-2 bg-slate-900 border border-slate-800 rounded-lg text-white"
                 >
                   <option value="all">All Cities</option>
                   {allCities.map(city => (
@@ -138,7 +135,7 @@ export default function VenuesPage() {
 
         {/* Results Count */}
         <div className="mb-8">
-          <h2 className="text-2xl font-semibold text-white">
+          <h2 className="text-2xl font-medium text-white">
             All Venues ({filteredVenues.length})
           </h2>
         </div>
@@ -146,60 +143,26 @@ export default function VenuesPage() {
         {/* Venues Grid */}
         {filteredVenues.length === 0 ? (
           <div className="text-center py-12">
-            <Search className="w-12 h-12 text-zinc-500 mx-auto mb-4" />
-            <p className="text-zinc-400">No venues found. Try adjusting your filters.</p>
+            <Search className="w-12 h-12 text-slate-500 mx-auto mb-4" />
+            <p className="text-slate-400">No venues found. Try adjusting your filters.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredVenues.map((venue, index) => {
-              return (
-                <Link key={venue.id} href={`/venue/${venue.id}`}>
-                  <Card className="group bg-zinc-900 border-zinc-800 hover:bg-zinc-800 transition-all duration-300 overflow-hidden">
-                    <div className="relative h-48 bg-gradient-to-br from-purple-900/20 to-pink-900/20 overflow-hidden group-hover:scale-105 transition-transform duration-300">
-                      <Image
-                        src={isValidImageUrl(venue.images?.[0]) ? venue.images[0] : getListFallbackImage('venue', index)}
-                        alt={venue.name}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                    </div>
-
-                    {/* Venue Info */}
-                    <div className="p-4 text-white">
-                      <div className="flex items-center gap-2 text-xs text-zinc-300 mb-2">
-                        <MapPin className="w-3 h-3" />
-                        {venue.city}, {venue.country}
-                        {venue.capacity && (
-                          <>
-                            <span>•</span>
-                            <Users className="w-3 h-3" />
-                            {venue.capacity}
-                          </>
-                        )}
-                      </div>
-                      <h3 className="font-semibold text-lg mb-2 line-clamp-1 text-white">
-                        {venue.name}
-                      </h3>
-                      
-                      {/* Genre Tags */}
-                      <div className="flex flex-wrap gap-1">
-                        {venue.genres?.slice(0, 2).map((genre: string) => (
-                          <Badge 
-                            key={genre} 
-                            variant="secondary" 
-                            className="text-xs bg-white/20 text-white border-none"
-                          >
-                            {genre}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  </Card>
-                </Link>
-              )
-            })}
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            {filteredVenues.map((venue, index) => (
+              <EntityCard
+                key={venue.id}
+                type="venue"
+                id={venue.id}
+                title={venue.name}
+                imageUrl={isValidImageUrl(venue.images?.[0]) ? venue.images[0] : getListFallbackImage('venue', index)}
+                category={venue.genres?.[0] || 'CLUB'}
+                href={`/venue/${venue.id}`}
+                city={venue.city}
+                country={venue.country}
+                capacity={venue.capacity}
+                genres={venue.genres}
+              />
+            ))}
           </div>
         )}
       </div>

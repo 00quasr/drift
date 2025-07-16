@@ -1,0 +1,285 @@
+---
+alwaysApply: true
+---
+
+# Tech Stack Document for Drift
+
+This document explains the technologies chosen for Drift in everyday language. It shows how each part of the stack helps us build a fast, reliable, and user-friendly platform for discovering and rating venues, events, and artists.
+
+## 1. Frontend Technologies
+
+Our frontend is everything the user sees and interacts with in their browser or on mobile. We chose tools that make it easy to build a beautiful, responsive, and accessible interface:
+
+- **React**  
+  A popular library for building user interfaces with reusable pieces called components. It helps us manage state (data) and update the screen quickly.
+
+- **shadcn/ui (Tailwind-based component system)**  
+  A set of pre-styled UI components built on Tailwind CSS. It speeds up design work while maintaining a clean, consistent look.
+
+- **Tailwind CSS**  
+  A utility-first styling framework that lets us write CSS classes directly in our HTML/JSX. This approach keeps styles predictable, small, and easy to maintain.
+
+- **Radix UI**  
+  Under the hood of shadcn/ui, Radix components ensure our interface is accessible (keyboard-friendly, screen-reader ready) without extra effort.
+
+- **Framer Motion**  
+  A library for smooth, physics-based animations and micro-interactions (hover effects, page transitions) that make the app feel premium and playful.
+
+- **Vite or Next.js**  
+  We’ll choose between:
+  - **Vite** for a lightning-fast development experience with simple static sites.
+  - **Next.js** for production-ready features like server-side rendering (fast first load), file-based routing, and built-in optimizations.
+
+Together, these tools give us a modern, mobile-first, dark-themed interface with minimal chrome, large imagery, and smooth animations.
+
+## 2. Backend Technologies
+
+Our backend handles data storage, authentication, real-time updates, and business logic. We focused on an all-in-one solution that scales easily:
+
+- **Supabase**  
+  An open-source Firebase alternative that bundles:
+  - **PostgreSQL database** for storing users, venues, events, artists, ratings, comments, and admin logs.
+  - **Auth** for secure sign-up, login, and role-based access control (regular users vs. verified creators vs. admins).
+  - **Storage** for uploading images (flyers, venue photos, press kits).
+  - **Realtime** subscriptions for live updates (new reviews, notifications).
+
+- **pgvector (optional)**  
+  An extension for PostgreSQL that lets us store and search vector embeddings. In the future, we can use it for AI-powered recommendations or semantic search.
+
+- **Supabase Functions**  
+  Serverless functions for custom backend logic (e.g., sending emails, processing moderation workflows). They run close to our database without managing servers.
+
+- **FastAPI (optional self-hosted)**  
+  If we decide to move off Supabase’s managed platform later, we can build a Python-based REST API with FastAPI, connecting to Neon Postgres or another Postgres instance.
+
+## 3. Infrastructure and Deployment
+
+Ensuring Drift is reliable, easy to update, and scalable relies on our infrastructure choices:
+
+- **Version Control with Git & GitHub**  
+  All code lives in Git repositories, enabling collaboration, code review, and history tracking.
+
+- **CI/CD with GitHub Actions**  
+  Every code change triggers automated tests and builds. Successful builds deploy to our staging or production environments without manual steps.
+
+- **Hosting Platforms**  
+  - **Front-end**: Deployed on Vercel (ideal for Next.js) or Netlify (great for Vite), providing global CDN, automatic SSL, and instant cache invalidation.
+  - **Back-end**: Supabase’s managed services host our database, auth, storage, and functions. For self-hosted later, we’ll consider **Neon Postgres** for a scalable, serverless Postgres solution.
+
+- **Domain & SSL**  
+  Custom domains with free HTTPS certificates ensure secure connections for users everywhere.
+
+This setup gives us fast global performance, easy rollbacks, and zero-downtime updates.
+
+## 4. Third-Party Integrations
+
+To extend Drift’s functionality without reinventing the wheel, we integrate several services:
+
+- **OpenAI content filtering**  
+  Automatically scans user comments for toxicity and spam, quarantining suspect feedback before it goes live.
+
+- **Langchain / OpenRouter (optional)**  
+  A wrapper around AI APIs to combine multiple moderation rules or switch providers seamlessly.
+
+- **Mapbox**  
+  Interactive maps for venue pages, showing precise locations with customizable styling that matches our dark theme.
+
+- **Email Service (e.g., SendGrid via Supabase SMTP)**  
+  Sends account confirmations, whitelist notifications, and review updates.
+
+- **Future Add-Ons**:
+  - **Spotify & SoundCloud embeds** on artist and event pages.
+  - **Ticketing platform links** (external) and eventual direct checkout integrations.
+  - **Analytics tools** for tracking user engagement (e.g., Google Analytics or a privacy-focused alternative).
+
+These integrations boost user engagement, streamline moderation, and prepare us for future growth.
+
+## 5. Security and Performance Considerations
+
+We build Drift with both user safety and speed in mind:
+
+Security Measures
+
+- **Role-Based Access Control (RBAC)**  
+  Only verified creators (club owners, promoters, artists) can add or edit listings. Admins manage whitelisting and moderation.
+
+- **Row-Level Security (PostgreSQL Policies)**  
+  Ensures users can only access or modify the data they’re allowed to see.
+
+- **Secure Authentication**  
+  Password hashing, email confirmations, and optional social logins via Supabase Auth.
+
+- **Content Moderation Workflow**  
+  Two-tiered system: AI filters + user flagging → admin review queue → audit logs for compliance.
+
+- **Data Encryption**  
+  All data is encrypted at rest (Supabase) and in transit (HTTPS/TLS).
+
+Performance Optimizations
+
+- **Server-Side Rendering (SSR) & Static Generation**  
+  Using Next.js, pages load faster for first-time visitors and improve SEO.
+
+- **Code Splitting & Lazy Loading**  
+  Loads only the code and assets needed for each page, reducing initial bundle sizes.
+
+- **Global CDN**  
+  Static assets and images (from Supabase Storage) served from edge locations near users.
+
+- **Realtime Subscriptions**  
+  Supabase Realtime for live updates without full page refreshes, keeping interactions snappy.
+
+- **Efficient CSS**  
+  Tailwind’s utility-based approach generates only the styles we use, keeping CSS footprints small.
+
+## 6. Conclusion and Overall Tech Stack Summary
+
+Drift’s tech stack balances speed, scalability, and ease of development while delivering a polished experience for electronic music fans, promoters, and artists:
+
+- Frontend: React + Tailwind (shadcn/ui, Radix UI) + Framer Motion + Vite/Next.js
+- Backend: Supabase (Postgres, Auth, Storage, Realtime, Functions) with pgvector for AI growth and FastAPI as an option
+- Infrastructure: GitHub + GitHub Actions + Vercel/Netlify + Supabase/Neon Postgres
+- Integrations: OpenAI filtering, Langchain/OpenRouter, Mapbox, Email service, plus planned Spotify/SoundCloud and ticketing
+- Security & Performance: RBAC, row-level security, AI moderation, SSR, CDN, lazy loading
+
+Each technology was chosen to support core features—secure accounts, entity interlinking, rich search & filtering, dynamic pages, and a robust moderation system—while ensuring future-proof growth. This stack lets us focus on building a standout platform for discovering and celebrating the global underground music scene.# Tech Stack Document for Drift
+
+This document explains the technologies chosen for Drift in everyday language. It shows how each part of the stack helps us build a fast, reliable, and user-friendly platform for discovering and rating venues, events, and artists.
+
+## 1. Frontend Technologies
+
+Our frontend is everything the user sees and interacts with in their browser or on mobile. We chose tools that make it easy to build a beautiful, responsive, and accessible interface:
+
+- **React**  
+  A popular library for building user interfaces with reusable pieces called components. It helps us manage state (data) and update the screen quickly.
+
+- **shadcn/ui (Tailwind-based component system)**  
+  A set of pre-styled UI components built on Tailwind CSS. It speeds up design work while maintaining a clean, consistent look.
+
+- **Tailwind CSS**  
+  A utility-first styling framework that lets us write CSS classes directly in our HTML/JSX. This approach keeps styles predictable, small, and easy to maintain.
+
+- **Radix UI**  
+  Under the hood of shadcn/ui, Radix components ensure our interface is accessible (keyboard-friendly, screen-reader ready) without extra effort.
+
+- **Framer Motion**  
+  A library for smooth, physics-based animations and micro-interactions (hover effects, page transitions) that make the app feel premium and playful.
+
+- **Vite or Next.js**  
+  We’ll choose between:
+  - **Vite** for a lightning-fast development experience with simple static sites.
+  - **Next.js** for production-ready features like server-side rendering (fast first load), file-based routing, and built-in optimizations.
+
+Together, these tools give us a modern, mobile-first, dark-themed interface with minimal chrome, large imagery, and smooth animations.
+
+## 2. Backend Technologies
+
+Our backend handles data storage, authentication, real-time updates, and business logic. We focused on an all-in-one solution that scales easily:
+
+- **Supabase**  
+  An open-source Firebase alternative that bundles:
+  - **PostgreSQL database** for storing users, venues, events, artists, ratings, comments, and admin logs.
+  - **Auth** for secure sign-up, login, and role-based access control (regular users vs. verified creators vs. admins).
+  - **Storage** for uploading images (flyers, venue photos, press kits).
+  - **Realtime** subscriptions for live updates (new reviews, notifications).
+
+- **pgvector (optional)**  
+  An extension for PostgreSQL that lets us store and search vector embeddings. In the future, we can use it for AI-powered recommendations or semantic search.
+
+- **Supabase Functions**  
+  Serverless functions for custom backend logic (e.g., sending emails, processing moderation workflows). They run close to our database without managing servers.
+
+- **FastAPI (optional self-hosted)**  
+  If we decide to move off Supabase’s managed platform later, we can build a Python-based REST API with FastAPI, connecting to Neon Postgres or another Postgres instance.
+
+## 3. Infrastructure and Deployment
+
+Ensuring Drift is reliable, easy to update, and scalable relies on our infrastructure choices:
+
+- **Version Control with Git & GitHub**  
+  All code lives in Git repositories, enabling collaboration, code review, and history tracking.
+
+- **CI/CD with GitHub Actions**  
+  Every code change triggers automated tests and builds. Successful builds deploy to our staging or production environments without manual steps.
+
+- **Hosting Platforms**  
+  - **Front-end**: Deployed on Vercel (ideal for Next.js) or Netlify (great for Vite), providing global CDN, automatic SSL, and instant cache invalidation.
+  - **Back-end**: Supabase’s managed services host our database, auth, storage, and functions. For self-hosted later, we’ll consider **Neon Postgres** for a scalable, serverless Postgres solution.
+
+- **Domain & SSL**  
+  Custom domains with free HTTPS certificates ensure secure connections for users everywhere.
+
+This setup gives us fast global performance, easy rollbacks, and zero-downtime updates.
+
+## 4. Third-Party Integrations
+
+To extend Drift’s functionality without reinventing the wheel, we integrate several services:
+
+- **OpenAI content filtering**  
+  Automatically scans user comments for toxicity and spam, quarantining suspect feedback before it goes live.
+
+- **Langchain / OpenRouter (optional)**  
+  A wrapper around AI APIs to combine multiple moderation rules or switch providers seamlessly.
+
+- **Mapbox**  
+  Interactive maps for venue pages, showing precise locations with customizable styling that matches our dark theme.
+
+- **Email Service (e.g., SendGrid via Supabase SMTP)**  
+  Sends account confirmations, whitelist notifications, and review updates.
+
+- **Future Add-Ons**:
+  - **Spotify & SoundCloud embeds** on artist and event pages.
+  - **Ticketing platform links** (external) and eventual direct checkout integrations.
+  - **Analytics tools** for tracking user engagement (e.g., Google Analytics or a privacy-focused alternative).
+
+These integrations boost user engagement, streamline moderation, and prepare us for future growth.
+
+## 5. Security and Performance Considerations
+
+We build Drift with both user safety and speed in mind:
+
+Security Measures
+
+- **Role-Based Access Control (RBAC)**  
+  Only verified creators (club owners, promoters, artists) can add or edit listings. Admins manage whitelisting and moderation.
+
+- **Row-Level Security (PostgreSQL Policies)**  
+  Ensures users can only access or modify the data they’re allowed to see.
+
+- **Secure Authentication**  
+  Password hashing, email confirmations, and optional social logins via Supabase Auth.
+
+- **Content Moderation Workflow**  
+  Two-tiered system: AI filters + user flagging → admin review queue → audit logs for compliance.
+
+- **Data Encryption**  
+  All data is encrypted at rest (Supabase) and in transit (HTTPS/TLS).
+
+Performance Optimizations
+
+- **Server-Side Rendering (SSR) & Static Generation**  
+  Using Next.js, pages load faster for first-time visitors and improve SEO.
+
+- **Code Splitting & Lazy Loading**  
+  Loads only the code and assets needed for each page, reducing initial bundle sizes.
+
+- **Global CDN**  
+  Static assets and images (from Supabase Storage) served from edge locations near users.
+
+- **Realtime Subscriptions**  
+  Supabase Realtime for live updates without full page refreshes, keeping interactions snappy.
+
+- **Efficient CSS**  
+  Tailwind’s utility-based approach generates only the styles we use, keeping CSS footprints small.
+
+## 6. Conclusion and Overall Tech Stack Summary
+
+Drift’s tech stack balances speed, scalability, and ease of development while delivering a polished experience for electronic music fans, promoters, and artists:
+
+- Frontend: React + Tailwind (shadcn/ui, Radix UI) + Framer Motion + Vite/Next.js
+- Backend: Supabase (Postgres, Auth, Storage, Realtime, Functions) with pgvector for AI growth and FastAPI as an option
+- Infrastructure: GitHub + GitHub Actions + Vercel/Netlify + Supabase/Neon Postgres
+- Integrations: OpenAI filtering, Langchain/OpenRouter, Mapbox, Email service, plus planned Spotify/SoundCloud and ticketing
+- Security & Performance: RBAC, row-level security, AI moderation, SSR, CDN, lazy loading
+
+Each technology was chosen to support core features—secure accounts, entity interlinking, rich search & filtering, dynamic pages, and a robust moderation system—while ensuring future-proof growth. This stack lets us focus on building a standout platform for discovering and celebrating the global underground music scene.

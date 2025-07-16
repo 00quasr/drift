@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Premium Dark Theme - Inspired by RA */
+  --color-bg: #000000; /* Pure black */
+  --color-surface: #0a0a0a; /* Near black */
+  --color-surface-elevated: #141414; /* Slightly elevated */
+  --color-border: #1a1a1a; /* Subtle borders */
+  --color-border-hover: #333333; /* Hover state borders */
+  
+  /* Accent colors - More subtle and sophisticated */
+  --color-primary: #ff3333; /* RA-inspired red */
+  --color-primary-hover: #ff5555;
+  --color-secondary: #ffffff; /* Pure white for contrast */
+  --color-muted: #666666; /* Muted text */
+  --color-text: #ffffff; /* White text */
+  --color-text-secondary: #999999; /* Secondary text */
+  
+  /* Functional colors */
+  --color-success: #00ff00;
+  --color-warning: #ffff00;
+  --color-error: #ff3333;
+  
+  /* Map to CSS variables for compatibility */
+  --background: var(--color-bg);
+  --foreground: var(--color-text);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+/* Ensure all text elements use proper font */
+button, input, textarea, select, label, p, span, div, a {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Premium hover effects */
+a {
+  transition: color 0.2s ease;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-hover);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted);
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  /* Premium gradient text */
+  .gradient-text {
+    background: linear-gradient(135deg, #ffffff 0%, #999999 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  /* Subtle animations */
+  .hover-lift {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  }
+}

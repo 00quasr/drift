@@ -1,0 +1,82 @@
+---
+alwaysApply: true
+---
+
+# App Flow Document for Drift
+
+## Onboarding and Sign-In/Sign-Up
+
+When a brand-new user first visits Drift, they land on the public landing page where they can see featured clubs, upcoming events, and top-rated artists without logging in. At the top of the page, they will find a prominent Log In button and a Register button. Clicking Register opens a clean, full-screen sign-up form that offers two methods: email and password, or social login using Google or Facebook. If a user chooses email, they enter their name, email address, and a secure password, then receive an email with a confirmation link. Once they click the link, they are prompted to complete their profile details and proceed into Drift as a regular user.
+
+Users who wish to become verified creators—club owners, promoters, or artists—select the relevant role during registration. They are then shown an additional verification form where they upload required documents such as a business license or promotional materials and link at least one social media account. After submitting these materials, they see a "Verification Pending" page that explains an admin will review their request. If they lose their password, they can click the Forgot Password link, enter their email, and receive a reset link. Signing out is available at any time via a dropdown under their avatar in the header. On sign-out, they return to the public landing page.
+
+## Main Dashboard or Home Page
+
+Immediately after logging in, users arrive at their main home feed, which shares the look and feel of the public landing page but is personalized. A dark header stretches across the top with the Drift logo on the left, a search icon, an Explore tab, an in-app notifications bell, and the user’s avatar on the right. On desktop, a slim sidebar on the left shows quick links to Home, Explore, My Reviews, and My Dashboard (for verified users). The main content area displays a hero carousel of editor’s picks, followed by sections for Trending Clubs, Upcoming Events, and Top-Rated Artists. As the user scrolls down, Framer Motion animations reveal genre-focused grids and community highlights.
+
+Users navigate to other parts of the app by clicking items in the sidebar or header. Tapping the Explore tab transitions them to a full-screen search page. Clicking on any hero card, club, event, or artist tile takes them to that entity’s detail page. The layout adapts seamlessly on mobile, with a bottom navigation bar replacing the sidebar.
+
+## Detailed Feature Flows and Page Transitions
+
+When the user taps Explore, a full-screen interface slides in that features a search input at the top and filter controls for genre tags, location radius, date filters, and star-rating thresholds. As the user types, Supabase Realtime search suggestions appear in a dropdown below. When they submit a search, a results grid animates into view, showing cards for clubs, events, and artists. Selecting any card transitions to its detail page with a smooth slide effect.
+
+On a club detail page, a large hero image fills the top section, followed by the venue name, address, capacity, contact details, and social media links. Below this, an embedded Mapbox map shows the exact location. A carousel of upcoming events at the venue appears under the map, each linking to its individual event page. Event pages feature the event flyer, date and time, venue name (which links back to the club page), ticket URL that opens externally, pricing tiers, and the artist lineup with links to each artist profile.
+
+Artist detail pages display the artist’s name, biography, social media profiles, and genre tags at the top. A timeline view shows past and upcoming gigs, each linking back to the associated event page. Ratings and comments appear prominently, with sub-ratings for sound quality, vibe, and crowd atmosphere summarized in an overall star average.
+
+When a user chooses to leave a review, a floating Rate button opens a form overlay. Here they assign 1–5 stars for each subcategory and type a comment. On submission, the text passes through an AI moderation filter powered by OpenAI. If it is clean, the review publishes immediately and a toast notification confirms publication. If it is flagged, the review enters a quarantine queue and the user sees a message that their review is under review. Other users can flag any comment via a small flag icon, sending it into the admin moderation queue.
+
+Verified creators access their Creator Dashboard by clicking My Dashboard in the sidebar. This secure area lists all venues, events, and artist profiles they have created or manage, each with a status badge (Live or Pending Approval). They can click a Create New Venue or Edit button, which opens a form with fields for venue name, capacity, address (with map preview), images, and social links, or event forms with date, time, ticket link, pricing, and lineup selectors, or artist forms with bio, press kit upload, and genre tags. All changes save in real time to Supabase and instantly reflect in previews. If content requires admin approval, it remains pending until an admin approves.
+
+Admins sign in to a dedicated Admin Panel by visiting the /admin URL or selecting Admin from their profile menu. Here they see two tabs: Verification Requests and Flagged Content. Verification Requests list each applicant’s documents and linked social accounts. Admins can view submissions, then Approve or Reject with a reason. Approving grants the user whitelisted creator status and triggers an in-app and email notification. The Flagged Content tab lists user reviews or comments flagged by AI or other users. Admins can Remove, Warn, or Restore content and every action writes an audit log entry in PostgreSQL.
+
+## Settings and Account Management
+
+Users access their Settings by clicking their avatar and choosing Profile Settings. On this page they can update personal information such as display name, bio, profile photo, and linked social accounts. They can configure notification preferences for in-app alerts and email digests, toggle language and regional locale options, and view their verification status. All settings save immediately to Supabase. After saving, a confirmation toast appears and they can return to Home via the logo or sidebar. Verified creators also find links here to their Creator Dashboard and to manage billing or subscription features when they become available.
+
+## Error States and Alternate Paths
+
+If a user enters invalid login credentials, an inline error message appears under the input fields explaining the problem. On password reset, if the email is not found, a gentle notification suggests checking the address and trying again. Network disruptions show a full-screen offline message with a retry button. Attempting to create or edit a venue, event, or artist without verification triggers a modal that explains the need to apply and provides a link to the verification form. If a comment is rejected by AI moderation, the user sees an explanatory banner and their review remains unpublished until a manual admin review resolves it. Any 404 when accessing a missing entity page displays a styled "Page Not Found" screen with a search bar for recovery.
+
+## Conclusion and Overall App Journey
+
+A typical user begins by landing on Drift’s public page, signs up via email or social login, and explores trending clubs, events, and artists. They search using filters, navigate between beautifully designed entity pages, and leave nuanced reviews that flow through AI and human moderation. Verified creators follow a straightforward document submission process to gain dashboard access for managing listings, while admins oversee whitelisting and content moderation in their own panel. Throughout every step, in-app notifications and email alerts keep everyone informed. From on-boarding to daily event discovery and community interaction, Drift provides a seamless, music-first experience that carries users from their first sign-up through ongoing engagement with the electronic music scene.
+# App Flow Document for Drift
+
+## Onboarding and Sign-In/Sign-Up
+
+When a brand-new user first visits Drift, they land on the public landing page where they can see featured clubs, upcoming events, and top-rated artists without logging in. At the top of the page, they will find a prominent Log In button and a Register button. Clicking Register opens a clean, full-screen sign-up form that offers two methods: email and password, or social login using Google or Facebook. If a user chooses email, they enter their name, email address, and a secure password, then receive an email with a confirmation link. Once they click the link, they are prompted to complete their profile details and proceed into Drift as a regular user.
+
+Users who wish to become verified creators—club owners, promoters, or artists—select the relevant role during registration. They are then shown an additional verification form where they upload required documents such as a business license or promotional materials and link at least one social media account. After submitting these materials, they see a "Verification Pending" page that explains an admin will review their request. If they lose their password, they can click the Forgot Password link, enter their email, and receive a reset link. Signing out is available at any time via a dropdown under their avatar in the header. On sign-out, they return to the public landing page.
+
+## Main Dashboard or Home Page
+
+Immediately after logging in, users arrive at their main home feed, which shares the look and feel of the public landing page but is personalized. A dark header stretches across the top with the Drift logo on the left, a search icon, an Explore tab, an in-app notifications bell, and the user’s avatar on the right. On desktop, a slim sidebar on the left shows quick links to Home, Explore, My Reviews, and My Dashboard (for verified users). The main content area displays a hero carousel of editor’s picks, followed by sections for Trending Clubs, Upcoming Events, and Top-Rated Artists. As the user scrolls down, Framer Motion animations reveal genre-focused grids and community highlights.
+
+Users navigate to other parts of the app by clicking items in the sidebar or header. Tapping the Explore tab transitions them to a full-screen search page. Clicking on any hero card, club, event, or artist tile takes them to that entity’s detail page. The layout adapts seamlessly on mobile, with a bottom navigation bar replacing the sidebar.
+
+## Detailed Feature Flows and Page Transitions
+
+When the user taps Explore, a full-screen interface slides in that features a search input at the top and filter controls for genre tags, location radius, date filters, and star-rating thresholds. As the user types, Supabase Realtime search suggestions appear in a dropdown below. When they submit a search, a results grid animates into view, showing cards for clubs, events, and artists. Selecting any card transitions to its detail page with a smooth slide effect.
+
+On a club detail page, a large hero image fills the top section, followed by the venue name, address, capacity, contact details, and social media links. Below this, an embedded Mapbox map shows the exact location. A carousel of upcoming events at the venue appears under the map, each linking to its individual event page. Event pages feature the event flyer, date and time, venue name (which links back to the club page), ticket URL that opens externally, pricing tiers, and the artist lineup with links to each artist profile.
+
+Artist detail pages display the artist’s name, biography, social media profiles, and genre tags at the top. A timeline view shows past and upcoming gigs, each linking back to the associated event page. Ratings and comments appear prominently, with sub-ratings for sound quality, vibe, and crowd atmosphere summarized in an overall star average.
+
+When a user chooses to leave a review, a floating Rate button opens a form overlay. Here they assign 1–5 stars for each subcategory and type a comment. On submission, the text passes through an AI moderation filter powered by OpenAI. If it is clean, the review publishes immediately and a toast notification confirms publication. If it is flagged, the review enters a quarantine queue and the user sees a message that their review is under review. Other users can flag any comment via a small flag icon, sending it into the admin moderation queue.
+
+Verified creators access their Creator Dashboard by clicking My Dashboard in the sidebar. This secure area lists all venues, events, and artist profiles they have created or manage, each with a status badge (Live or Pending Approval). They can click a Create New Venue or Edit button, which opens a form with fields for venue name, capacity, address (with map preview), images, and social links, or event forms with date, time, ticket link, pricing, and lineup selectors, or artist forms with bio, press kit upload, and genre tags. All changes save in real time to Supabase and instantly reflect in previews. If content requires admin approval, it remains pending until an admin approves.
+
+Admins sign in to a dedicated Admin Panel by visiting the /admin URL or selecting Admin from their profile menu. Here they see two tabs: Verification Requests and Flagged Content. Verification Requests list each applicant’s documents and linked social accounts. Admins can view submissions, then Approve or Reject with a reason. Approving grants the user whitelisted creator status and triggers an in-app and email notification. The Flagged Content tab lists user reviews or comments flagged by AI or other users. Admins can Remove, Warn, or Restore content and every action writes an audit log entry in PostgreSQL.
+
+## Settings and Account Management
+
+Users access their Settings by clicking their avatar and choosing Profile Settings. On this page they can update personal information such as display name, bio, profile photo, and linked social accounts. They can configure notification preferences for in-app alerts and email digests, toggle language and regional locale options, and view their verification status. All settings save immediately to Supabase. After saving, a confirmation toast appears and they can return to Home via the logo or sidebar. Verified creators also find links here to their Creator Dashboard and to manage billing or subscription features when they become available.
+
+## Error States and Alternate Paths
+
+If a user enters invalid login credentials, an inline error message appears under the input fields explaining the problem. On password reset, if the email is not found, a gentle notification suggests checking the address and trying again. Network disruptions show a full-screen offline message with a retry button. Attempting to create or edit a venue, event, or artist without verification triggers a modal that explains the need to apply and provides a link to the verification form. If a comment is rejected by AI moderation, the user sees an explanatory banner and their review remains unpublished until a manual admin review resolves it. Any 404 when accessing a missing entity page displays a styled "Page Not Found" screen with a search bar for recovery.
+
+## Conclusion and Overall App Journey
+
+A typical user begins by landing on Drift’s public page, signs up via email or social login, and explores trending clubs, events, and artists. They search using filters, navigate between beautifully designed entity pages, and leave nuanced reviews that flow through AI and human moderation. Verified creators follow a straightforward document submission process to gain dashboard access for managing listings, while admins oversee whitelisting and content moderation in their own panel. Throughout every step, in-app notifications and email alerts keep everyone informed. From on-boarding to daily event discovery and community interaction, Drift provides a seamless, music-first experience that carries users from their first sign-up through ongoing engagement with the electronic music scene.

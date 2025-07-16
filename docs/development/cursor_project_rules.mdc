@@ -1,0 +1,286 @@
+---
+alwaysApply: true
+---
+
+## Project Overview
+
+*   **Type:** Web Application
+*   **Description:** Drift is a platform for electronic music fans, promoters, club owners, and artists to connect, discover, and rate venues, events, and artists.
+*   **Primary Goal:** Centralize scattered venue, event, and artist information into a unified, searchable platform.
+
+## Project Structure
+
+### Framework-Specific Routing
+
+*   **Directory Rules:**
+
+    *   Next.js 14 (App Router): Use `app/[route]/psystemctl restart kodosumi.serviceage.tsx` conventions for all routes.
+    *   (No Pages Router: the `pages/` directory is not used.)
+
+### Core Directories
+
+*   **Versioned Structure:**
+
+    *   `app`: Root of Next.js 14 App Router with nested route folders.
+    *   `app/api`: Next.js 14 API routes using Route Handlers.
+    *   `components`: Shared React components (shadcn/ui, Radix UI).
+    *   `lib`: Client and server utilities (Supabase client, OpenAI moderation).
+    *   `styles`: Tailwind CSS configuration and global styles.
+
+### Key Files
+
+*   **Stack-Versioned Patterns:**
+
+    *   `app/layout.tsx`: Next.js 14 root layout with Providers (Theme, i18n).
+    *   `app/page.tsx`: Landing page (`/`).
+    *   `app/explore/page.tsx`: Search & filtering interface.
+    *   `app/venue/[id]/page.tsx`: Club detail page.
+    *   `app/event/[id]/page.tsx`: Event detail page.
+    *   `app/artist/[id]/page.tsx`: Artist profile page.
+    *   `app/auth/login/page.tsx` & `app/auth/register/page.tsx`: Authentication flows using server actions.
+    *   `app/dashboard/layout.tsx` & `app/dashboard/page.tsx`: Creator dashboard structure.
+    *   `app/admin/layout.tsx` & `app/admin/page.tsx`: Admin panel structure.
+    *   `next.config.js`: Next.js configuration (i18n, images).
+    *   `tailwind.config.js`: Tailwind CSS setup for shadcn/ui.
+    *   `supabaseClient.ts`: Supabase client initialization for server and client use.
+    *   `openaiClient.ts`: OpenAI moderation function wrapper.
+
+## Tech Stack Rules
+
+*   **Version Enforcement:**
+
+    *   next@14: App Router required, no `pages/` directory, use React Server Components and Server Actions.
+    *   react@18: Functional components with Hooks only.
+    *   tailwindcss@3: Use utility classes via shadcn/ui presets.
+    *   @radix-ui/react: Base accessible UI primitives styled with Tailwind.
+    *   framer-motion@latest: Animations on client components only.
+    *   supabase-js@2: RPC and Edge Functions for backend logic.
+    *   openai@latest: Content moderation integrated in server functions.
+    *   mapbox-gl@latest: Client-only map rendering with dynamic imports.
+
+## PRD Compliance
+
+*   **Non-Negotiable:**
+
+    *   "Multi-Language Support": Implement localized routing and translations in all pages.
+    *   "Secure User Accounts": Use Supabase Auth with RBAC and whitelisting workflows.
+    *   "AI-moderated (toxicity, spam)": Route all comment submissions through OpenAI filter via server function.
+    *   "Mobile-first responsiveness": All layouts and components must degrade gracefully on small screens.
+
+## App Flow Integration
+
+*   **Stack-Aligned Flow:**
+
+    *   Next.js 14 Auth Flow → `app/auth/login/page.tsx` uses Server Actions to call Supabase Auth.
+    *   Next.js 14 Explore Flow → `app/explore/page.tsx` uses server components for initial data and client components for filtering.
+    *   Next.js 14 Venue/Event/Artist Flow → `app/[entity]/[id]/page.tsx` fetches via Supabase Edge Functions.
+    *   Next.js 14 Dashboard Flow → `app/dashboard/page.tsx` and `app/admin/page.tsx` with role-based access in layouts.
+
+## Best Practices
+
+*   Next.js
+
+    *   Use App Router and React Server Components for data-heavy pages.
+    *   Leverage Server Actions for form handling (auth, comments).
+    *   Use `next/link` and `next/image` for optimized navigation and images.
+
+*   React
+
+    *   Keep components small and reusable, use Hooks for state and effects.
+    *   Memoize expensive computations with `useMemo` and `useCallback`.
+
+*   Tailwind CSS (shadcn/ui)
+
+    *   Maintain design consistency via component libraries and variant props.
+    *   Use utility-first classes; avoid custom CSS when possible.
+
+*   Radix UI
+
+    *   Use unstyled primitives for accessibility, style with Tailwind.
+
+*   Framer Motion
+
+    *   Animate on client components only; use reduced motion preferences.
+    *   Avoid layout thrashing by animating opacity and transform.
+
+*   Supabase
+
+    *   Enforce Row-Level Security for all tables.
+    *   Abstract queries in `lib/supabaseClient.ts`.
+    *   Use Edge Functions for sensitive operations (moderation, webhooks).
+
+*   OpenAI Moderation
+
+    *   Centralize filtering logic in a server-side function.
+    *   Cache results to avoid rate limits.
+
+*   Mapbox
+
+    *   Dynamically import map components to reduce initial bundle size.
+
+*   Internationalization
+
+    *   Use Next.js built-in i18n or `next-intl` for locale routing and message extraction.
+
+## Rules
+
+*   Derive folder and file patterns directly from the `techStackDoc` (exact versions + routing patterns).
+*   Enforce Next.js 14 App Router: use `app/` directory with nested routes.
+*   No `pages/` directory; do not mix App Router and Pages Router patterns.
+*   Use `components/` and `lib/` for shared logic and utilities.
+*   Maintain strict separation between server and client components.
+
+## Rules Metrics
+
+Before starting the project development, create a metrics file in the root of the project called `cursor_metrics.md`.
+
+### Instructions:
+
+*   Each time a cursor rule is used as context, update `cursor_metrics.md`.
+
+*   Use the following format for `cursor_metrics.md`: Rules Metrics Usage The number of times rules is used as context
+
+    *   rule-name.mdc: 5
+    *   another-rule.mdc: 2
+    *   ...other rules
+## Project Overview
+
+*   **Type:** Web Application
+*   **Description:** Drift is a platform for electronic music fans, promoters, club owners, and artists to connect, discover, and rate venues, events, and artists.
+*   **Primary Goal:** Centralize scattered venue, event, and artist information into a unified, searchable platform.
+
+## Project Structure
+
+### Framework-Specific Routing
+
+*   **Directory Rules:**
+
+    *   Next.js 14 (App Router): Use `app/[route]/page.tsx` conventions for all routes.
+    *   (No Pages Router: the `pages/` directory is not used.)
+
+### Core Directories
+
+*   **Versioned Structure:**
+
+    *   `app`: Root of Next.js 14 App Router with nested route folders.
+    *   `app/api`: Next.js 14 API routes using Route Handlers.
+    *   `components`: Shared React components (shadcn/ui, Radix UI).
+    *   `lib`: Client and server utilities (Supabase client, OpenAI moderation).
+    *   `styles`: Tailwind CSS configuration and global styles.
+
+### Key Files
+
+*   **Stack-Versioned Patterns:**
+
+    *   `app/layout.tsx`: Next.js 14 root layout with Providers (Theme, i18n).
+    *   `app/page.tsx`: Landing page (`/`).
+    *   `app/explore/page.tsx`: Search & filtering interface.
+    *   `app/venue/[id]/page.tsx`: Club detail page.
+    *   `app/event/[id]/page.tsx`: Event detail page.
+    *   `app/artist/[id]/page.tsx`: Artist profile page.
+    *   `app/auth/login/page.tsx` & `app/auth/register/page.tsx`: Authentication flows using server actions.
+    *   `app/dashboard/layout.tsx` & `app/dashboard/page.tsx`: Creator dashboard structure.
+    *   `app/admin/layout.tsx` & `app/admin/page.tsx`: Admin panel structure.
+    *   `next.config.js`: Next.js configuration (i18n, images).
+    *   `tailwind.config.js`: Tailwind CSS setup for shadcn/ui.
+    *   `supabaseClient.ts`: Supabase client initialization for server and client use.
+    *   `openaiClient.ts`: OpenAI moderation function wrapper.
+
+## Tech Stack Rules
+
+*   **Version Enforcement:**
+
+    *   next@14: App Router required, no `pages/` directory, use React Server Components and Server Actions.
+    *   react@18: Functional components with Hooks only.
+    *   tailwindcss@3: Use utility classes via shadcn/ui presets.
+    *   @radix-ui/react: Base accessible UI primitives styled with Tailwind.
+    *   framer-motion@latest: Animations on client components only.
+    *   supabase-js@2: RPC and Edge Functions for backend logic.
+    *   openai@latest: Content moderation integrated in server functions.
+    *   mapbox-gl@latest: Client-only map rendering with dynamic imports.
+
+## PRD Compliance
+
+*   **Non-Negotiable:**
+
+    *   "Multi-Language Support": Implement localized routing and translations in all pages.
+    *   "Secure User Accounts": Use Supabase Auth with RBAC and whitelisting workflows.
+    *   "AI-moderated (toxicity, spam)": Route all comment submissions through OpenAI filter via server function.
+    *   "Mobile-first responsiveness": All layouts and components must degrade gracefully on small screens.
+
+## App Flow Integration
+
+*   **Stack-Aligned Flow:**
+
+    *   Next.js 14 Auth Flow → `app/auth/login/page.tsx` uses Server Actions to call Supabase Auth.
+    *   Next.js 14 Explore Flow → `app/explore/page.tsx` uses server components for initial data and client components for filtering.
+    *   Next.js 14 Venue/Event/Artist Flow → `app/[entity]/[id]/page.tsx` fetches via Supabase Edge Functions.
+    *   Next.js 14 Dashboard Flow → `app/dashboard/page.tsx` and `app/admin/page.tsx` with role-based access in layouts.
+
+## Best Practices
+
+*   Next.js
+
+    *   Use App Router and React Server Components for data-heavy pages.
+    *   Leverage Server Actions for form handling (auth, comments).
+    *   Use `next/link` and `next/image` for optimized navigation and images.
+
+*   React
+
+    *   Keep components small and reusable, use Hooks for state and effects.
+    *   Memoize expensive computations with `useMemo` and `useCallback`.
+
+*   Tailwind CSS (shadcn/ui)
+
+    *   Maintain design consistency via component libraries and variant props.
+    *   Use utility-first classes; avoid custom CSS when possible.
+
+*   Radix UI
+
+    *   Use unstyled primitives for accessibility, style with Tailwind.
+
+*   Framer Motion
+
+    *   Animate on client components only; use reduced motion preferences.
+    *   Avoid layout thrashing by animating opacity and transform.
+
+*   Supabase
+
+    *   Enforce Row-Level Security for all tables.
+    *   Abstract queries in `lib/supabaseClient.ts`.
+    *   Use Edge Functions for sensitive operations (moderation, webhooks).
+
+*   OpenAI Moderation
+
+    *   Centralize filtering logic in a server-side function.
+    *   Cache results to avoid rate limits.
+
+*   Mapbox
+
+    *   Dynamically import map components to reduce initial bundle size.
+
+*   Internationalization
+
+    *   Use Next.js built-in i18n or `next-intl` for locale routing and message extraction.
+
+## Rules
+
+*   Derive folder and file patterns directly from the `techStackDoc` (exact versions + routing patterns).
+*   Enforce Next.js 14 App Router: use `app/` directory with nested routes.
+*   No `pages/` directory; do not mix App Router and Pages Router patterns.
+*   Use `components/` and `lib/` for shared logic and utilities.
+*   Maintain strict separation between server and client components.
+
+## Rules Metrics
+
+Before starting the project development, create a metrics file in the root of the project called `cursor_metrics.md`.
+
+### Instructions:
+
+*   Each time a cursor rule is used as context, update `cursor_metrics.md`.
+
+*   Use the following format for `cursor_metrics.md`: Rules Metrics Usage The number of times rules is used as context
+
+    *   rule-name.mdc: 5
+    *   another-rule.mdc: 2
+    *   ...other rules

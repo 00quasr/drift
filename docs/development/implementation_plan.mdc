@@ -1,0 +1,239 @@
+---
+alwaysApply: true
+---
+
+# Implementation plan
+
+## Phase 1: Environment Setup
+
+1. **Prevalidation**: Check if current directory is already a Git repo. If not, run `git init` (**Prevalidation Step**).
+2. Install Node.js v20.2.1 and npm 9.x (**Tech Stack: Core Tools**).
+   - Validation: Run `node -v` (expect `v20.2.1`) and `npm -v` to confirm.  
+3. Initialize Next.js 14 project in `/` with `npx create-next-app@14 my-drift-app --typescript` (Note: Next.js 14 is required for AI tooling) (**Tech Stack: Frontend**).
+   - Validation: Ensure `/package.json` lists `next@14.x` under dependencies.
+4. Install Tailwind CSS v3, shadcn/ui, Radix UI, and Framer Motion:
+   ```bash
+   cd my-drift-app
+   npm install -D tailwindcss@3 postcss autoprefixer
+   npx tailwindcss init -p
+   npm install @shadcn/ui @radix-ui/react-dropdown-menu framer-motion
+   ```
+   (**Tech Stack: Frontend**)
+5. Create `/components` and `/styles` directories for UI components and Tailwind config (**App Flow: UI Structure**).
+6. Initialize Cursor metrics file: create `/cursor_metrics.md` in project root and refer to `cursor_project_rules.mdc` for usage (**Tooling: Cursor**).
+7. Setup Supabase MCP for schema migrations:
+   - Create `.cursor` directory in project root if missing.  
+   - Create `.cursor/mcp.json`, add it to `.gitignore` (DO NOT SKIP) (**Tooling: Cursor**).
+   - Paste placeholder config:
+     ```json
+     {
+       "mcpServers": {
+         "supabase": {
+           "command": "npx",
+           "args": ["-y", "@modelcontextprotocol/server-postgres", "<connection-string>"]
+         }
+       }
+     }
+     ```
+   - Display link for user to retrieve connection string: https://supabase.com/docs/guides/getting-started/mcp#connect-to-supabase-using-mcp  
+   (**Tech Stack: Supabase**, **Tooling: Cursor**)
+
+## Phase 2: Frontend Development
+
+8. Create global layout at `/app/layout.tsx` with dark theme wrapper and `<Header />`, `<Footer />` components (**Design Preferences**).
+9. Implement `/app/page.tsx` (Landing page) showing trending clubs, upcoming events, top-rated artists using placeholder components (**Core Features: Landing Page**).
+10. Create `/app/explore/page.tsx` with search input and filter sidebar (location, genre, date, rating) using shadcn/ui dropdowns (**Core Features: Global Search & Filtering**).
+11. Add dynamic route `/app/venue/[id]/page.tsx` to render club detail page with gallery, ratings, upcoming events—fetch data via Supabase client (**Core Features: Entity Management & Interlinking**).
+12. Add dynamic route `/app/event/[id]/page.tsx` to render event page with date, venue link, lineup, ticket buttons (**Core Features: Entity Management & Interlinking**).
+13. Add dynamic route `/app/artist/[id]/page.tsx` to render artist profile with biography, past/upcoming gigs, social links (**Core Features: Entity Management & Interlinking**).
+14. Create `/app/auth/login/page.tsx` and `/app/auth/register/page.tsx` with email/password inputs and social OAuth buttons—use Radix UI for accessibility (**Core Features: Secure User Accounts**).
+15. Create `/app/dashboard/page.tsx` for creators to add/edit their venues/events/artists—use shadcn/ui forms with validation rules from **PRD: Venue Fields** and **Event Fields**.
+16. Create `/app/admin/page.tsx` for role whitelist approvals and moderation queue listing flagged comments (**Core Features: Whitelisting System**, **Review & Rating System**).
+17. **Validation**: Run `npm run dev` and verify that all routes return HTTP 200 with placeholder UI.
+
+## Phase 3: Backend Development
+
+18. Authenticate Supabase CLI with `npx supabase login` and link to project ID (**Tech Stack: Supabase**).
+19. Define PostgreSQL schema in `/db/schema.sql`:
+    ```sql
+    CREATE TABLE venues (
+      id serial PRIMARY KEY,
+      name text NOT NULL,
+      address text,
+      capacity integer,
+      contact_info jsonb,
+      social_links jsonb
+    );
+    CREATE TABLE artists (
+      id serial PRIMARY KEY,
+      name text NOT NULL,
+      biography text,
+      social_links jsonb,
+      genre_tags text[]
+    );
+    CREATE TABLE events (
+      id serial PRIMARY KEY,
+      name text NOT NULL,
+      event_datetime timestamp,
+      venue_id integer REFERENCES venues(id),
+      artist_ids integer[] REFERENCES artists(id),
+      ticket_links jsonb,
+      pricing jsonb,
+      genre_tags text[]
+    );
+    CREATE TABLE ratings (
+      id serial PRIMARY KEY,
+      user_id uuid REFERENCES auth.users(id),
+      entity_type text CHECK (entity_type IN ('venue','event','artist')),
+      entity_id integer,
+      stars integer CHECK (stars BETWEEN 1 AND 5),
+      sub_ratings jsonb,
+      comment text,
+      created_at timestamp DEFAULT now()
+    );
+    ```
+    (**Tech Stack: Database**, **Core Features: Review & Rating System**)
+20. Apply schema with Cursor MCP: run `npx @modelcontextprotocol/server-postgres <connection-string> < db/schema.sql` (**Tooling: Cursor**, **Tech Stack: Supabase**).
+21. Configure Supabase Auth RBAC roles:
+    - In Supabase dashboard, add roles `user`, `club_owner`, `promoter`, `artist`, `admin`.  
+    - Attach policies in `/db/policies.sql` (grant INSERT on ratings to `authenticated`, grant SELECT on venues/events/artists to public) (**Core Features: Secure User Accounts**, **Tech Stack: Supabase**).
+22. Create Supabase Function `/supabase/functions/moderate_comment/index.ts` using OpenAI filter API to auto-moderate new comments (**Core Features: Review & Rating System**).
+    - Validation: Deploy function with `npx supabase functions deploy moderate_comment` and test via `curl`.
+
+## Phase 4: Integration
+
+23. Create `/lib/supabaseClient.ts` to initialize Supabase client with env variables from `.env.local` (**Tech Stack: Supabase**).
+24. Update data-fetching in pages to call Supabase APIs via `supabaseClient` (e.g., `supabase.from('venues').select('*')`) (**App Flow: Data Layer**).
+25. Implement frontend auth wrappers: protect `/dashboard` and `/admin` by checking `user.role` from Supabase session (**Core Features: Secure User Accounts**).
+26. Integrate real-time comments stream on detail pages with `supabaseClient.from('ratings').on('INSERT', …)` to update UI (**Core Features: Review & Rating System**).
+27. Add search indexing via Supabase pgvector on `genre_tags` for AI recommendations (optional future add-on) (**Future Add-ons**).
+28. **Validation**: Run `npm run build` and `npm run start` locally; verify all pages load and Supabase data operations succeed.
+
+## Phase 5: Deployment
+
+29. Commit code to GitHub and push to `main` branch.  
+30. Configure GitHub Actions CI in `/.github/workflows/ci.yml` to run `npm install`, `npm run lint`, `npm run test`, `npm run build` on push (**Tech Stack: CI/CD**).
+31. Deploy frontend to Vercel under `us-east-1` region; set env vars for SUPABASE_URL and SUPABASE_KEY (**Tech Stack: Deployment**, **Project Overview**).
+32. Deploy Supabase Edge Function `moderate_comment` automatically via GitHub Actions on push to `main` (**Tech Stack: Supabase Functions**).
+33. **Validation**: Run end-to-end tests with Cypress against production URL; ensure role-based routes and real-time comments work as expected (**Q&A: Pre-Launch Checklist**).
+
+---
+
+Complete these steps sequentially to implement the Drift platform end-to-end. Feel free to request clarifications or deeper breakdowns of any phase.# Implementation plan
+
+## Phase 1: Environment Setup
+
+1. **Prevalidation**: Check if current directory is already a Git repo. If not, run `git init` (**Prevalidation Step**).
+2. Install Node.js v20.2.1 and npm 9.x (**Tech Stack: Core Tools**).
+   - Validation: Run `node -v` (expect `v20.2.1`) and `npm -v` to confirm.  
+3. Initialize Next.js 14 project in `/` with `npx create-next-app@14 my-drift-app --typescript` (Note: Next.js 14 is required for AI tooling) (**Tech Stack: Frontend**).
+   - Validation: Ensure `/package.json` lists `next@14.x` under dependencies.
+4. Install Tailwind CSS v3, shadcn/ui, Radix UI, and Framer Motion:
+   ```bash
+   cd my-drift-app
+   npm install -D tailwindcss@3 postcss autoprefixer
+   npx tailwindcss init -p
+   npm install @shadcn/ui @radix-ui/react-dropdown-menu framer-motion
+   ```
+   (**Tech Stack: Frontend**)
+5. Create `/components` and `/styles` directories for UI components and Tailwind config (**App Flow: UI Structure**).
+6. Initialize Cursor metrics file: create `/cursor_metrics.md` in project root and refer to `cursor_project_rules.mdc` for usage (**Tooling: Cursor**).
+7. Setup Supabase MCP for schema migrations:
+   - Create `.cursor` directory in project root if missing.  
+   - Create `.cursor/mcp.json`, add it to `.gitignore` (DO NOT SKIP) (**Tooling: Cursor**).
+   - Paste placeholder config:
+     ```json
+     {
+       "mcpServers": {
+         "supabase": {
+           "command": "npx",
+           "args": ["-y", "@modelcontextprotocol/server-postgres", "<connection-string>"]
+         }
+       }
+     }
+     ```
+   - Display link for user to retrieve connection string: https://supabase.com/docs/guides/getting-started/mcp#connect-to-supabase-using-mcp  
+   (**Tech Stack: Supabase**, **Tooling: Cursor**)
+
+## Phase 2: Frontend Development
+
+8. Create global layout at `/app/layout.tsx` with dark theme wrapper and `<Header />`, `<Footer />` components (**Design Preferences**).
+9. Implement `/app/page.tsx` (Landing page) showing trending clubs, upcoming events, top-rated artists using placeholder components (**Core Features: Landing Page**).
+10. Create `/app/explore/page.tsx` with search input and filter sidebar (location, genre, date, rating) using shadcn/ui dropdowns (**Core Features: Global Search & Filtering**).
+11. Add dynamic route `/app/venue/[id]/page.tsx` to render club detail page with gallery, ratings, upcoming events—fetch data via Supabase client (**Core Features: Entity Management & Interlinking**).
+12. Add dynamic route `/app/event/[id]/page.tsx` to render event page with date, venue link, lineup, ticket buttons (**Core Features: Entity Management & Interlinking**).
+13. Add dynamic route `/app/artist/[id]/page.tsx` to render artist profile with biography, past/upcoming gigs, social links (**Core Features: Entity Management & Interlinking**).
+14. Create `/app/auth/login/page.tsx` and `/app/auth/register/page.tsx` with email/password inputs and social OAuth buttons—use Radix UI for accessibility (**Core Features: Secure User Accounts**).
+15. Create `/app/dashboard/page.tsx` for creators to add/edit their venues/events/artists—use shadcn/ui forms with validation rules from **PRD: Venue Fields** and **Event Fields**.
+16. Create `/app/admin/page.tsx` for role whitelist approvals and moderation queue listing flagged comments (**Core Features: Whitelisting System**, **Review & Rating System**).
+17. **Validation**: Run `npm run dev` and verify that all routes return HTTP 200 with placeholder UI.
+
+## Phase 3: Backend Development
+
+18. Authenticate Supabase CLI with `npx supabase login` and link to project ID (**Tech Stack: Supabase**).
+19. Define PostgreSQL schema in `/db/schema.sql`:
+    ```sql
+    CREATE TABLE venues (
+      id serial PRIMARY KEY,
+      name text NOT NULL,
+      address text,
+      capacity integer,
+      contact_info jsonb,
+      social_links jsonb
+    );
+    CREATE TABLE artists (
+      id serial PRIMARY KEY,
+      name text NOT NULL,
+      biography text,
+      social_links jsonb,
+      genre_tags text[]
+    );
+    CREATE TABLE events (
+      id serial PRIMARY KEY,
+      name text NOT NULL,
+      event_datetime timestamp,
+      venue_id integer REFERENCES venues(id),
+      artist_ids integer[] REFERENCES artists(id),
+      ticket_links jsonb,
+      pricing jsonb,
+      genre_tags text[]
+    );
+    CREATE TABLE ratings (
+      id serial PRIMARY KEY,
+      user_id uuid REFERENCES auth.users(id),
+      entity_type text CHECK (entity_type IN ('venue','event','artist')),
+      entity_id integer,
+      stars integer CHECK (stars BETWEEN 1 AND 5),
+      sub_ratings jsonb,
+      comment text,
+      created_at timestamp DEFAULT now()
+    );
+    ```
+    (**Tech Stack: Database**, **Core Features: Review & Rating System**)
+20. Apply schema with Cursor MCP: run `npx @modelcontextprotocol/server-postgres <connection-string> < db/schema.sql` (**Tooling: Cursor**, **Tech Stack: Supabase**).
+21. Configure Supabase Auth RBAC roles:
+    - In Supabase dashboard, add roles `user`, `club_owner`, `promoter`, `artist`, `admin`.  
+    - Attach policies in `/db/policies.sql` (grant INSERT on ratings to `authenticated`, grant SELECT on venues/events/artists to public) (**Core Features: Secure User Accounts**, **Tech Stack: Supabase**).
+22. Create Supabase Function `/supabase/functions/moderate_comment/index.ts` using OpenAI filter API to auto-moderate new comments (**Core Features: Review & Rating System**).
+    - Validation: Deploy function with `npx supabase functions deploy moderate_comment` and test via `curl`.
+
+## Phase 4: Integration
+
+23. Create `/lib/supabaseClient.ts` to initialize Supabase client with env variables from `.env.local` (**Tech Stack: Supabase**).
+24. Update data-fetching in pages to call Supabase APIs via `supabaseClient` (e.g., `supabase.from('venues').select('*')`) (**App Flow: Data Layer**).
+25. Implement frontend auth wrappers: protect `/dashboard` and `/admin` by checking `user.role` from Supabase session (**Core Features: Secure User Accounts**).
+26. Integrate real-time comments stream on detail pages with `supabaseClient.from('ratings').on('INSERT', …)` to update UI (**Core Features: Review & Rating System**).
+27. Add search indexing via Supabase pgvector on `genre_tags` for AI recommendations (optional future add-on) (**Future Add-ons**).
+28. **Validation**: Run `npm run build` and `npm run start` locally; verify all pages load and Supabase data operations succeed.
+
+## Phase 5: Deployment
+
+29. Commit code to GitHub and push to `main` branch.  
+30. Configure GitHub Actions CI in `/.github/workflows/ci.yml` to run `npm install`, `npm run lint`, `npm run test`, `npm run build` on push (**Tech Stack: CI/CD**).
+31. Deploy frontend to Vercel under `us-east-1` region; set env vars for SUPABASE_URL and SUPABASE_KEY (**Tech Stack: Deployment**, **Project Overview**).
+32. Deploy Supabase Edge Function `moderate_comment` automatically via GitHub Actions on push to `main` (**Tech Stack: Supabase Functions**).
+33. **Validation**: Run end-to-end tests with Cypress against production URL; ensure role-based routes and real-time comments work as expected (**Q&A: Pre-Launch Checklist**).
+
+---
+
+Complete these steps sequentially to implement the Drift platform end-to-end. Feel free to request clarifications or deeper breakdowns of any phase.

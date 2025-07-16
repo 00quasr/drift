@@ -1,2 +1,281 @@
-# drift
+# Drift
 
+> A comprehensive platform for electronic music enthusiasts, artists, promoters, and venue owners to discover, rate, and manage venues, events, and artist profiles.
+
+[![Next.js](https://img.shields.io/badge/Next.js-14-black?style=flat-square&logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org/)
+[![Supabase](https://img.shields.io/badge/Supabase-Backend-green?style=flat-square&logo=supabase)](https://supabase.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-blue?style=flat-square&logo=tailwindcss)](https://tailwindcss.com/)
+
+## Overview
+
+Drift solves the fragmented nature of underground electronic music scenes by providing a centralized platform where fans can discover venues and events, artists can showcase their work, and promoters can connect with their audience. The platform features a comprehensive review system, real-time search, role-based access control, and AI-powered content moderation.
+
+### Key Features
+
+- **Venue Discovery** - Find and explore electronic music venues with detailed ratings
+- **Event Management** - Discover upcoming events and manage event listings
+- **Artist Profiles** - Comprehensive artist pages with gig history and reviews
+- **Multi-facet Reviews** - Rate venues and events on sound, vibe, and crowd
+- **Global Search** - Advanced search and filtering across all content
+- **Role-based Access** - Different access levels for fans, artists, promoters, and venue owners
+- **Content Moderation** - AI-powered content filtering with admin oversight
+- **Mobile-first Design** - Responsive design optimized for all devices
+
+## Quick Start
+
+### Prerequisites
+
+- Node.js 20.x or higher
+- npm 9.x or higher
+- Supabase account and project
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/your-username/drift.git
+   cd drift
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables**
+   ```bash
+   cp env.example .env.local
+   ```
+   Update `.env.local` with your Supabase credentials:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+   ```
+
+4. **Set up the database**
+   ```bash
+   # Install Supabase CLI if you haven't already
+   npm install -g supabase
+
+   # Run migrations
+   supabase db push
+   ```
+
+5. **Start the development server**
+   ```bash
+   npm run dev
+   ```
+
+6. **Open your browser**
+   Navigate to [http://localhost:3000](http://localhost:3000)
+
+## Architecture
+
+### Tech Stack
+
+**Frontend**
+- Next.js 14 (App Router)
+- TypeScript
+- Tailwind CSS
+- shadcn/ui Components
+- Radix UI (Accessibility)
+- Framer Motion (Animations)
+
+**Backend**
+- Supabase (PostgreSQL, Auth, Storage, Realtime)
+- Next.js API Routes
+- TypeScript
+
+**Development & Tools**
+- ESLint & Prettier
+- Husky (Git Hooks)
+- Claude Code (AI Development Assistant)
+
+### Project Structure
+```
+drift/
+├── app/                    # Next.js app directory
+│   ├── api/               # API routes
+│   ├── (pages)/           # Page components
+│   └── globals.css        # Global styles
+├── components/            # Reusable UI components
+│   └── ui/               # shadcn/ui components
+├── lib/                   # Utility libraries
+│   ├── services/         # Business logic
+│   ├── types/           # TypeScript definitions
+│   └── utils.ts         # Helper functions
+├── docs/                  # Documentation
+│   ├── api/              # API documentation
+│   ├── architecture/     # Architecture docs
+│   ├── development/      # Development guides
+│   └── deployment/       # Deployment guides
+├── supabase/             # Database migrations
+└── public/               # Static assets
+```
+
+## 🎯 User Roles
+
+### Fan
+- Browse venues, events, and artists
+- Leave reviews and ratings
+- Create basic user profile
+
+### Artist
+- Create and manage artist profile
+- View performance history
+- Respond to reviews (planned)
+
+### Promoter
+- Create and manage events
+- Link events to venues and artists
+- View event analytics (planned)
+
+### Venue Owner
+- Create and manage venue profiles
+- Manage venue events
+- View venue analytics (planned)
+
+### Admin
+- Moderate content and reviews
+- Manage user verifications
+- Access all platform features
+
+## 📱 Core Features
+
+### Venue Management
+- Detailed venue profiles with photos and information
+- Location mapping with Mapbox integration
+- Capacity, contact info, and social links
+- Upcoming and past events listing
+
+### Event Discovery
+- Comprehensive event listings with dates and lineups
+- Advanced filtering by date, location, genre, and rating
+- Ticket integration with external platforms
+- Artist lineup management
+
+### Artist Profiles
+- Professional artist pages with biographies
+- Performance history and upcoming shows
+- Genre categorization and social media links
+- Photo galleries and press kit support
+
+### Review System
+- Multi-faceted ratings (Sound, Vibe, Crowd)
+- Detailed written reviews with moderation
+- Review flagging and admin oversight
+- Average rating calculations and statistics
+
+### Search & Discovery
+- Global search across all content types
+- Advanced filtering and sorting options
+- Trending and recommended content
+- Location-based discovery
+
+## 🔐 Security & Privacy
+
+- JWT-based authentication with Supabase Auth
+- Role-based access control (RBAC)
+- Row-level security policies
+- Input validation and sanitization
+- Content moderation with AI assistance
+- GDPR compliance ready
+
+## 🚀 API Reference
+
+The platform provides a comprehensive RESTful API. See [API Documentation](docs/api/API_DOCUMENTATION.md) for detailed endpoint information.
+
+### Quick API Overview
+
+- **Authentication**: `/api/auth/*` - User registration, login, password reset
+- **Venues**: `/api/venues/*` - Venue CRUD operations
+- **Events**: `/api/events/*` - Event management
+- **Artists**: `/api/artists/*` - Artist profile management
+- **Reviews**: `/api/reviews/*` - Review and rating system
+- **Search**: `/api/search` - Global search functionality
+- **Admin**: `/api/admin/*` - Administrative functions
+
+## 🛠️ Development
+
+### Available Scripts
+
+```bash
+# Development
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run start        # Start production server
+
+# Code Quality
+npm run lint         # Run ESLint
+npm run lint:fix     # Fix ESLint errors
+npm run type-check   # Run TypeScript checks
+
+# Database
+npm run db:generate  # Generate database types
+npm run db:push     # Push schema changes
+npm run db:reset    # Reset database
+```
+
+### Development Workflow
+
+1. Create feature branch from `main`
+2. Make changes and test locally
+3. Run linting and type checks
+4. Submit pull request
+5. Code review and merge
+
+### Contributing
+
+Please read our [Contributing Guidelines](docs/development/CONTRIBUTING.md) for details on our code of conduct and development process.
+
+## 📋 Roadmap
+
+### Phase 1 (Current)
+- ✅ User authentication and profiles
+- ✅ Venue, event, and artist management
+- ✅ Review and rating system
+- ✅ Search and discovery
+- ✅ Admin moderation tools
+
+### Phase 2 (Planned)
+- 🔄 Advanced AI recommendations
+- 🔄 Real-time notifications
+- 🔄 Mobile app development
+- 🔄 Social features and following
+- 🔄 Advanced analytics dashboard
+
+### Phase 3 (Future)
+- 📋 Direct ticket sales integration
+- 📋 Artist press kit hosting
+- 📋 Event livestreaming
+- 📋 Marketplace features
+- 📋 API for third-party integrations
+
+## 🤝 Community
+
+- [GitHub Issues](https://github.com/your-username/drift/issues) - Bug reports and feature requests
+- [Discussions](https://github.com/your-username/drift/discussions) - Community discussions
+- [Discord](#) - Real-time community chat (coming soon)
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- [Supabase](https://supabase.com/) for the backend infrastructure
+- [Vercel](https://vercel.com/) for deployment platform
+- [shadcn/ui](https://ui.shadcn.com/) for beautiful UI components
+- [Claude Code](https://claude.ai/code) for AI-assisted development
+
+---
+
+**Built with ❤️ for the electronic music community**
+
+For detailed setup instructions, see [Deployment Guide](docs/deployment/SETUP.md)
+
+For development guidelines, see [Development Docs](docs/development/)
+
+For architecture details, see [Architecture Docs](docs/architecture/)

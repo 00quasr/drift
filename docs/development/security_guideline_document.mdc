@@ -1,0 +1,398 @@
+---
+alwaysApply: true
+---
+
+**Next Steps & Architectural Overview for Drift**
+
+Below is a high-level plan covering system architecture, database schema, folder structure, and key security controls aligned with our requirements.
+
+## 1. System Architecture
+
+- **Frontend**
+  - Next.js (React + Vite in future); Tailwind CSS + shadcn/ui + Radix UI
+  - Framer Motion for animations
+  - Localization via `next-i18next` or `react-intl`
+  - Mapbox React SDK
+  - API interactions through a Supabase client wrapper
+
+- **Backend & Data**
+  - Supabase (PostgreSQL, Auth, Storage, Functions, Realtime)
+  - Supabase Functions (Edge/Rust or JavaScript) for custom endpoints
+  - Future: pgvector extension for similarity search
+  - OpenAI moderation called server-side via Supabase Function
+
+- **Hosting & Infra**
+  - Initially: Supabase managed
+  - CI/CD: GitHub Actions with secrets in GitHub Secrets or Vault
+  - Enforce HTTPS everywhere (via Next.js config and Supabase HTTPS)
+
+## 2. Core Database Schema (PostgreSQL)
+
+```sql
+-- 1. Roles & Users
+CREATE TABLE roles (
+  id     SMALLSERIAL PRIMARY KEY,
+  name   TEXT UNIQUE NOT NULL  -- e.g. ‘user’, ‘artist’, ‘promoter’, ‘club_owner’, ‘admin’
+);
+
+CREATE TABLE users (
+  id             UUID PRIMARY KEY DEFAULT auth.uid(),
+  email          TEXT UNIQUE NOT NULL,
+  password_hash  TEXT NOT NULL,
+  role_id        SMALLINT NOT NULL REFERENCES roles(id),
+  is_verified    BOOLEAN DEFAULT FALSE,
+  locale         TEXT DEFAULT 'en',
+  created_at     TIMESTAMP WITH TIME ZONE DEFAULT now(),
+  updated_at     TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+-- 2. Whitelist Requests
+CREATE TABLE whitelist_requests (
+  id            BIGSERIAL PRIMARY KEY,
+  user_id       UUID NOT NULL REFERENCES users(id),
+  documents     JSONB,       -- S3 URLs or Supabase Storage refs
+  social_links  JSONB,
+  status        TEXT NOT NULL CHECK(status IN ('pending','approved','rejected')),
+  submitted_at  TIMESTAMP WITH TIME ZONE DEFAULT now(),
+  reviewed_at   TIMESTAMP WITH TIME ZONE
+);
+
+-- 3. Clubs, Events, Artists
+CREATE TABLE clubs (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  owner_id    UUID NOT NULL REFERENCES users(id),
+  name        TEXT NOT NULL,
+  description TEXT,
+  address     TEXT,
+  location    GEOGRAPHY(Point,4326),
+  genre_tags  TEXT[],       -- e.g. ['Techno','House']
+  created_at  TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+CREATE TABLE artists (
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id      UUID UNIQUE REFERENCES users(id),
+  name         TEXT NOT NULL,
+  bio          TEXT,
+  photo_url    TEXT,
+  genre_tags   TEXT[],
+  created_at   TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+CREATE TABLE events (
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  club_id      UUID NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
+  title        TEXT NOT NULL,
+  description  TEXT,
+  start_time   TIMESTAMP WITH TIME ZONE NOT NULL,
+  end_time     TIMESTAMP WITH TIME ZONE,
+  poster_url   TEXT,
+  created_at   TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+CREATE TABLE event_artists (
+  event_id  UUID REFERENCES events(id) ON DELETE CASCADE,
+  artist_id UUID REFERENCES artists(id) ON DELETE CASCADE,
+  PRIMARY KEY(event_id,artist_id)
+);
+
+-- 4. Reviews & Ratings
+CREATE TABLE reviews (
+  id            BIGSERIAL PRIMARY KEY,
+  user_id       UUID NOT NULL REFERENCES users(id),
+  target_type   TEXT NOT NULL CHECK(target_type IN ('club','event','artist')),
+  target_id     UUID NOT NULL,
+  rating        SMALLINT NOT NULL CHECK(rating BETWEEN 1 AND 5),
+  sub_ratings   JSONB,       -- {sound:4,vibe:5,crowd:3}
+  comment       TEXT,
+  ai_flagged    BOOLEAN DEFAULT FALSE,
+  user_flagged  BOOLEAN DEFAULT FALSE,
+  status        TEXT NOT NULL CHECK(status IN ('visible','pending_review','hidden')),
+  created_at    TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+-- 5. Notifications
+CREATE TABLE notifications (
+  id            BIGSERIAL PRIMARY KEY,
+  user_id       UUID NOT NULL REFERENCES users(id),
+  type          TEXT NOT NULL,
+  payload       JSONB,
+  is_read       BOOLEAN DEFAULT FALSE,
+  created_at    TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+```
+
+## 3. Folder Structure (Next.js)  
+```
+├── /app                  # Next.js App Router
+│   ├── /api              # Serverless API routes (Supabase Functions proxy)
+│   ├── /components       # Shared React components
+│   ├── /dashboard        # Creator dashboard pages
+│   ├── /admin            # Admin panel pages
+│   ├── /explore          # Search & filter pages
+│   ├── /venue/[id]       # Club detail route
+│   ├── /event/[id]       # Event detail route
+│   ├── /artist/[id]      # Artist profile route
+│   ├── /auth             # Login/Register
+│   └── /layout.tsx       # Root layout with security headers
+├── /lib
+│   ├── supabaseClient.ts # Typed Supabase wrapper
+│   ├── api.ts            # Fetch wrappers + rate limiting
+│   ├── i18n.ts           # Localization setup
+├── /hooks                # Custom React hooks (useAuth, useReview)
+├── /styles
+│   └── tailwind.config.js
+├── next.config.js        # Enforce security headers, CSP
+├── tsconfig.json
+└── package.json
+```
+
+## 4. Security Controls & Best Practices
+
+- **Authentication & RBAC**
+  - Supabase Auth with JWTs (HS256 or RS256) + role claims
+  - Server-side role checks in every API route
+  - Strong password policy + bcrypt/argon2 via Supabase
+  - Idle/absolute session timeouts
+  - CSRF protection: NextAuth or custom synchronizer tokens
+
+- **Input Validation & Output Encoding**
+  - Zod or Yup schemas for incoming payloads
+  - Prepared statements for any raw SQL
+  - Escape all user content in React with `dangerouslySetInnerHTML` only after sanitization
+  - CSP header: `script-src 'self' 'nonce-...'` etc.
+
+- **Data Protection**
+  - TLS everywhere (Next.js & Supabase)
+  - Supabase Storage buckets locked down (per-user ACL)
+  - No secrets in repo; use environment variables + secrets manager
+
+- **API Security**
+  - Rate limiting per IP or user via middleware (e.g. `express-rate-limit` or Vercel edge functions)
+  - Strict CORS (Allow only our domains)
+  - Versioned endpoints: `/api/v1/...`
+  - Minimal response payloads (omit PII)
+
+- **Web Security Headers** (in `next.config.js`)
+  - `Strict-Transport-Security`;
+  - `X-Frame-Options: DENY`;
+  - `X-Content-Type-Options: nosniff`;
+  - `Referrer-Policy: no-referrer`;
+  - `Content-Security-Policy` locked down;
+  - `Permissions-Policy`
+
+- **File Uploads**
+  - Validate file type & size in edge function
+  - Store outside public folder; serve via signed URLs
+
+- **Monitoring & Logging**
+  - Supabase Logs + Sentry for front/back errors
+  - Sanitize logs to avoid PII
+
+## 5. Immediate Next Steps
+
+1. Finalize DB schema & migrate via Supabase Migrations.
+2. Spin up Next.js project; configure Tailwind + shadcn/ui + Radix.
+3. Implement Supabase client wrapper with typed queries & RBAC middleware.
+4. Build auth flow (login/register, whitelisting request form).
+5. Scaffold basic pages (landing, explore, venue/event/artist).
+6. Set up CI/CD pipelines with secret management & security linters.
+
+Let me know which area you’d like to tackle first, or if you’d like deeper detail on any component!
+**Next Steps & Architectural Overview for Drift**
+
+Below is a high-level plan covering system architecture, database schema, folder structure, and key security controls aligned with our requirements.
+
+## 1. System Architecture
+
+- **Frontend**
+  - Next.js (React + Vite in future); Tailwind CSS + shadcn/ui + Radix UI
+  - Framer Motion for animations
+  - Localization via `next-i18next` or `react-intl`
+  - Mapbox React SDK
+  - API interactions through a Supabase client wrapper
+
+- **Backend & Data**
+  - Supabase (PostgreSQL, Auth, Storage, Functions, Realtime)
+  - Supabase Functions (Edge/Rust or JavaScript) for custom endpoints
+  - Future: pgvector extension for similarity search
+  - OpenAI moderation called server-side via Supabase Function
+
+- **Hosting & Infra**
+  - Initially: Supabase managed
+  - CI/CD: GitHub Actions with secrets in GitHub Secrets or Vault
+  - Enforce HTTPS everywhere (via Next.js config and Supabase HTTPS)
+
+## 2. Core Database Schema (PostgreSQL)
+
+```sql
+-- 1. Roles & Users
+CREATE TABLE roles (
+  id     SMALLSERIAL PRIMARY KEY,
+  name   TEXT UNIQUE NOT NULL  -- e.g. ‘user’, ‘artist’, ‘promoter’, ‘club_owner’, ‘admin’
+);
+
+CREATE TABLE users (
+  id             UUID PRIMARY KEY DEFAULT auth.uid(),
+  email          TEXT UNIQUE NOT NULL,
+  password_hash  TEXT NOT NULL,
+  role_id        SMALLINT NOT NULL REFERENCES roles(id),
+  is_verified    BOOLEAN DEFAULT FALSE,
+  locale         TEXT DEFAULT 'en',
+  created_at     TIMESTAMP WITH TIME ZONE DEFAULT now(),
+  updated_at     TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+-- 2. Whitelist Requests
+CREATE TABLE whitelist_requests (
+  id            BIGSERIAL PRIMARY KEY,
+  user_id       UUID NOT NULL REFERENCES users(id),
+  documents     JSONB,       -- S3 URLs or Supabase Storage refs
+  social_links  JSONB,
+  status        TEXT NOT NULL CHECK(status IN ('pending','approved','rejected')),
+  submitted_at  TIMESTAMP WITH TIME ZONE DEFAULT now(),
+  reviewed_at   TIMESTAMP WITH TIME ZONE
+);
+
+-- 3. Clubs, Events, Artists
+CREATE TABLE clubs (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  owner_id    UUID NOT NULL REFERENCES users(id),
+  name        TEXT NOT NULL,
+  description TEXT,
+  address     TEXT,
+  location    GEOGRAPHY(Point,4326),
+  genre_tags  TEXT[],       -- e.g. ['Techno','House']
+  created_at  TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+CREATE TABLE artists (
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id      UUID UNIQUE REFERENCES users(id),
+  name         TEXT NOT NULL,
+  bio          TEXT,
+  photo_url    TEXT,
+  genre_tags   TEXT[],
+  created_at   TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+CREATE TABLE events (
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  club_id      UUID NOT NULL REFERENCES clubs(id) ON DELETE CASCADE,
+  title        TEXT NOT NULL,
+  description  TEXT,
+  start_time   TIMESTAMP WITH TIME ZONE NOT NULL,
+  end_time     TIMESTAMP WITH TIME ZONE,
+  poster_url   TEXT,
+  created_at   TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+CREATE TABLE event_artists (
+  event_id  UUID REFERENCES events(id) ON DELETE CASCADE,
+  artist_id UUID REFERENCES artists(id) ON DELETE CASCADE,
+  PRIMARY KEY(event_id,artist_id)
+);
+
+-- 4. Reviews & Ratings
+CREATE TABLE reviews (
+  id            BIGSERIAL PRIMARY KEY,
+  user_id       UUID NOT NULL REFERENCES users(id),
+  target_type   TEXT NOT NULL CHECK(target_type IN ('club','event','artist')),
+  target_id     UUID NOT NULL,
+  rating        SMALLINT NOT NULL CHECK(rating BETWEEN 1 AND 5),
+  sub_ratings   JSONB,       -- {sound:4,vibe:5,crowd:3}
+  comment       TEXT,
+  ai_flagged    BOOLEAN DEFAULT FALSE,
+  user_flagged  BOOLEAN DEFAULT FALSE,
+  status        TEXT NOT NULL CHECK(status IN ('visible','pending_review','hidden')),
+  created_at    TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+-- 5. Notifications
+CREATE TABLE notifications (
+  id            BIGSERIAL PRIMARY KEY,
+  user_id       UUID NOT NULL REFERENCES users(id),
+  type          TEXT NOT NULL,
+  payload       JSONB,
+  is_read       BOOLEAN DEFAULT FALSE,
+  created_at    TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+```
+
+## 3. Folder Structure (Next.js)  
+```
+├── /app                  # Next.js App Router
+│   ├── /api              # Serverless API routes (Supabase Functions proxy)
+│   ├── /components       # Shared React components
+│   ├── /dashboard        # Creator dashboard pages
+│   ├── /admin            # Admin panel pages
+│   ├── /explore          # Search & filter pages
+│   ├── /venue/[id]       # Club detail route
+│   ├── /event/[id]       # Event detail route
+│   ├── /artist/[id]      # Artist profile route
+│   ├── /auth             # Login/Register
+│   └── /layout.tsx       # Root layout with security headers
+├── /lib
+│   ├── supabaseClient.ts # Typed Supabase wrapper
+│   ├── api.ts            # Fetch wrappers + rate limiting
+│   ├── i18n.ts           # Localization setup
+├── /hooks                # Custom React hooks (useAuth, useReview)
+├── /styles
+│   └── tailwind.config.js
+├── next.config.js        # Enforce security headers, CSP
+├── tsconfig.json
+└── package.json
+```
+
+## 4. Security Controls & Best Practices
+
+- **Authentication & RBAC**
+  - Supabase Auth with JWTs (HS256 or RS256) + role claims
+  - Server-side role checks in every API route
+  - Strong password policy + bcrypt/argon2 via Supabase
+  - Idle/absolute session timeouts
+  - CSRF protection: NextAuth or custom synchronizer tokens
+
+- **Input Validation & Output Encoding**
+  - Zod or Yup schemas for incoming payloads
+  - Prepared statements for any raw SQL
+  - Escape all user content in React with `dangerouslySetInnerHTML` only after sanitization
+  - CSP header: `script-src 'self' 'nonce-...'` etc.
+
+- **Data Protection**
+  - TLS everywhere (Next.js & Supabase)
+  - Supabase Storage buckets locked down (per-user ACL)
+  - No secrets in repo; use environment variables + secrets manager
+
+- **API Security**
+  - Rate limiting per IP or user via middleware (e.g. `express-rate-limit` or Vercel edge functions)
+  - Strict CORS (Allow only our domains)
+  - Versioned endpoints: `/api/v1/...`
+  - Minimal response payloads (omit PII)
+
+- **Web Security Headers** (in `next.config.js`)
+  - `Strict-Transport-Security`;
+  - `X-Frame-Options: DENY`;
+  - `X-Content-Type-Options: nosniff`;
+  - `Referrer-Policy: no-referrer`;
+  - `Content-Security-Policy` locked down;
+  - `Permissions-Policy`
+
+- **File Uploads**
+  - Validate file type & size in edge function
+  - Store outside public folder; serve via signed URLs
+
+- **Monitoring & Logging**
+  - Supabase Logs + Sentry for front/back errors
+  - Sanitize logs to avoid PII
+
+## 5. Immediate Next Steps
+
+1. Finalize DB schema & migrate via Supabase Migrations.
+2. Spin up Next.js project; configure Tailwind + shadcn/ui + Radix.
+3. Implement Supabase client wrapper with typed queries & RBAC middleware.
+4. Build auth flow (login/register, whitelisting request form).
+5. Scaffold basic pages (landing, explore, venue/event/artist).
+6. Set up CI/CD pipelines with secret management & security linters.
+
+Let me know which area you’d like to tackle first, or if you’d like deeper detail on any component!

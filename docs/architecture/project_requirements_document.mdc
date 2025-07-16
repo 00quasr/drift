@@ -1,0 +1,304 @@
+---
+alwaysApply: true
+---
+
+# Project Requirements Document (PRD) – Drift
+
+## 1. Project Overview
+
+Drift is a web platform for electronic music enthusiasts, promoters, club owners, and artists to discover, rate, and manage venues, events, and artist profiles all in one place. Fans can browse trending clubs, upcoming events, and top-rated DJs; leave structured reviews with sub-ratings (sound, vibe, crowd); and flag inappropriate comments. Promoters and venue owners can create and edit event listings once verified, while artists can claim and maintain their gig history. An AI-powered moderation layer auto-filters toxicity and spam, supplemented by a human review queue for flagged content.
+
+The purpose of Drift is to solve the fragmented nature of underground electronic music scenes—currently fans piece together information from ticket sites, social feeds, and word of mouth. By offering a centralized, moderated directory with rich search and filtering, Drift helps fans find the best experiences, helps creators promote themselves, and gives curators data-driven insights on emerging hotspots. Key objectives for v1 are:
+
+*   Secure, role-based access control with manual verification
+*   A robust, multi-facet rating and review system
+*   Fast global search and filtering by location, genre, date, and rating
+*   Clear, engaging pages for venues, events, and artists
+*   Simple admin workflows for whitelisting and content moderation
+
+Success will be measured by user sign-ups, reviewed entities (venues/events/artists), volume of community ratings, and low rate of abusive content slipping through.
+
+## 2. In-Scope vs. Out-of-Scope
+
+### In-Scope (Version 1)
+
+*   User authentication & RBAC (fans vs. whitelisted Club Owners, Promoters, Artists)
+*   Whitelisting workflow (document upload, social links, manual admin approval)
+*   Entity management & interlinking: Clubs ↔ Events ↔ Artists
+*   Search & filter by location (Mapbox), genre tags, date, rating
+*   Review & rating form with 1–5 stars + subcategories (sound, vibe, crowd)
+*   AI content filtering (OpenAI) + user flagging + admin moderation queue
+*   Landing page with rotating highlights (trending clubs, upcoming events, top artists)
+*   Detail pages for venues, events, artists with all required fields and images
+*   Creator dashboard for adding/editing listings
+*   Admin dashboard for whitelist requests & flagged comment queue
+*   In-app notifications & optional email alerts
+*   Multi-language support and regional localization from day one
+
+### Out-of-Scope (Will consider later)
+
+*   Direct ticket sales / payment gateway integration
+*   Embedded Spotify/SoundCloud players
+*   Advanced AI recommendations (pgvector-based)
+*   SMS or push notifications
+*   Detailed artist press kit hosting
+*   Self-hosted backend deployment (initially on Supabase managed)
+
+## 3. User Flow
+
+First-time visitors land on the Drift homepage and can browse trending venues, events, and artists. To actively participate (rate or comment), they sign up via email or social login. Standard fans pick the “basic user” role; Club Owners, Promoters, or Artists click “Request Verification,” upload relevant documents (business license, promotional materials) and link social profiles. After submitting, they see a pending-approval banner and receive an email once an admin approves or rejects their request. Once approved, creators are redirected to a personalized dashboard where they can add or edit venues, events, or artist profiles.
+
+Returning users land on a dark-mode interface showing rotating carousels of “Editor Picks,” “Hot Right Now” genres, and “Local Favorites.” They tap “Explore” to open a full-screen search overlay where filters for genre, date range, location radius, and rating thresholds refine results instantly. Clicking any result opens its detail page, richly laid out with hero images, map embeds, social links, and review sections. Fans scroll to read community comments or tap “Leave a Review” to rate an entity on sound, vibe, and crowd, then submit. Their comment passes through AI filtering; approved comments appear immediately and trigger an in-app notification. Flagged or quarantined items go to the admin queue.
+
+## 4. Core Features
+
+*   **Authentication & Role Management**\
+    • Supabase Auth with email/social login\
+    • Role-based access control (fan, club owner, promoter, artist)\
+    • Whitelisting workflow: document upload, social link, manual admin approval
+*   **Entity Management & Interlinking**\
+    • Clubs: name, address, capacity, contact info, social links, events list\
+    • Events: title, date/time, venue link, artists lineup, ticket URL, pricing, genre tags\
+    • Artists: name, bio, social profiles, genre tags, past/upcoming gigs, ratings
+*   **Review & Rating System**\
+    • 1–5 star overall rating + subcategory ratings (sound, vibe, crowd)\
+    • Comment text field with AI filtering (toxicity/spam)\
+    • User flagging → admin moderation queue
+*   **Global Search & Filtering**\
+    • Real-time search across all entities\
+    • Filters: genre tags, location (Mapbox), date range, rating threshold\
+    • Instant result updates
+*   **Landing & Highlight Pages**\
+    • Rotating hero carousel for trending clubs, events, artists\
+    • Grid of latest reviews and community picks\
+    • Smooth Framer Motion animations
+*   **Detail Pages**\
+    • Hero imagery, map embed, social links, contact info\
+    • Upcoming/past events carousel (venue page)\
+    • Lineup, flyer, pricing, external ticket link (event page)\
+    • Biography, genre tags, gig history (artist page)
+*   **Dashboards**\
+    • Creator dashboard: forms to create/edit venues, events, artists with real-time preview\
+    • Admin dashboard: pending verifications, flagged content queue, audit logs
+*   **Notifications & Localization**\
+    • In-app toasts + optional email alerts\
+    • User settings for language/region preferences
+
+## 5. Tech Stack & Tools
+
+Frontend
+
+*   React (Next.js or Vite)
+*   shadcn/ui (Tailwind-based components)
+*   Tailwind CSS, Radix UI (accessibility)
+*   Framer Motion (micro-interactions)
+
+Backend & Storage
+
+*   Supabase (PostgreSQL, Auth, Storage, Realtime, Functions)
+*   Neon Postgres (future self-hosted option)
+*   pgvector (future AI recommendation)
+*   FastAPI (optional if migrating off Supabase Functions)
+
+AI & APIs
+
+*   OpenAI content moderation API
+*   Langchain / OpenRouter (optional wrapper for custom rules)
+*   Mapbox (maps & geocoding)
+
+IDE & Developer Tools
+
+*   Claude Code (AI-powered coding assistant in terminal)
+*   Cursor (AI-enhanced IDE with real-time suggestions)
+
+## 6. Non-Functional Requirements
+
+*   **Performance**:\
+    • Page load time ≤ 2 seconds on 3G/4G\
+    • Search/filter response ≤ 500ms
+*   **Scalability**:\
+    • Handle 100K+ entities, thousands of concurrent users
+*   **Security & Compliance**:\
+    • SSL/TLS encryption in transit\
+    • AES-256 encryption at rest (Supabase default)\
+    • Role-based access control, parameterized queries\
+    • GDPR & CCPA readiness: data portability, user consent
+*   **Usability & Accessibility**:\
+    • Mobile-first, responsive design\
+    • WCAG 2.1 AA compliance (ARIA roles, color contrast)
+
+## 7. Constraints & Assumptions
+
+*   Initial deployment on Supabase managed platform; self-hosted backend (Neon/FastAPI) possible later
+*   OpenAI content filter availability (rate limits apply)
+*   Mapbox free tier quotas must cover usage; upgrade if needed
+*   Users worldwide require multi-language support from launch
+*   Ticketing handled via external links only
+*   Document uploads limited to 10 MB per file
+
+## 8. Known Issues & Potential Pitfalls
+
+*   **API Rate Limits**:\
+    • OpenAI and Mapbox limits could throttle moderation or map loads.\
+    • Mitigation: implement request queuing, caching, exponential backoff.
+*   **False Positives in Moderation**:\
+    • AI filters may quarantine valid reviews.\
+    • Mitigation: manual review queue and “restore” action for admins.
+*   **Duplicate Entity Entries**:\
+    • Users might create the same venue or artist twice.\
+    • Mitigation: fuzzy-search checks before creation and admin merge tool.
+*   **Localization Edge Cases**:\
+    • Timezones, date formats, RTL languages.\
+    • Mitigation: use i18n library with tested locale bundles.
+
+This document is the single source of truth for Drift’s v1 scope. It provides clear, unambiguous instructions so subsequent technical documents (Tech Stack, Frontend Guidelines, Backend Structure, etc.) can be generated directly from it.
+# Project Requirements Document (PRD) – Drift
+
+## 1. Project Overview
+
+Drift is a web platform for electronic music enthusiasts, promoters, club owners, and artists to discover, rate, and manage venues, events, and artist profiles all in one place. Fans can browse trending clubs, upcoming events, and top-rated DJs; leave structured reviews with sub-ratings (sound, vibe, crowd); and flag inappropriate comments. Promoters and venue owners can create and edit event listings once verified, while artists can claim and maintain their gig history. An AI-powered moderation layer auto-filters toxicity and spam, supplemented by a human review queue for flagged content.
+
+The purpose of Drift is to solve the fragmented nature of underground electronic music scenes—currently fans piece together information from ticket sites, social feeds, and word of mouth. By offering a centralized, moderated directory with rich search and filtering, Drift helps fans find the best experiences, helps creators promote themselves, and gives curators data-driven insights on emerging hotspots. Key objectives for v1 are:
+
+*   Secure, role-based access control with manual verification
+*   A robust, multi-facet rating and review system
+*   Fast global search and filtering by location, genre, date, and rating
+*   Clear, engaging pages for venues, events, and artists
+*   Simple admin workflows for whitelisting and content moderation
+
+Success will be measured by user sign-ups, reviewed entities (venues/events/artists), volume of community ratings, and low rate of abusive content slipping through.
+
+## 2. In-Scope vs. Out-of-Scope
+
+### In-Scope (Version 1)
+
+*   User authentication & RBAC (fans vs. whitelisted Club Owners, Promoters, Artists)
+*   Whitelisting workflow (document upload, social links, manual admin approval)
+*   Entity management & interlinking: Clubs ↔ Events ↔ Artists
+*   Search & filter by location (Mapbox), genre tags, date, rating
+*   Review & rating form with 1–5 stars + subcategories (sound, vibe, crowd)
+*   AI content filtering (OpenAI) + user flagging + admin moderation queue
+*   Landing page with rotating highlights (trending clubs, upcoming events, top artists)
+*   Detail pages for venues, events, artists with all required fields and images
+*   Creator dashboard for adding/editing listings
+*   Admin dashboard for whitelist requests & flagged comment queue
+*   In-app notifications & optional email alerts
+*   Multi-language support and regional localization from day one
+
+### Out-of-Scope (Will consider later)
+
+*   Direct ticket sales / payment gateway integration
+*   Embedded Spotify/SoundCloud players
+*   Advanced AI recommendations (pgvector-based)
+*   SMS or push notifications
+*   Detailed artist press kit hosting
+*   Self-hosted backend deployment (initially on Supabase managed)
+
+## 3. User Flow
+
+First-time visitors land on the Drift homepage and can browse trending venues, events, and artists. To actively participate (rate or comment), they sign up via email or social login. Standard fans pick the “basic user” role; Club Owners, Promoters, or Artists click “Request Verification,” upload relevant documents (business license, promotional materials) and link social profiles. After submitting, they see a pending-approval banner and receive an email once an admin approves or rejects their request. Once approved, creators are redirected to a personalized dashboard where they can add or edit venues, events, or artist profiles.
+
+Returning users land on a dark-mode interface showing rotating carousels of “Editor Picks,” “Hot Right Now” genres, and “Local Favorites.” They tap “Explore” to open a full-screen search overlay where filters for genre, date range, location radius, and rating thresholds refine results instantly. Clicking any result opens its detail page, richly laid out with hero images, map embeds, social links, and review sections. Fans scroll to read community comments or tap “Leave a Review” to rate an entity on sound, vibe, and crowd, then submit. Their comment passes through AI filtering; approved comments appear immediately and trigger an in-app notification. Flagged or quarantined items go to the admin queue.
+
+## 4. Core Features
+
+*   **Authentication & Role Management**\
+    • Supabase Auth with email/social login\
+    • Role-based access control (fan, club owner, promoter, artist)\
+    • Whitelisting workflow: document upload, social link, manual admin approval
+*   **Entity Management & Interlinking**\
+    • Clubs: name, address, capacity, contact info, social links, events list\
+    • Events: title, date/time, venue link, artists lineup, ticket URL, pricing, genre tags\
+    • Artists: name, bio, social profiles, genre tags, past/upcoming gigs, ratings
+*   **Review & Rating System**\
+    • 1–5 star overall rating + subcategory ratings (sound, vibe, crowd)\
+    • Comment text field with AI filtering (toxicity/spam)\
+    • User flagging → admin moderation queue
+*   **Global Search & Filtering**\
+    • Real-time search across all entities\
+    • Filters: genre tags, location (Mapbox), date range, rating threshold\
+    • Instant result updates
+*   **Landing & Highlight Pages**\
+    • Rotating hero carousel for trending clubs, events, artists\
+    • Grid of latest reviews and community picks\
+    • Smooth Framer Motion animations
+*   **Detail Pages**\
+    • Hero imagery, map embed, social links, contact info\
+    • Upcoming/past events carousel (venue page)\
+    • Lineup, flyer, pricing, external ticket link (event page)\
+    • Biography, genre tags, gig history (artist page)
+*   **Dashboards**\
+    • Creator dashboard: forms to create/edit venues, events, artists with real-time preview\
+    • Admin dashboard: pending verifications, flagged content queue, audit logs
+*   **Notifications & Localization**\
+    • In-app toasts + optional email alerts\
+    • User settings for language/region preferences
+
+## 5. Tech Stack & Tools
+
+Frontend
+
+*   React (Next.js or Vite)
+*   shadcn/ui (Tailwind-based components)
+*   Tailwind CSS, Radix UI (accessibility)
+*   Framer Motion (micro-interactions)
+
+Backend & Storage
+
+*   Supabase (PostgreSQL, Auth, Storage, Realtime, Functions)
+*   Neon Postgres (future self-hosted option)
+*   pgvector (future AI recommendation)
+*   FastAPI (optional if migrating off Supabase Functions)
+
+AI & APIs
+
+*   OpenAI content moderation API
+*   Langchain / OpenRouter (optional wrapper for custom rules)
+*   Mapbox (maps & geocoding)
+
+IDE & Developer Tools
+
+*   Claude Code (AI-powered coding assistant in terminal)
+*   Cursor (AI-enhanced IDE with real-time suggestions)
+
+## 6. Non-Functional Requirements
+
+*   **Performance**:\
+    • Page load time ≤ 2 seconds on 3G/4G\
+    • Search/filter response ≤ 500ms
+*   **Scalability**:\
+    • Handle 100K+ entities, thousands of concurrent users
+*   **Security & Compliance**:\
+    • SSL/TLS encryption in transit\
+    • AES-256 encryption at rest (Supabase default)\
+    • Role-based access control, parameterized queries\
+    • GDPR & CCPA readiness: data portability, user consent
+*   **Usability & Accessibility**:\
+    • Mobile-first, responsive design\
+    • WCAG 2.1 AA compliance (ARIA roles, color contrast)
+
+## 7. Constraints & Assumptions
+
+*   Initial deployment on Supabase managed platform; self-hosted backend (Neon/FastAPI) possible later
+*   OpenAI content filter availability (rate limits apply)
+*   Mapbox free tier quotas must cover usage; upgrade if needed
+*   Users worldwide require multi-language support from launch
+*   Ticketing handled via external links only
+*   Document uploads limited to 10 MB per file
+
+## 8. Known Issues & Potential Pitfalls
+
+*   **API Rate Limits**:\
+    • OpenAI and Mapbox limits could throttle moderation or map loads.\
+    • Mitigation: implement request queuing, caching, exponential backoff.
+*   **False Positives in Moderation**:\
+    • AI filters may quarantine valid reviews.\
+    • Mitigation: manual review queue and “restore” action for admins.
+*   **Duplicate Entity Entries**:\
+    • Users might create the same venue or artist twice.\
+    • Mitigation: fuzzy-search checks before creation and admin merge tool.
+*   **Localization Edge Cases**:\
+    • Timezones, date formats, RTL languages.\
+    • Mitigation: use i18n library with tested locale bundles.
+
+This document is the single source of truth for Drift’s v1 scope. It provides clear, unambiguous instructions so subsequent technical documents (Tech Stack, Frontend Guidelines, Backend Structure, etc.) can be generated directly from it.

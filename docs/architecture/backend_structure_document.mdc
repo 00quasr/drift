@@ -1,0 +1,390 @@
+---
+alwaysApply: true
+---
+
+# Backend Structure Document
+
+This document outlines the backend setup for the Drift platform, using clear language so anyone can understand how data flows, where it’s hosted, and how it’s kept secure and reliable.
+
+## 1. Backend Architecture
+
+Overall, the backend is built on a serverless, API-driven model using Supabase as the primary platform, with the option to self-host later using FastAPI and Neon Postgres.
+
+• Supabase Managed Platform
+
+*   Provides Auth, Database (Postgres), Storage, Realtime, and Edge Functions out of the box
+*   Automatically scales with usage
+*   Handles SSL, backups, and basic monitoring
+
+• Future Self-Hosting (optional)
+
+*   Neon Postgres for database hosting
+*   FastAPI for RESTful endpoints and custom business logic
+*   Dockerized services managed via Kubernetes or Docker Compose
+
+How this supports our goals:
+
+*   **Scalability**: Supabase auto-scales storage, compute, and connections. FastAPI + Neon can scale via container orchestration.
+*   **Maintainability**: Clear separation of authentication, data, and business logic. Functions isolate custom code.
+*   **Performance**: Edge functions and serverless queries keep latency low for global users.
+
+## 2. Database Management
+
+We use PostgreSQL (SQL) as our primary data store, managed by Supabase. Key points:
+
+• Data Types and Storage
+
+*   Structured relational data (users, events, venues, reviews)
+*   JSONB for flexible metadata (e.g., social links, genre tags)
+*   pgvector extension reserved for future AI recommendation embeddings
+
+• Access Patterns
+
+*   RESTful queries via Supabase auto-generated endpoints
+*   Edge Functions for custom complex operations (e.g., admin approval workflows)
+*   Realtime subscriptions for live event updates
+
+• Data Practices
+
+*   Role-based access controls (RBAC) to restrict reads/writes by user role
+*   Soft deletes (archived flags) on content to preserve history
+*   Regular backups handled by Supabase
+
+## 3. Database Schema
+
+### Human-Readable Overview
+
+• **Users**: store account info, role, verification status • **Roles**: master list of user roles (fan, artist, promoter, club owner, admin) • **Venues (Clubs)**: name, location, description, owner reference • **Events**: title, date/time, venue reference, lineup data, external ticket link • **Artists**: name, bio, social links, genre tags • **Reviews**: rating scores, comments, user reference, target entity (venue or artist) • **Flags**: user-reported content for admin moderation • **Notifications**: in-app and email notifications per user • **Whitelist Applications**: documents and status for privileged role verification
+
+### SQL Schema (PostgreSQL)
+
+`-- Roles Table enum user_role AS ('fan','artist','promoter','club_owner','admin'); CREATE TABLE users ( id UUID PRIMARY KEY DEFAULT gen_random_uuid(), email TEXT UNIQUE NOT NULL, password_hash TEXT NOT NULL, role user_role NOT NULL DEFAULT 'fan', is_verified BOOLEAN NOT NULL DEFAULT FALSE, created_at TIMESTAMP WITH TIME ZONE DEFAULT now() ); CREATE TABLE venues ( id UUID PRIMARY KEY DEFAULT gen_random_uuid(), name TEXT NOT NULL, description TEXT, address TEXT, city TEXT, country TEXT, map_location GEOGRAPHY(POINT), owner_id UUID REFERENCES users(id), created_at TIMESTAMP WITH TIME ZONE DEFAULT now() ); CREATE TABLE artists ( id UUID PRIMARY KEY DEFAULT gen_random_uuid(), name TEXT NOT NULL, bio TEXT, social_links JSONB, genre_tags TEXT[], created_at TIMESTAMP WITH TIME ZONE DEFAULT now() ); CREATE TABLE events ( id UUID PRIMARY KEY DEFAULT gen_random_uuid(), title TEXT NOT NULL, event_date TIMESTAMP WITH TIME ZONE NOT NULL, venue_id UUID REFERENCES venues(id), artist_ids UUID[], flyer_url TEXT, ticket_link TEXT, price_info TEXT, created_at TIMESTAMP WITH TIME ZONE DEFAULT now() ); CREATE TABLE reviews ( id UUID PRIMARY KEY DEFAULT gen_random_uuid(), user_id UUID REFERENCES users(id), target_type TEXT CHECK (target_type IN ('venue','artist','event')), target_id UUID NOT NULL, rating_overall INT CHECK (rating_overall BETWEEN 1 AND 5), rating_sound INT, rating_vibe INT, rating_crowd INT, comment TEXT, created_at TIMESTAMP WITH TIME ZONE DEFAULT now() ); CREATE TABLE flags ( id UUID PRIMARY KEY DEFAULT gen_random_uuid(), review_id UUID REFERENCES reviews(id), reported_by UUID REFERENCES users(id), reason TEXT, created_at TIMESTAMP WITH TIME ZONE DEFAULT now() ); CREATE TABLE notifications ( id UUID PRIMARY KEY DEFAULT gen_random_uuid(), user_id UUID REFERENCES users(id), type TEXT, content JSONB, is_read BOOLEAN DEFAULT FALSE, created_at TIMESTAMP WITH TIME ZONE DEFAULT now() ); CREATE TABLE whitelist_applications ( id UUID PRIMARY KEY DEFAULT gen_random_uuid(), user_id UUID REFERENCES users(id), documents JSONB, linked_accounts JSONB, status TEXT CHECK (status IN ('pending','approved','rejected')), reviewed_at TIMESTAMP WITH TIME ZONE, created_at TIMESTAMP WITH TIME ZONE DEFAULT now() );`
+
+## 4. API Design and Endpoints
+
+We follow a RESTful approach using Supabase’s autogenerated endpoints and custom Edge Functions.
+
+• **Authentication & User**
+
+*   POST `/auth/signup` • Register new user
+*   POST `/auth/login` • User login, returns JWT
+*   GET `/users/me` • Fetch profile of logged-in user
+*   PUT `/users/me` • Update profile or link socials
+
+• **Role & Whitelisting**
+
+*   POST `/applications` • Submit role application
+*   GET `/applications/:id` • Check status
+*   PATCH `/applications/:id` • Admin approves or rejects
+
+• **Venues, Events, Artists**
+
+*   GET `/venues` / `/events` / `/artists` • List with filters (location, genre, date)
+*   GET `/venues/:id` / etc. • Fetch details
+*   POST `/venues` / `/events` / `/artists` • Creators/Owners only
+*   PUT `/venues/:id` / etc. • Update by owner
+
+• **Reviews & Flags**
+
+*   POST `/reviews` • Submit review
+*   GET `/reviews` • List reviews by entity
+*   POST `/flags` • Flag a review
+*   GET `/flags` • Admin moderation queue
+
+• **Search & Filter**
+
+*   GET `/search`?q=&location=&genre= • Global search endpoint
+
+• **Notifications**
+
+*   GET `/notifications` • List for user
+*   PATCH `/notifications/:id/read` • Mark as read
+
+• **Custom Functions**
+
+*   Edge Function `/notify-new-event` • Trigger notifications on event creation
+*   Edge Function `/moderate-content` • AI-powered toxicity check
+
+## 5. Hosting Solutions
+
+Primary hosting is on Supabase’s managed cloud:
+
+• **Supabase Managed**
+
+*   One-click provisioning, auto SSL, high availability
+*   Built-in Postgres with automated backups and updates
+*   Edge Functions at global points of presence for low latency
+*   CDN for storage assets (flyers images, user uploads)
+
+Future option: • **Self-hosted on Neon + FastAPI**
+
+*   Neon for a serverless Postgres experience
+*   FastAPI containers on AWS ECS, GCP Cloud Run, or DigitalOcean App Platform
+*   GitHub Actions CI/CD deploying container images
+
+## 6. Infrastructure Components
+
+• **Load Balancer / API Gateway**
+
+*   Supabase Edge handles routing incoming requests to the right service
+*   In self-hosted mode, use NGINX or AWS API Gateway
+
+• **Caching**
+
+*   Postgres internal query cache for repeated queries
+*   CDN (via Supabase Storage) for static assets
+
+• **Realtime**
+
+*   Supabase Realtime (WebSockets) for live event updates and notifications
+
+• **CDN**
+
+*   Supabase’s integrated CDN for storage files
+
+• **Logging & Queues**
+
+*   Edge function logs stored in Supabase Logs
+*   Future self-hosted: use RabbitMQ or Redis Streams for async jobs (notifications, email)
+
+## 7. Security Measures
+
+• **Authentication & Authorization**
+
+*   Supabase Auth with JWT tokens
+*   Row-Level Security (RLS) policies in Postgres for per-table access control
+*   Role checks in Edge Functions and FastAPI endpoints
+
+• **Data Encryption**
+
+*   SSL/TLS for all in-transit data
+*   Supabase encrypts data at rest by default
+
+• **Content Moderation**
+
+*   OpenAI content filter API before saving user comments
+*   Admin flagging and review workflows
+
+• **Network Security**
+
+*   WAF (Web Application Firewall) at the edge (provided by Supabase)
+*   CORS policies restricting origins in production
+
+• **Compliance & Privacy**
+
+*   GDPR-style user data export/delete endpoints
+*   Privacy policy and data retention rules
+
+## 8. Monitoring and Maintenance
+
+• **Monitoring Tools**
+
+*   Supabase Dashboard for DB performance and usage metrics
+*   Logflare (integrated) or Datadog for real‐time logs and alerts
+*   Sentry for application error tracking in Edge Functions or FastAPI
+
+• **Maintenance Practices**
+
+*   Automated backups and point-in-time recovery via Supabase
+*   Weekly dependency updates via GitHub Dependabot
+*   Scheduled security audits and RLS policy reviews
+*   Database vacuuming and index maintenance (managed by Supabase)
+
+## 9. Conclusion and Overall Backend Summary
+
+Drift’s backend uses Supabase to deliver a scalable, maintainable, and high-performance platform straight out of the box. We store structured data in Postgres, manage users with secure auth and RBAC, and use Edge Functions for custom workflows like moderation and notifications. All traffic is encrypted and monitored, with built-in CDN and real-time features giving fans and creators a snappy, reliable experience.
+
+Looking ahead, a self-hosted stack with Neon Postgres and FastAPI can be introduced to gain more control over infrastructure while retaining the same clear architecture and robust security we’ve established.
+# Backend Structure Document
+
+This document outlines the backend setup for the Drift platform, using clear language so anyone can understand how data flows, where it’s hosted, and how it’s kept secure and reliable.
+
+## 1. Backend Architecture
+
+Overall, the backend is built on a serverless, API-driven model using Supabase as the primary platform, with the option to self-host later using FastAPI and Neon Postgres.
+
+• Supabase Managed Platform
+
+*   Provides Auth, Database (Postgres), Storage, Realtime, and Edge Functions out of the box
+*   Automatically scales with usage
+*   Handles SSL, backups, and basic monitoring
+
+• Future Self-Hosting (optional)
+
+*   Neon Postgres for database hosting
+*   FastAPI for RESTful endpoints and custom business logic
+*   Dockerized services managed via Kubernetes or Docker Compose
+
+How this supports our goals:
+
+*   **Scalability**: Supabase auto-scales storage, compute, and connections. FastAPI + Neon can scale via container orchestration.
+*   **Maintainability**: Clear separation of authentication, data, and business logic. Functions isolate custom code.
+*   **Performance**: Edge functions and serverless queries keep latency low for global users.
+
+## 2. Database Management
+
+We use PostgreSQL (SQL) as our primary data store, managed by Supabase. Key points:
+
+• Data Types and Storage
+
+*   Structured relational data (users, events, venues, reviews)
+*   JSONB for flexible metadata (e.g., social links, genre tags)
+*   pgvector extension reserved for future AI recommendation embeddings
+
+• Access Patterns
+
+*   RESTful queries via Supabase auto-generated endpoints
+*   Edge Functions for custom complex operations (e.g., admin approval workflows)
+*   Realtime subscriptions for live event updates
+
+• Data Practices
+
+*   Role-based access controls (RBAC) to restrict reads/writes by user role
+*   Soft deletes (archived flags) on content to preserve history
+*   Regular backups handled by Supabase
+
+## 3. Database Schema
+
+### Human-Readable Overview
+
+• **Users**: store account info, role, verification status • **Roles**: master list of user roles (fan, artist, promoter, club owner, admin) • **Venues (Clubs)**: name, location, description, owner reference • **Events**: title, date/time, venue reference, lineup data, external ticket link • **Artists**: name, bio, social links, genre tags • **Reviews**: rating scores, comments, user reference, target entity (venue or artist) • **Flags**: user-reported content for admin moderation • **Notifications**: in-app and email notifications per user • **Whitelist Applications**: documents and status for privileged role verification
+
+### SQL Schema (PostgreSQL)
+
+`-- Roles Table enum user_role AS ('fan','artist','promoter','club_owner','admin'); CREATE TABLE users ( id UUID PRIMARY KEY DEFAULT gen_random_uuid(), email TEXT UNIQUE NOT NULL, password_hash TEXT NOT NULL, role user_role NOT NULL DEFAULT 'fan', is_verified BOOLEAN NOT NULL DEFAULT FALSE, created_at TIMESTAMP WITH TIME ZONE DEFAULT now() ); CREATE TABLE venues ( id UUID PRIMARY KEY DEFAULT gen_random_uuid(), name TEXT NOT NULL, description TEXT, address TEXT, city TEXT, country TEXT, map_location GEOGRAPHY(POINT), owner_id UUID REFERENCES users(id), created_at TIMESTAMP WITH TIME ZONE DEFAULT now() ); CREATE TABLE artists ( id UUID PRIMARY KEY DEFAULT gen_random_uuid(), name TEXT NOT NULL, bio TEXT, social_links JSONB, genre_tags TEXT[], created_at TIMESTAMP WITH TIME ZONE DEFAULT now() ); CREATE TABLE events ( id UUID PRIMARY KEY DEFAULT gen_random_uuid(), title TEXT NOT NULL, event_date TIMESTAMP WITH TIME ZONE NOT NULL, venue_id UUID REFERENCES venues(id), artist_ids UUID[], flyer_url TEXT, ticket_link TEXT, price_info TEXT, created_at TIMESTAMP WITH TIME ZONE DEFAULT now() ); CREATE TABLE reviews ( id UUID PRIMARY KEY DEFAULT gen_random_uuid(), user_id UUID REFERENCES users(id), target_type TEXT CHECK (target_type IN ('venue','artist','event')), target_id UUID NOT NULL, rating_overall INT CHECK (rating_overall BETWEEN 1 AND 5), rating_sound INT, rating_vibe INT, rating_crowd INT, comment TEXT, created_at TIMESTAMP WITH TIME ZONE DEFAULT now() ); CREATE TABLE flags ( id UUID PRIMARY KEY DEFAULT gen_random_uuid(), review_id UUID REFERENCES reviews(id), reported_by UUID REFERENCES users(id), reason TEXT, created_at TIMESTAMP WITH TIME ZONE DEFAULT now() ); CREATE TABLE notifications ( id UUID PRIMARY KEY DEFAULT gen_random_uuid(), user_id UUID REFERENCES users(id), type TEXT, content JSONB, is_read BOOLEAN DEFAULT FALSE, created_at TIMESTAMP WITH TIME ZONE DEFAULT now() ); CREATE TABLE whitelist_applications ( id UUID PRIMARY KEY DEFAULT gen_random_uuid(), user_id UUID REFERENCES users(id), documents JSONB, linked_accounts JSONB, status TEXT CHECK (status IN ('pending','approved','rejected')), reviewed_at TIMESTAMP WITH TIME ZONE, created_at TIMESTAMP WITH TIME ZONE DEFAULT now() );`
+
+## 4. API Design and Endpoints
+
+We follow a RESTful approach using Supabase’s autogenerated endpoints and custom Edge Functions.
+
+• **Authentication & User**
+
+*   POST `/auth/signup` • Register new user
+*   POST `/auth/login` • User login, returns JWT
+*   GET `/users/me` • Fetch profile of logged-in user
+*   PUT `/users/me` • Update profile or link socials
+
+• **Role & Whitelisting**
+
+*   POST `/applications` • Submit role application
+*   GET `/applications/:id` • Check status
+*   PATCH `/applications/:id` • Admin approves or rejects
+
+• **Venues, Events, Artists**
+
+*   GET `/venues` / `/events` / `/artists` • List with filters (location, genre, date)
+*   GET `/venues/:id` / etc. • Fetch details
+*   POST `/venues` / `/events` / `/artists` • Creators/Owners only
+*   PUT `/venues/:id` / etc. • Update by owner
+
+• **Reviews & Flags**
+
+*   POST `/reviews` • Submit review
+*   GET `/reviews` • List reviews by entity
+*   POST `/flags` • Flag a review
+*   GET `/flags` • Admin moderation queue
+
+• **Search & Filter**
+
+*   GET `/search`?q=&location=&genre= • Global search endpoint
+
+• **Notifications**
+
+*   GET `/notifications` • List for user
+*   PATCH `/notifications/:id/read` • Mark as read
+
+• **Custom Functions**
+
+*   Edge Function `/notify-new-event` • Trigger notifications on event creation
+*   Edge Function `/moderate-content` • AI-powered toxicity check
+
+## 5. Hosting Solutions
+
+Primary hosting is on Supabase’s managed cloud:
+
+• **Supabase Managed**
+
+*   One-click provisioning, auto SSL, high availability
+*   Built-in Postgres with automated backups and updates
+*   Edge Functions at global points of presence for low latency
+*   CDN for storage assets (flyers images, user uploads)
+
+Future option: • **Self-hosted on Neon + FastAPI**
+
+*   Neon for a serverless Postgres experience
+*   FastAPI containers on AWS ECS, GCP Cloud Run, or DigitalOcean App Platform
+*   GitHub Actions CI/CD deploying container images
+
+## 6. Infrastructure Components
+
+• **Load Balancer / API Gateway**
+
+*   Supabase Edge handles routing incoming requests to the right service
+*   In self-hosted mode, use NGINX or AWS API Gateway
+
+• **Caching**
+
+*   Postgres internal query cache for repeated queries
+*   CDN (via Supabase Storage) for static assets
+
+• **Realtime**
+
+*   Supabase Realtime (WebSockets) for live event updates and notifications
+
+• **CDN**
+
+*   Supabase’s integrated CDN for storage files
+
+• **Logging & Queues**
+
+*   Edge function logs stored in Supabase Logs
+*   Future self-hosted: use RabbitMQ or Redis Streams for async jobs (notifications, email)
+
+## 7. Security Measures
+
+• **Authentication & Authorization**
+
+*   Supabase Auth with JWT tokens
+*   Row-Level Security (RLS) policies in Postgres for per-table access control
+*   Role checks in Edge Functions and FastAPI endpoints
+
+• **Data Encryption**
+
+*   SSL/TLS for all in-transit data
+*   Supabase encrypts data at rest by default
+
+• **Content Moderation**
+
+*   OpenAI content filter API before saving user comments
+*   Admin flagging and review workflows
+
+• **Network Security**
+
+*   WAF (Web Application Firewall) at the edge (provided by Supabase)
+*   CORS policies restricting origins in production
+
+• **Compliance & Privacy**
+
+*   GDPR-style user data export/delete endpoints
+*   Privacy policy and data retention rules
+
+## 8. Monitoring and Maintenance
+
+• **Monitoring Tools**
+
+*   Supabase Dashboard for DB performance and usage metrics
+*   Logflare (integrated) or Datadog for real‐time logs and alerts
+*   Sentry for application error tracking in Edge Functions or FastAPI
+
+• **Maintenance Practices**
+
+*   Automated backups and point-in-time recovery via Supabase
+*   Weekly dependency updates via GitHub Dependabot
+*   Scheduled security audits and RLS policy reviews
+*   Database vacuuming and index maintenance (managed by Supabase)
+
+## 9. Conclusion and Overall Backend Summary
+
+Drift’s backend uses Supabase to deliver a scalable, maintainable, and high-performance platform straight out of the box. We store structured data in Postgres, manage users with secure auth and RBAC, and use Edge Functions for custom workflows like moderation and notifications. All traffic is encrypted and monitored, with built-in CDN and real-time features giving fans and creators a snappy, reliable experience.
+
+Looking ahead, a self-hosted stack with Neon Postgres and FastAPI can be introduced to gain more control over infrastructure while retaining the same clear architecture and robust security we’ve established.

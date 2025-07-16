@@ -1,0 +1,366 @@
+---
+alwaysApply: true
+---
+
+# Frontend Guideline Document for Drift
+
+This document lays out the frontend setup for **Drift**, a web platform for electronic music fans, promoters, club owners, and artists. It explains the architecture, design principles, chosen technologies, and best practices so that any team member can understand how the frontend is built and why.
+
+## 1. Frontend Architecture
+
+**Framework and Tooling**
+
+*   We use **React** as the core library to build our user interface.
+
+*   For a fast, modern developer experience, we choose **Vite** or **Next.js** as our build tool and framework:
+
+    *   **Vite** for a super-fast dev server and simple configuration.
+    *   **Next.js** if we need server-side rendering, built-in routing, and easy deployment.
+
+*   All UI components come from **shadcn/ui** (a Tailwind-based library) and **Radix UI** primitives to ensure accessibility.
+
+*   Animations and transitions are handled with **Framer Motion**.
+
+**Scalability, Maintainability, Performance**
+
+*   Component-based structure keeps code modular and reusable.
+*   Tailwind CSS utility classes enable consistent styling without massive CSS files.
+*   Code splitting and lazy loading keep initial bundle sizes small, speeding up page loads.
+*   File-based routing (in Next.js) or React Router (in Vite) organizes navigation cleanly as the app grows.
+
+## 2. Design Principles
+
+We follow these guiding principles to make Drift easy and enjoyable to use:
+
+1.  **Usability**
+
+    *   Clear, straightforward layouts so users find what they need quickly.
+    *   Familiar patterns (cards, lists, search bars) that meet user expectations.
+
+2.  **Accessibility**
+
+    *   Semantic HTML elements (buttons, headings, form controls).
+    *   ARIA roles and Radix UI components ensure keyboard navigation and screen-reader friendliness.
+    *   Color contrast checks to support users with low vision.
+
+3.  **Responsiveness**
+
+    *   Mobile-first design: components adapt smoothly from phone to desktop widths.
+    *   Flexbox and CSS grid layouts for flexible arrangements of cards, calendars, and maps.
+
+4.  **Focus on Content**
+
+    *   Minimal chrome (UI framing) so images of venues, events, and artists shine.
+    *   Clear calls to action (buttons, links) guide users through reviews, ratings, and submissions.
+
+5.  **Motion with Purpose**
+
+    *   Subtle animations (hover states, page transitions) via Framer Motion to add delight without distraction.
+
+## 3. Styling and Theming
+
+### 3.1 Styling Approach
+
+*   We use **Tailwind CSS** for utility-first styling, which keeps CSS close to the markup.
+*   Our CSS follows a loose BEM mindset in component classes (e.g., `card`, `card__title`), but mostly relies on Tailwind utilities.
+*   PostCSS is configured via Vite or Next.js so we can customize Tailwind and add plugins (autoprefixer, forms, typography).
+
+### 3.2 Theming
+
+*   Themes are handled via CSS custom properties (`:root` variables) for primary/secondary colors and dark mode:
+
+    *   Light/dark mode toggles stored in React context and user preferences in local storage.
+    *   All color references use variables like `--color-bg`, `--color-text`, so theme switches are automatic across components.
+
+### 3.3 Visual Style, Color Palette, Typography
+
+*   **Style:** Modern flat design with subtle glassmorphism touches (semi-opaque cards over dark backgrounds).
+
+*   **Color Palette:**
+
+    *   `--color-bg`: #0F0F0F (rich black)
+    *   `--color-surface`: #1A1A1A (dark charcoal)
+    *   `--color-primary`: #9B5DE5 (vibrant purple)
+    *   `--color-secondary`: #00BBF9 (bright cyan)
+    *   `--color-accent`: #F15BB5 (rose pink)
+    *   `--color-muted`: #2E2E2E (for borders, dividers)
+    *   `--color-text`: #EAEAEA (off-white)
+
+*   **Typography:**
+
+    *   Primary font: **Inter** for body text—clean, highly readable.
+    *   Secondary font: **Neue Montreal** for headings—adds a modern, bold tone.
+    *   Fallbacks: system UI fonts (sans-serif).
+
+## 4. Component Structure
+
+*   Components live under a `/components` folder, grouped by feature (e.g., `/components/EventCard`, `/components/RatingStars`).
+
+*   Each component folder contains:
+
+    *   `index.tsx` (React component)
+    *   `styles.css` or Tailwind module if needed
+    *   `types.ts` for any specific TypeScript interfaces
+    *   `__tests__` subfolder for unit tests
+
+*   Shared primitives (buttons, inputs) go in `/components/ui` and are pulled from **shadcn/ui** or built on top of **Radix** for accessibility.
+
+*   Reusing components (cards, lists, modals) avoids duplication and keeps the UI consistent.
+
+## 5. State Management
+
+*   **Local UI State:** React’s built-in `useState` and `useReducer` for toggles, form inputs, modals.
+
+*   **Global App State:** React Context allows sharing theme, user session, and notification data across the app.
+
+*   **Server State & Data Fetching:** We use **React Query** (or Supabase’s own hooks) to fetch, cache, and sync data (events, venues, user profiles). This ensures:
+
+    *   Data stays fresh with background refetching.
+    *   Loading and error states are handled consistently.
+    *   Mutations (ratings, comments) automatically refresh relevant queries.
+
+## 6. Routing and Navigation
+
+*   **Next.js:** File-based routing in `/pages` or `/app` folder. Dynamic routes for `/venue/[id]`, `/event/[id]`, `/artist/[id]`.
+
+*   **Vite + React Router:** Set up routes in `App.tsx` using React Router v6’s `<Routes>` and `<Route>` components.
+
+*   **Navigation Structure:**
+
+    1.  `/` – Landing page
+    2.  `/explore` – Global search and filter
+    3.  `/venue/:id` – Venue detail
+    4.  `/event/:id` – Event detail
+    5.  `/artist/:id` – Artist profile
+    6.  `/auth` – Login / Register
+    7.  `/dashboard` – Creator tools (for whitelisted roles)
+    8.  `/admin` – Moderation dashboard
+
+*   **Linking:** Use Next.js `<Link>` or React Router’s `<Link>` to enable client-side navigation without full page reloads.
+
+## 7. Performance Optimization
+
+1.  **Code Splitting & Lazy Loading**
+
+    *   Use React’s `lazy` and `Suspense` or Next.js dynamic imports for heavy pages (admin, dashboard).
+
+2.  **Asset Optimization**
+
+    *   Compress images, use modern formats (WebP).
+    *   Tailwind’s purge removes unused styles in production.
+
+3.  **Caching & Prefetching**
+
+    *   React Query caches API responses.
+    *   Prefetch critical data on hover or route transition.
+
+4.  **Font Loading**
+
+    *   Use `font-display: swap` and preload key font files to avoid invisible text.
+
+5.  **Minimal Third-Party Scripts**
+
+    *   Only load Mapbox and OpenAI scripts when needed (e.g., on pages with maps or moderation).
+
+These steps help pages load in under 2 seconds and keep interactions snappy.
+
+## 8. Testing and Quality Assurance
+
+*   **Unit Tests:** Jest + React Testing Library for component logic, rendering, and edge cases.
+*   **Integration Tests:** Combine Testing Library with MSW (Mock Service Worker) to simulate API responses and test flows like login, rating, comment posting.
+*   **End-to-End (E2E) Tests:** Cypress for critical user journeys (search → view event → submit rating).
+*   **Storybook:** Document and visually test components in isolation, ensuring UI consistency and catching visual regressions.
+*   **Linting & Formatting:** ESLint with React plugin and Prettier for code style. Husky + lint-staged to run checks on pre-commit.
+
+## 9. Conclusion and Overall Frontend Summary
+
+Drift’s frontend is built with modern tools—React, Tailwind CSS, shadcn/ui, and Radix—to deliver a fast, accessible, and scalable Single Page Application. We favor:
+
+*   A **component-based** approach for reusability and clarity.
+*   **Tailwind CSS** for utility-first styling and theming with CSS variables.
+*   **React Query** (or Supabase hooks) for smooth data fetching and caching.
+*   **Framer Motion** to enhance the user experience without slowing interactions.
+*   **Rigorous testing** at unit, integration, and end-to-end levels to maintain quality.
+
+By following these guidelines, new team members and contributors can quickly understand and build upon Drift’s frontend, ensuring consistency, high performance, and a user-first design throughout the project.
+# Frontend Guideline Document for Drift
+
+This document lays out the frontend setup for **Drift**, a web platform for electronic music fans, promoters, club owners, and artists. It explains the architecture, design principles, chosen technologies, and best practices so that any team member can understand how the frontend is built and why.
+
+## 1. Frontend Architecture
+
+**Framework and Tooling**
+
+*   We use **React** as the core library to build our user interface.
+
+*   For a fast, modern developer experience, we choose **Vite** or **Next.js** as our build tool and framework:
+
+    *   **Vite** for a super-fast dev server and simple configuration.
+    *   **Next.js** if we need server-side rendering, built-in routing, and easy deployment.
+
+*   All UI components come from **shadcn/ui** (a Tailwind-based library) and **Radix UI** primitives to ensure accessibility.
+
+*   Animations and transitions are handled with **Framer Motion**.
+
+**Scalability, Maintainability, Performance**
+
+*   Component-based structure keeps code modular and reusable.
+*   Tailwind CSS utility classes enable consistent styling without massive CSS files.
+*   Code splitting and lazy loading keep initial bundle sizes small, speeding up page loads.
+*   File-based routing (in Next.js) or React Router (in Vite) organizes navigation cleanly as the app grows.
+
+## 2. Design Principles
+
+We follow these guiding principles to make Drift easy and enjoyable to use:
+
+1.  **Usability**
+
+    *   Clear, straightforward layouts so users find what they need quickly.
+    *   Familiar patterns (cards, lists, search bars) that meet user expectations.
+
+2.  **Accessibility**
+
+    *   Semantic HTML elements (buttons, headings, form controls).
+    *   ARIA roles and Radix UI components ensure keyboard navigation and screen-reader friendliness.
+    *   Color contrast checks to support users with low vision.
+
+3.  **Responsiveness**
+
+    *   Mobile-first design: components adapt smoothly from phone to desktop widths.
+    *   Flexbox and CSS grid layouts for flexible arrangements of cards, calendars, and maps.
+
+4.  **Focus on Content**
+
+    *   Minimal chrome (UI framing) so images of venues, events, and artists shine.
+    *   Clear calls to action (buttons, links) guide users through reviews, ratings, and submissions.
+
+5.  **Motion with Purpose**
+
+    *   Subtle animations (hover states, page transitions) via Framer Motion to add delight without distraction.
+
+## 3. Styling and Theming
+
+### 3.1 Styling Approach
+
+*   We use **Tailwind CSS** for utility-first styling, which keeps CSS close to the markup.
+*   Our CSS follows a loose BEM mindset in component classes (e.g., `card`, `card__title`), but mostly relies on Tailwind utilities.
+*   PostCSS is configured via Vite or Next.js so we can customize Tailwind and add plugins (autoprefixer, forms, typography).
+
+### 3.2 Theming
+
+*   Themes are handled via CSS custom properties (`:root` variables) for primary/secondary colors and dark mode:
+
+    *   Light/dark mode toggles stored in React context and user preferences in local storage.
+    *   All color references use variables like `--color-bg`, `--color-text`, so theme switches are automatic across components.
+
+### 3.3 Visual Style, Color Palette, Typography
+
+*   **Style:** Modern flat design with subtle glassmorphism touches (semi-opaque cards over dark backgrounds).
+
+*   **Color Palette:**
+
+    *   `--color-bg`: #0F0F0F (rich black)
+    *   `--color-surface`: #1A1A1A (dark charcoal)
+    *   `--color-primary`: #9B5DE5 (vibrant purple)
+    *   `--color-secondary`: #00BBF9 (bright cyan)
+    *   `--color-accent`: #F15BB5 (rose pink)
+    *   `--color-muted`: #2E2E2E (for borders, dividers)
+    *   `--color-text`: #EAEAEA (off-white)
+
+*   **Typography:**
+
+    *   Primary font: **Inter** for body text—clean, highly readable.
+    *   Secondary font: **Neue Montreal** for headings—adds a modern, bold tone.
+    *   Fallbacks: system UI fonts (sans-serif).
+
+## 4. Component Structure
+
+*   Components live under a `/components` folder, grouped by feature (e.g., `/components/EventCard`, `/components/RatingStars`).
+
+*   Each component folder contains:
+
+    *   `index.tsx` (React component)
+    *   `styles.css` or Tailwind module if needed
+    *   `types.ts` for any specific TypeScript interfaces
+    *   `__tests__` subfolder for unit tests
+
+*   Shared primitives (buttons, inputs) go in `/components/ui` and are pulled from **shadcn/ui** or built on top of **Radix** for accessibility.
+
+*   Reusing components (cards, lists, modals) avoids duplication and keeps the UI consistent.
+
+## 5. State Management
+
+*   **Local UI State:** React’s built-in `useState` and `useReducer` for toggles, form inputs, modals.
+
+*   **Global App State:** React Context allows sharing theme, user session, and notification data across the app.
+
+*   **Server State & Data Fetching:** We use **React Query** (or Supabase’s own hooks) to fetch, cache, and sync data (events, venues, user profiles). This ensures:
+
+    *   Data stays fresh with background refetching.
+    *   Loading and error states are handled consistently.
+    *   Mutations (ratings, comments) automatically refresh relevant queries.
+
+## 6. Routing and Navigation
+
+*   **Next.js:** File-based routing in `/pages` or `/app` folder. Dynamic routes for `/venue/[id]`, `/event/[id]`, `/artist/[id]`.
+
+*   **Vite + React Router:** Set up routes in `App.tsx` using React Router v6’s `<Routes>` and `<Route>` components.
+
+*   **Navigation Structure:**
+
+    1.  `/` – Landing page
+    2.  `/explore` – Global search and filter
+    3.  `/venue/:id` – Venue detail
+    4.  `/event/:id` – Event detail
+    5.  `/artist/:id` – Artist profile
+    6.  `/auth` – Login / Register
+    7.  `/dashboard` – Creator tools (for whitelisted roles)
+    8.  `/admin` – Moderation dashboard
+
+*   **Linking:** Use Next.js `<Link>` or React Router’s `<Link>` to enable client-side navigation without full page reloads.
+
+## 7. Performance Optimization
+
+1.  **Code Splitting & Lazy Loading**
+
+    *   Use React’s `lazy` and `Suspense` or Next.js dynamic imports for heavy pages (admin, dashboard).
+
+2.  **Asset Optimization**
+
+    *   Compress images, use modern formats (WebP).
+    *   Tailwind’s purge removes unused styles in production.
+
+3.  **Caching & Prefetching**
+
+    *   React Query caches API responses.
+    *   Prefetch critical data on hover or route transition.
+
+4.  **Font Loading**
+
+    *   Use `font-display: swap` and preload key font files to avoid invisible text.
+
+5.  **Minimal Third-Party Scripts**
+
+    *   Only load Mapbox and OpenAI scripts when needed (e.g., on pages with maps or moderation).
+
+These steps help pages load in under 2 seconds and keep interactions snappy.
+
+## 8. Testing and Quality Assurance
+
+*   **Unit Tests:** Jest + React Testing Library for component logic, rendering, and edge cases.
+*   **Integration Tests:** Combine Testing Library with MSW (Mock Service Worker) to simulate API responses and test flows like login, rating, comment posting.
+*   **End-to-End (E2E) Tests:** Cypress for critical user journeys (search → view event → submit rating).
+*   **Storybook:** Document and visually test components in isolation, ensuring UI consistency and catching visual regressions.
+*   **Linting & Formatting:** ESLint with React plugin and Prettier for code style. Husky + lint-staged to run checks on pre-commit.
+
+## 9. Conclusion and Overall Frontend Summary
+
+Drift’s frontend is built with modern tools—React, Tailwind CSS, shadcn/ui, and Radix—to deliver a fast, accessible, and scalable Single Page Application. We favor:
+
+*   A **component-based** approach for reusability and clarity.
+*   **Tailwind CSS** for utility-first styling and theming with CSS variables.
+*   **React Query** (or Supabase hooks) for smooth data fetching and caching.
+*   **Framer Motion** to enhance the user experience without slowing interactions.
+*   **Rigorous testing** at unit, integration, and end-to-end levels to maintain quality.
+
+By following these guidelines, new team members and contributors can quickly understand and build upon Drift’s frontend, ensuring consistency, high performance, and a user-first design throughout the project.

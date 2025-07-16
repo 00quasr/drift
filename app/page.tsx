@@ -534,37 +534,29 @@ export default function HomePage() {
         initial={{ opacity: 0, scale: 0 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 1, delay: 3.5 }}
-        className="absolute top-8 left-8 z-30"
-      >
-        <div className="w-16 h-16 border-l-2 border-t-2 border-white" />
-      </motion.div>
+        className="absolute top-4 left-4 z-30 w-16 h-16 border-l-2 border-t-2 border-white"
+      />
 
       <motion.div
         initial={{ opacity: 0, scale: 0 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 1, delay: 3.7 }}
-        className="absolute top-8 right-8 z-30"
-      >
-        <div className="w-16 h-16 border-r-2 border-t-2 border-white" />
-      </motion.div>
+        className="absolute top-4 right-4 z-30 w-16 h-16 border-r-2 border-t-2 border-white"
+      />
 
       <motion.div
         initial={{ opacity: 0, scale: 0 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 1, delay: 3.9 }}
-        className="absolute bottom-8 left-8 z-30"
-      >
-        <div className="w-16 h-16 border-l-2 border-b-2 border-white" />
-      </motion.div>
+        className="absolute bottom-4 left-4 z-30 w-16 h-16 border-l-2 border-b-2 border-white"
+      />
 
       <motion.div
         initial={{ opacity: 0, scale: 0 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 1, delay: 4.1 }}
-        className="absolute bottom-8 right-8 z-30"
-      >
-        <div className="w-16 h-16 border-r-2 border-b-2 border-white" />
-      </motion.div>
+        className="absolute bottom-4 right-4 z-30 w-16 h-16 border-r-2 border-b-2 border-white"
+      />
     </div>
   );
 }

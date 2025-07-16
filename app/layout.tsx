@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import LayoutContent from "@/components/LayoutContent";
 
 export const metadata: Metadata = {
   title: "Drift - Discover Electronic Music Venues, Events & Artists",
@@ -24,9 +25,9 @@ export default function RootLayout({
       </head>
       <body className="antialiased min-h-screen flex flex-col bg-black text-white overflow-x-hidden" style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
         <Header />
-        <main className="flex-1 relative z-10 pt-16">
+        <LayoutContent>
           {children}
-        </main>
+        </LayoutContent>
         <Footer />
       </body>
     </html>

@@ -135,7 +135,7 @@ export default function Footer() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-6">
               <p className="text-white/60 text-sm font-bold tracking-widest uppercase">
-                © 2024 DRIFT. ALL RIGHTS RESERVED.
+                © 2025 DRIFT. ALL RIGHTS RESERVED.
               </p>
               <div className="flex items-center gap-2">
                 <span className="text-white/60 text-sm font-bold tracking-widest uppercase">

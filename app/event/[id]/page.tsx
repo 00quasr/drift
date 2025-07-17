@@ -30,28 +30,27 @@ export default async function EventPage({ params }: EventPageProps) {
   const isPast = startDate < new Date()
 
   return (
-    <div className="min-h-screen bg-black text-white pt-24">
-      <div className="max-w-7xl mx-auto px-6 py-12">
+    <div className="min-h-screen bg-black text-white">
+      <div className="max-w-7xl mx-auto px-6 pt-24 pb-12">
         {/* Main Event Tile */}
-        <div className="relative overflow-hidden bg-black border-2 border-white/20 mb-12">
+        <div className="relative overflow-hidden bg-black border-2 border-white/20 mb-8">
           {/* Angular Corner Design */}
-          <div className="absolute top-4 right-4 w-8 h-8">
+          <div className="absolute top-4 right-4 w-8 h-8 z-10">
             <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
-          </div>
-          
-          {/* Category Tag */}
-          <div className="absolute top-4 left-4 z-20">
-            <div className="bg-black border border-white/60 px-3 py-1">
-              <span className="text-white text-xs font-bold tracking-widest uppercase font-mono">
-                {isPast ? 'PAST EVENT' : 'UPCOMING EVENT'}
-              </span>
-            </div>
           </div>
 
           {/* Content */}
-          <div className="p-8">
-            {/* Genre Tags */}
-            <div className="flex flex-wrap gap-2 mb-6">
+          <div className="relative z-0 p-8 pt-12">
+            {/* Category Tag and Genre Tags Container */}
+            <div className="flex flex-wrap items-center gap-2 mb-6">
+              {/* Category Tag */}
+              <div className="bg-black border border-white/60 px-3 py-1">
+                <span className="text-white text-xs font-bold tracking-widest uppercase font-mono">
+                  {isPast ? 'PAST EVENT' : 'UPCOMING EVENT'}
+                </span>
+              </div>
+              
+              {/* Genre Tags */}
               {event.genres?.map((genre: string) => (
                 <div key={genre} className="bg-white/10 border border-white/30 px-2 py-1">
                   <span className="text-white text-xs font-bold tracking-widest uppercase">
@@ -147,13 +146,13 @@ export default async function EventPage({ params }: EventPageProps) {
         </div>
 
         {/* Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* About Section */}
             {event.description && (
-              <div className="bg-black border-2 border-white/20 p-6">
-                <div className="absolute top-4 right-4 w-6 h-6">
+              <div className="relative bg-black border-2 border-white/20 p-6">
+                <div className="absolute top-4 right-4 w-6 h-6 z-10">
                   <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
                 </div>
                 <h2 className="text-2xl font-bold tracking-widest uppercase mb-4 text-white">
@@ -167,8 +166,8 @@ export default async function EventPage({ params }: EventPageProps) {
 
             {/* Lineup Section */}
             {event.artists && event.artists.length > 0 && (
-              <div className="bg-black border-2 border-white/20 p-6">
-                <div className="absolute top-4 right-4 w-6 h-6">
+              <div className="relative bg-black border-2 border-white/20 p-6">
+                <div className="absolute top-4 right-4 w-6 h-6 z-10">
                   <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
                 </div>
                 <h2 className="text-2xl font-bold tracking-widest uppercase mb-6 text-white">
@@ -197,8 +196,8 @@ export default async function EventPage({ params }: EventPageProps) {
             )}
 
             {/* Reviews Section */}
-            <div className="bg-black border-2 border-white/20 p-6">
-              <div className="absolute top-4 right-4 w-6 h-6">
+            <div className="relative bg-black border-2 border-white/20 p-6">
+              <div className="absolute top-4 right-4 w-6 h-6 z-10">
                 <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
               </div>
               <div className="flex items-center justify-between mb-6">
@@ -230,8 +229,8 @@ export default async function EventPage({ params }: EventPageProps) {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Event Details */}
-            <div className="bg-black border-2 border-white/20 p-6">
-              <div className="absolute top-4 right-4 w-6 h-6">
+            <div className="relative bg-black border-2 border-white/20 p-6">
+              <div className="absolute top-4 right-4 w-6 h-6 z-10">
                 <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
               </div>
               <h3 className="text-xl font-bold tracking-widest uppercase mb-6 text-white">
@@ -282,8 +281,8 @@ export default async function EventPage({ params }: EventPageProps) {
 
             {/* Artists */}
             {event.artists && event.artists.length > 0 && (
-              <div className="bg-black border-2 border-white/20 p-6">
-                <div className="absolute top-4 right-4 w-6 h-6">
+              <div className="relative bg-black border-2 border-white/20 p-6">
+                <div className="absolute top-4 right-4 w-6 h-6 z-10">
                   <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
                 </div>
                 <h3 className="text-xl font-bold tracking-widest uppercase mb-4 text-white">
@@ -306,8 +305,8 @@ export default async function EventPage({ params }: EventPageProps) {
 
             {/* More at Venue */}
             {event.venue && (
-              <div className="bg-black border-2 border-white/20 p-6">
-                <div className="absolute top-4 right-4 w-6 h-6">
+              <div className="relative bg-black border-2 border-white/20 p-6">
+                <div className="absolute top-4 right-4 w-6 h-6 z-10">
                   <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
                 </div>
                 <h3 className="text-xl font-bold tracking-widest uppercase mb-4 text-white">

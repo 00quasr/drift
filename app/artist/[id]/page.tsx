@@ -29,28 +29,27 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
   ).slice(0, 6) || []
 
   return (
-    <div className="min-h-screen bg-black text-white pt-24">
-      <div className="max-w-7xl mx-auto px-6 py-12">
+    <div className="min-h-screen bg-black text-white">
+      <div className="max-w-7xl mx-auto px-6 pt-24 pb-12">
         {/* Main Artist Tile */}
-        <div className="relative overflow-hidden bg-black border-2 border-white/20 mb-12">
+        <div className="relative overflow-hidden bg-black border-2 border-white/20 mb-8">
           {/* Angular Corner Design */}
-          <div className="absolute top-4 right-4 w-8 h-8">
+          <div className="absolute top-4 right-4 w-8 h-8 z-10">
             <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
           </div>
           
-          {/* Category Tag */}
-          <div className="absolute top-4 left-4 z-20">
-            <div className="bg-black border border-white/60 px-3 py-1">
-              <span className="text-white text-xs font-bold tracking-widest uppercase font-mono">
-                ARTIST
-              </span>
-            </div>
-          </div>
-
           {/* Content */}
-          <div className="p-8">
-            {/* Genre Tags */}
-            <div className="flex flex-wrap gap-2 mb-6">
+          <div className="relative z-0 p-8 pt-12">
+            {/* Category Tag and Genre Tags Container */}
+            <div className="flex flex-wrap items-center gap-2 mb-6">
+              {/* Category Tag */}
+              <div className="bg-black border border-white/60 px-3 py-1">
+                <span className="text-white text-xs font-bold tracking-widest uppercase font-mono">
+                  ARTIST
+                </span>
+              </div>
+              
+              {/* Genre Tags */}
               {artist.genres?.map((genre: string) => (
                 <div key={genre} className="bg-white/10 border border-white/30 px-2 py-1">
                   <span className="text-white text-xs font-bold tracking-widest uppercase">
@@ -66,7 +65,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
             </h1>
 
             {/* Artist Details Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
               {/* Location */}
               <div className="bg-white/5 border border-white/20 p-4">
                 <div className="flex items-center gap-2 mb-2">
@@ -111,7 +110,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-3">
               <button className="p-3 bg-white/10 hover:bg-white/20 border border-white/30 hover:border-white/60 text-white transition-all duration-200">
                 <Heart className="w-5 h-5" />
               </button>
@@ -126,13 +125,13 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
         </div>
 
         {/* Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Biography Section */}
             {artist.bio && (
               <div className="relative bg-black border-2 border-white/20 p-6">
-                <div className="absolute top-4 right-4 w-6 h-6">
+                <div className="absolute top-4 right-4 w-6 h-6 z-10">
                   <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
                 </div>
                 <h2 className="text-2xl font-bold tracking-widest uppercase mb-4 text-white">
@@ -147,7 +146,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
             {/* Upcoming Performances Section */}
             {upcomingEvents && upcomingEvents.length > 0 && (
               <div className="relative bg-black border-2 border-white/20 p-6">
-                <div className="absolute top-4 right-4 w-6 h-6">
+                <div className="absolute top-4 right-4 w-6 h-6 z-10">
                   <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
                 </div>
                 <div className="flex items-center justify-between mb-6">
@@ -189,7 +188,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
             {/* Past Performances Section */}
             {pastEvents && pastEvents.length > 0 && (
               <div className="relative bg-black border-2 border-white/20 p-6">
-                <div className="absolute top-4 right-4 w-6 h-6">
+                <div className="absolute top-4 right-4 w-6 h-6 z-10">
                   <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
                 </div>
                 <h2 className="text-2xl font-bold tracking-widest uppercase mb-6 text-white">
@@ -222,7 +221,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
 
             {/* Reviews Section */}
             <div className="relative bg-black border-2 border-white/20 p-6">
-              <div className="absolute top-4 right-4 w-6 h-6">
+              <div className="absolute top-4 right-4 w-6 h-6 z-10">
                 <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
               </div>
               <div className="flex items-center justify-between mb-6">
@@ -255,7 +254,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
           <div className="space-y-6">
             {/* Artist Information */}
             <div className="relative bg-black border-2 border-white/20 p-6">
-              <div className="absolute top-4 right-4 w-6 h-6">
+              <div className="absolute top-4 right-4 w-6 h-6 z-10">
                 <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
               </div>
               <h3 className="text-xl font-bold tracking-widest uppercase mb-6 text-white">
@@ -306,7 +305,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
 
             {/* Performance Stats */}
             <div className="relative bg-black border-2 border-white/20 p-6">
-              <div className="absolute top-4 right-4 w-6 h-6">
+              <div className="absolute top-4 right-4 w-6 h-6 z-10">
                 <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
               </div>
               <h3 className="text-xl font-bold tracking-widest uppercase mb-4 text-white">
@@ -336,7 +335,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
 
             {/* Follow Section */}
             <div className="relative bg-black border-2 border-white/20 p-6">
-              <div className="absolute top-4 right-4 w-6 h-6">
+              <div className="absolute top-4 right-4 w-6 h-6 z-10">
                 <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
               </div>
               <h3 className="text-xl font-bold tracking-widest uppercase mb-4 text-white">

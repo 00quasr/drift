@@ -13,6 +13,8 @@ Drift solves the fragmented nature of underground electronic music scenes by pro
 
 ### Key Features
 
+https://github.com/user-attachments/assets/3a99f07d-f601-41c1-8a00-5ff72eb54857
+
 - **Venue Discovery** - Find and explore electronic music venues with detailed ratings
 - **Event Management** - Discover upcoming events and manage event listings
 - **Artist Profiles** - Comprehensive artist pages with gig history and reviews

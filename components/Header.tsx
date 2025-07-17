@@ -1,17 +1,20 @@
 'use client'
 
 import Link from 'next/link'
-import { Search, Menu, X, Bell } from 'lucide-react'
+import { Search, Menu, X, Bell, User, LogOut } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { usePathname } from 'next/navigation'
+import { useAuth } from '@/contexts/AuthContext'
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [hoveredItem, setHoveredItem] = useState<string | null>(null)
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
   const pathname = usePathname()
+  const { user, signOut, loading } = useAuth()
   
   const isLandingPage = pathname === '/'
 
@@ -167,25 +170,89 @@ export default function Header() {
             </motion.button>
             
             <div className="hidden lg:flex items-center space-x-3">
-              <Link href="/auth/login">
-                <motion.div
-                  className="relative px-4 py-2 text-sm font-bold tracking-wider text-white/80 hover:text-white border border-white/30 hover:border-white/60 bg-black/50 backdrop-blur-sm transition-all duration-200 uppercase h-10 flex items-center overflow-hidden"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <span className="relative z-10">SIGN IN</span>
-                  <div className="absolute inset-0 bg-white/5 opacity-0 hover:opacity-100 transition-opacity duration-200" />
-                </motion.div>
-              </Link>
-              <Link href="/auth/register">
-                <motion.div
-                  className="relative px-4 py-2 bg-white text-black text-sm font-bold tracking-wider hover:bg-white/90 transition-all duration-200 uppercase border-2 border-white h-10 flex items-center overflow-hidden"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <span className="relative z-10">REGISTER</span>
-                </motion.div>
-              </Link>
+              {loading ? (
+                <div className="w-8 h-8 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+              ) : user ? (
+                <div className="relative">
+                  <motion.button
+                    onClick={() => setUserMenuOpen(!userMenuOpen)}
+                    className="relative px-4 py-2 text-sm font-bold tracking-wider text-white/80 hover:text-white border border-white/30 hover:border-white/60 bg-black/50 backdrop-blur-sm transition-all duration-200 uppercase h-10 flex items-center space-x-2 overflow-hidden"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <User className="w-4 h-4 relative z-10" />
+                    <span className="relative z-10">{user.full_name || user.email}</span>
+                    <div className="absolute inset-0 bg-white/5 opacity-0 hover:opacity-100 transition-opacity duration-200" />
+                  </motion.button>
+                  
+                  {userMenuOpen && (
+                    <div className="absolute right-0 top-12 w-48 bg-black border border-white/20 shadow-lg z-50">
+                      <div className="p-2">
+                        <div className="px-3 py-2 text-xs text-white/60 uppercase tracking-wider border-b border-white/10">
+                          {user.role} {user.is_verified && '• VERIFIED'}
+                        </div>
+                        <Link 
+                          href="/profile" 
+                          className="block px-3 py-2 text-sm text-white hover:bg-white/10 transition-colors uppercase tracking-wider"
+                          onClick={() => setUserMenuOpen(false)}
+                        >
+                          Profile
+                        </Link>
+                        {(user.role !== 'fan' && user.is_verified) && (
+                          <Link 
+                            href="/dashboard" 
+                            className="block px-3 py-2 text-sm text-white hover:bg-white/10 transition-colors uppercase tracking-wider"
+                            onClick={() => setUserMenuOpen(false)}
+                          >
+                            Dashboard
+                          </Link>
+                        )}
+                        {user.role === 'admin' && (
+                          <Link 
+                            href="/admin" 
+                            className="block px-3 py-2 text-sm text-white hover:bg-white/10 transition-colors uppercase tracking-wider"
+                            onClick={() => setUserMenuOpen(false)}
+                          >
+                            Admin
+                          </Link>
+                        )}
+                        <button
+                          onClick={async () => {
+                            await signOut()
+                            setUserMenuOpen(false)
+                          }}
+                          className="w-full text-left px-3 py-2 text-sm text-white hover:bg-white/10 transition-colors uppercase tracking-wider flex items-center space-x-2"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          <span>Sign Out</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <>
+                  <Link href="/auth/login">
+                    <motion.div
+                      className="relative px-4 py-2 text-sm font-bold tracking-wider text-white/80 hover:text-white border border-white/30 hover:border-white/60 bg-black/50 backdrop-blur-sm transition-all duration-200 uppercase h-10 flex items-center overflow-hidden"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <span className="relative z-10">SIGN IN</span>
+                      <div className="absolute inset-0 bg-white/5 opacity-0 hover:opacity-100 transition-opacity duration-200" />
+                    </motion.div>
+                  </Link>
+                  <Link href="/auth/register">
+                    <motion.div
+                      className="relative px-4 py-2 bg-white text-black text-sm font-bold tracking-wider hover:bg-white/90 transition-all duration-200 uppercase border-2 border-white h-10 flex items-center overflow-hidden"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <span className="relative z-10">REGISTER</span>
+                    </motion.div>
+                  </Link>
+                </>
+              )}
             </div>
 
             {/* Mobile menu button */}

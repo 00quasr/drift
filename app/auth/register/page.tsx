@@ -1,13 +1,16 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
-import { Eye, EyeOff, Lock, Mail, User, UserPlus } from "lucide-react"
+import { Card } from "@/components/ui/card"
+import { Eye, EyeOff, Lock, Mail, User, UserPlus, AlertCircle, CheckCircle2 } from "lucide-react"
 import Link from "next/link"
+import { useAuth } from "@/contexts/AuthContext"
+import { UserRole } from "@/lib/auth"
 
 const roles = [
   { id: "fan", name: "Fan", description: "Discover and review venues and events" },
@@ -22,33 +25,80 @@ export default function RegisterPage() {
     email: "",
     password: "",
     confirmPassword: "",
-    role: "fan"
+    role: "fan" as UserRole
   })
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState("")
+  const [success, setSuccess] = useState("")
+  
+  const { signUp } = useAuth()
+  const router = useRouter()
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
+    setError("") // Clear errors when user types
+  }
+
+  const validateForm = () => {
+    if (!formData.name.trim()) {
+      setError("Full name is required")
+      return false
+    }
+    if (!formData.email.trim()) {
+      setError("Email is required")
+      return false
+    }
+    if (!formData.email.includes('@')) {
+      setError("Please enter a valid email address")
+      return false
+    }
+    if (formData.password.length < 6) {
+      setError("Password must be at least 6 characters")
+      return false
+    }
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords don't match")
+      return false
+    }
+    return true
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
     
-    // Validate passwords match
-    if (formData.password !== formData.confirmPassword) {
-      alert("Passwords don't match")
-      setIsLoading(false)
+    if (!validateForm()) {
       return
     }
     
-    console.log("Registration attempt:", formData)
+    setIsLoading(true)
+    setError("")
+    setSuccess("")
     
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const result = await signUp({
+        email: formData.email,
+        password: formData.password,
+        fullName: formData.name,
+        role: formData.role
+      })
+
+      if (result.needsEmailConfirmation) {
+        setSuccess("Registration successful! Please check your email to confirm your account.")
+      } else {
+        setSuccess("Registration successful! Redirecting...")
+        setTimeout(() => {
+          router.push('/')
+        }, 2000)
+      }
+      
+    } catch (error: any) {
+      console.error("Registration error:", error)
+      setError(error.message || "Registration failed. Please try again.")
+    } finally {
       setIsLoading(false)
-    }, 1000)
+    }
   }
 
   const handleSocialLogin = (provider: string) => {
@@ -77,6 +127,29 @@ export default function RegisterPage() {
         {/* Register Card */}
         <Card className="bg-white/5 border border-white/20 p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Error Message */}
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/30 p-4 rounded">
+                <div className="flex items-center gap-3">
+                  <AlertCircle className="w-5 h-5 text-red-400" />
+                  <p className="text-red-400 font-bold tracking-wider uppercase text-sm">
+                    {error}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Success Message */}
+            {success && (
+              <div className="bg-green-500/10 border border-green-500/30 p-4 rounded">
+                <div className="flex items-center gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-green-400" />
+                  <p className="text-green-400 font-bold tracking-wider uppercase text-sm">
+                    {success}
+                  </p>
+                </div>
+              </div>
+            )}
             {/* Name */}
             <div className="space-y-3">
               <Label htmlFor="name" className="text-white font-bold tracking-widest uppercase text-sm">

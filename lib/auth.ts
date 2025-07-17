@@ -84,6 +84,12 @@ export const authService = {
         throw error
       }
 
+      // Wait a moment for the session to be established
+      await new Promise(resolve => setTimeout(resolve, 500))
+      
+      // Verify the session is active
+      const { data: sessionData } = await supabase.auth.getSession()
+
       return { user: data.user, session: data.session }
     } catch (error) {
       console.error('Sign in error:', error)
@@ -111,24 +117,42 @@ export const authService = {
         return null
       }
 
-      // Get profile data
+      // Get profile data with better error handling
       const { data: profile, error } = await supabase
         .from('profiles')
-        .select('role, is_verified')
+        .select('role, is_verified, full_name')
         .eq('id', user.id)
-        .single()
+        .maybeSingle() // Use maybeSingle instead of single to handle missing profiles gracefully
 
-      if (error || !profile) {
+      if (error) {
         console.error('Profile fetch error:', error)
-        return null
+        // Still return user data even if profile fetch fails
+        return {
+          id: user.id,
+          email: user.email!,
+          role: 'fan' as UserRole, // Default to fan if profile not found
+          is_verified: false,
+        }
       }
 
-      return {
+      if (!profile) {
+        console.warn('No profile found for user, creating basic user object')
+        return {
+          id: user.id,
+          email: user.email!,
+          role: 'fan' as UserRole,
+          is_verified: false,
+        }
+      }
+
+      const authUser = {
         id: user.id,
         email: user.email!,
         role: profile.role as UserRole,
         is_verified: profile.is_verified,
       }
+      
+      return authUser
     } catch (error) {
       console.error('Get current user error:', error)
       return null

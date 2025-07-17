@@ -62,9 +62,9 @@ export default function LoginPage() {
       })
 
       setSuccess("Login successful! Redirecting...")
-      setTimeout(() => {
-        router.push('/explore')
-      }, 1500)
+      // Redirect immediately after successful sign in
+      router.push('/explore')
+      router.refresh() // Force a refresh of the page
       
     } catch (error: any) {
       console.error("Login error:", error)

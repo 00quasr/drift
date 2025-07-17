@@ -181,7 +181,7 @@ export default function Header() {
                     whileTap={{ scale: 0.98 }}
                   >
                     <User className="w-4 h-4 relative z-10" />
-                    <span className="relative z-10">{user.full_name || user.email}</span>
+                    <span className="relative z-10">{user.email}</span>
                     <div className="absolute inset-0 bg-white/5 opacity-0 hover:opacity-100 transition-opacity duration-200" />
                   </motion.button>
                   
@@ -333,26 +333,82 @@ export default function Header() {
             ))}
             
             <div className="pt-4 border-t border-white/20 space-y-3">
-              <Link href="/auth/login">
-                <motion.div 
-                  className="block w-full text-center px-4 py-2 text-sm font-bold tracking-wider text-white/80 hover:text-white border border-white/30 hover:border-white/60 transition-all duration-200 uppercase"
-                  onClick={() => setMobileMenuOpen(false)}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  SIGN IN
-                </motion.div>
-              </Link>
-              <Link href="/auth/register">
-                <motion.div 
-                  className="block w-full text-center px-4 py-2 bg-white text-black text-sm font-bold tracking-wider hover:bg-white/90 transition-all duration-200 uppercase"
-                  onClick={() => setMobileMenuOpen(false)}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  REGISTER
-                </motion.div>
-              </Link>
+              {user ? (
+                <>
+                  <div className="px-4 py-2 text-white/60 text-sm uppercase tracking-wider">
+                    Welcome, {user.email}
+                  </div>
+                  <Link href="/profile">
+                    <motion.div 
+                      className="block w-full text-left px-4 py-2 text-sm font-bold tracking-wider text-white/80 hover:text-white transition-all duration-200 uppercase"
+                      onClick={() => setMobileMenuOpen(false)}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      Profile
+                    </motion.div>
+                  </Link>
+                  {(user.role !== 'fan' && user.is_verified) && (
+                    <Link href="/dashboard">
+                      <motion.div 
+                        className="block w-full text-left px-4 py-2 text-sm font-bold tracking-wider text-white/80 hover:text-white transition-all duration-200 uppercase"
+                        onClick={() => setMobileMenuOpen(false)}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        Dashboard
+                      </motion.div>
+                    </Link>
+                  )}
+                  {user.role === 'admin' && (
+                    <Link href="/admin">
+                      <motion.div 
+                        className="block w-full text-left px-4 py-2 text-sm font-bold tracking-wider text-white/80 hover:text-white transition-all duration-200 uppercase"
+                        onClick={() => setMobileMenuOpen(false)}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        Admin
+                      </motion.div>
+                    </Link>
+                  )}
+                  <motion.button
+                    onClick={async () => {
+                      await signOut()
+                      setMobileMenuOpen(false)
+                    }}
+                    className="block w-full text-left px-4 py-2 text-sm font-bold tracking-wider text-white/80 hover:text-white transition-all duration-200 uppercase flex items-center space-x-2"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>Sign Out</span>
+                  </motion.button>
+                </>
+              ) : (
+                <>
+                  <Link href="/auth/login">
+                    <motion.div 
+                      className="block w-full text-center px-4 py-2 text-sm font-bold tracking-wider text-white/80 hover:text-white border border-white/30 hover:border-white/60 transition-all duration-200 uppercase"
+                      onClick={() => setMobileMenuOpen(false)}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      SIGN IN
+                    </motion.div>
+                  </Link>
+                  <Link href="/auth/register">
+                    <motion.div 
+                      className="block w-full text-center px-4 py-2 bg-white text-black text-sm font-bold tracking-wider hover:bg-white/90 transition-all duration-200 uppercase"
+                      onClick={() => setMobileMenuOpen(false)}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      REGISTER
+                    </motion.div>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </motion.div>

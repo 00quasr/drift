@@ -58,3 +58,5 @@ Desktop.ini
 # cursor
 .cursor/mcp.json
 .cursor/rules/
+
+/public/

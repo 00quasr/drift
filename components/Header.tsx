@@ -41,18 +41,18 @@ export default function Header() {
   ]
 
   const GeometricBorder = ({ isActive }: { isActive: boolean }) => (
-    <div className={`absolute inset-0 pointer-events-none transition-all duration-300 ${isActive ? 'opacity-100' : 'opacity-0'}`}>
-      <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-white" />
-      <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-white" />
-      <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-white" />
-      <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-white" />
+    <div className={`absolute inset-0 pointer-events-none transition-all duration-300 ${isActive ? 'opacity-60' : 'opacity-0'}`}>
+      <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-white/80" />
+      <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-white/80" />
+      <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-white/80" />
+      <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-white/80" />
     </div>
   )
 
   const ScanLine = ({ isActive }: { isActive: boolean }) => (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
       <motion.div
-        className={`absolute top-0 left-0 h-px bg-white transition-opacity duration-200 ${isActive ? 'opacity-60' : 'opacity-0'}`}
+        className={`absolute top-0 left-0 h-px bg-white transition-opacity duration-200 ${isActive ? 'opacity-30' : 'opacity-0'}`}
         style={{ width: '100%' }}
         animate={isActive ? { 
           x: ['-100%', '0%', '100%'],
@@ -115,13 +115,13 @@ export default function Header() {
                       border border-white/20 bg-black/50 backdrop-blur-sm
                       transition-all duration-300 ease-out overflow-hidden
                       ${hoveredItem === label 
-                        ? 'bg-white text-black border-white shadow-[0_0_15px_rgba(255,255,255,0.2)]' 
-                        : 'hover:border-white/40 hover:bg-white/5 hover:text-white'
+                        ? 'border-white text-white bg-black/80' 
+                        : 'hover:border-white/60 hover:bg-black/70 hover:text-white'
                       }
                     `}
                     style={{
                       clipPath: hoveredItem === label 
-                        ? 'polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px))'
+                        ? 'polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px))'
                         : 'polygon(0 0, 100% 0, 100% 100%, 0 100%)'
                     }}
                     whileHover={{ scale: 1.02 }}
@@ -135,8 +135,8 @@ export default function Header() {
                     {/* Scan line effect */}
                     <ScanLine isActive={hoveredItem === label} />
                     
-                    {/* Glitch background */}
-                    <div className={`absolute inset-0 bg-white/5 transition-opacity duration-200 ${hoveredItem === label ? 'opacity-100' : 'opacity-0'}`} />
+                    {/* Subtle glow effect */}
+                    <div className={`absolute inset-0 bg-white/5 transition-opacity duration-200 ${hoveredItem === label ? 'opacity-20' : 'opacity-0'}`} />
                   </motion.div>
                 </Link>
               </div>

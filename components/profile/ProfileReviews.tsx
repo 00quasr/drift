@@ -170,14 +170,6 @@ export const ProfileReviews: React.FC<ProfileReviewsProps> = ({
     }
   }
 
-  const getTargetColor = (type: string) => {
-    switch (type) {
-      case 'venue': return 'text-green-400'
-      case 'event': return 'text-yellow-400'
-      case 'artist': return 'text-purple-400'
-      default: return 'text-white'
-    }
-  }
 
   const renderStars = (rating: number | null) => {
     if (!rating) return <span className="text-white/40">No rating</span>
@@ -201,9 +193,9 @@ export const ProfileReviews: React.FC<ProfileReviewsProps> = ({
 
   const renderDetailedRatings = (review: Review) => {
     const ratings = [
-      { label: 'Sound', value: review.rating_sound, icon: Volume2, color: 'text-cyan-400' },
-      { label: 'Vibe', value: review.rating_vibe, icon: Zap, color: 'text-purple-400' },
-      { label: 'Crowd', value: review.rating_crowd, icon: Users, color: 'text-green-400' }
+      { label: 'Sound', value: review.rating_sound, icon: Volume2 },
+      { label: 'Vibe', value: review.rating_vibe, icon: Zap },
+      { label: 'Crowd', value: review.rating_crowd, icon: Users }
     ]
 
     return (
@@ -213,7 +205,7 @@ export const ProfileReviews: React.FC<ProfileReviewsProps> = ({
           return (
             <div key={rating.label} className="text-center">
               <div className="flex items-center justify-center gap-1 mb-1">
-                <Icon className={`w-4 h-4 ${rating.color}`} />
+                <Icon className="w-4 h-4 text-white/60" />
                 <span className="text-white/80 text-xs font-bold uppercase tracking-wider">
                   {rating.label}
                 </span>
@@ -274,7 +266,7 @@ export const ProfileReviews: React.FC<ProfileReviewsProps> = ({
           
           <Card className="bg-white/5 border border-white/20 p-4">
             <div className="text-center">
-              <div className="text-2xl font-bold text-yellow-400 mb-1">
+              <div className="text-2xl font-bold text-white mb-1">
                 {stats.avgRating.toFixed(1)}
               </div>
               <div className="text-white/60 font-bold tracking-wider uppercase text-sm">
@@ -285,7 +277,7 @@ export const ProfileReviews: React.FC<ProfileReviewsProps> = ({
           
           <Card className="bg-white/5 border border-white/20 p-4">
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-400 mb-1">{stats.venueReviews}</div>
+              <div className="text-2xl font-bold text-white mb-1">{stats.venueReviews}</div>
               <div className="text-white/60 font-bold tracking-wider uppercase text-sm">
                 VENUES
               </div>
@@ -294,7 +286,7 @@ export const ProfileReviews: React.FC<ProfileReviewsProps> = ({
           
           <Card className="bg-white/5 border border-white/20 p-4">
             <div className="text-center">
-              <div className="text-2xl font-bold text-purple-400 mb-1">
+              <div className="text-2xl font-bold text-white mb-1">
                 {stats.eventReviews + stats.artistReviews}
               </div>
               <div className="text-white/60 font-bold tracking-wider uppercase text-sm">
@@ -337,7 +329,6 @@ export const ProfileReviews: React.FC<ProfileReviewsProps> = ({
           <div className="space-y-6">
             {reviews.map((review) => {
               const Icon = getTargetIcon(review.target_type)
-              const color = getTargetColor(review.target_type)
 
               return (
                 <Card key={review.id} className="bg-white/5 border border-white/20 p-6">
@@ -345,19 +336,19 @@ export const ProfileReviews: React.FC<ProfileReviewsProps> = ({
                     {/* Review Header */}
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 border border-white/30 flex items-center justify-center ${color.replace('text-', 'bg-').replace('400', '400/20')}`}>
-                          <Icon className={`w-5 h-5 ${color}`} />
+                        <div className="w-10 h-10 border border-white/20 bg-white/5 flex items-center justify-center">
+                          <Icon className="w-5 h-5 text-white/60" />
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <Badge className={`font-bold tracking-wider uppercase text-xs ${color.replace('text-', 'bg-').replace('400', '400/20')} ${color} border-white/30`}>
+                            <Badge className="font-bold tracking-wider uppercase text-xs bg-white/10 text-white border-white/20">
                               {review.target_type}
                             </Badge>
                           </div>
                           {review.target_name && (
                             <Link 
                               href={`/${review.target_type}s/${review.target_slug}`}
-                              className="text-lg font-bold tracking-wider uppercase text-white hover:text-cyan-400 transition-colors"
+                              className="text-lg font-bold tracking-wider uppercase text-white hover:text-white/80 transition-colors"
                             >
                               {review.target_name}
                             </Link>
@@ -405,7 +396,7 @@ export const ProfileReviews: React.FC<ProfileReviewsProps> = ({
             {reviews.length >= 20 && (
               <Card className="bg-white/5 border border-white/20 p-4">
                 <div className="text-center">
-                  <button className="text-cyan-400 hover:text-cyan-300 font-bold tracking-wider uppercase text-sm transition-colors">
+                  <button className="text-white hover:text-white/80 font-bold tracking-wider uppercase text-sm transition-colors">
                     LOAD MORE REVIEWS
                   </button>
                 </div>

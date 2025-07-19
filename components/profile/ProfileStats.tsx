@@ -53,35 +53,30 @@ export const ProfileStats: React.FC<ProfileStatsProps> = ({
       title: 'TOTAL REVIEWS',
       value: stats.reviews_count,
       icon: MessageSquare,
-      color: 'text-cyan-400',
       description: 'Reviews written'
     },
     {
       title: 'FAVORITES',
       value: stats.favorites_count,
       icon: Heart,
-      color: 'text-red-400',
       description: 'Items favorited'
     },
     {
       title: 'PROFILE VIEWS',
       value: stats.profile_views,
       icon: Eye,
-      color: 'text-green-400',
       description: 'Profile visits'
     },
     {
       title: 'CONNECTIONS',
       value: stats.connections_count,
       icon: Users,
-      color: 'text-purple-400',
       description: 'Active connections'
     },
     {
       title: 'ENGAGEMENT RATE',
       value: Math.round(((stats.reviews_count + stats.favorites_count) / Math.max(stats.profile_views, 1)) * 100),
       icon: TrendingUp,
-      color: 'text-yellow-400',
       description: 'Reviews + Favorites / Views',
       suffix: '%'
     },
@@ -89,7 +84,6 @@ export const ProfileStats: React.FC<ProfileStatsProps> = ({
       title: 'ACTIVITY SCORE',
       value: Math.min(Math.round((stats.reviews_count * 3 + stats.favorites_count * 2 + stats.connections_count * 1) / 10), 100),
       icon: BarChart3,
-      color: 'text-pink-400',
       description: 'Overall activity level',
       suffix: '/100'
     }
@@ -107,9 +101,9 @@ export const ProfileStats: React.FC<ProfileStatsProps> = ({
           {statCards.map((stat) => {
             const Icon = stat.icon
             return (
-              <Card key={stat.title} className="bg-white/5 border border-white/20 p-6 hover:bg-white/10 transition-all duration-300">
+              <Card key={stat.title} className="bg-white/5 border border-white/20 p-6 hover:border-white/30 transition-all duration-300">
                 <div className="flex items-center justify-between mb-4">
-                  <Icon className={`w-8 h-8 ${stat.color}`} />
+                  <Icon className="w-6 h-6 text-white/60" />
                   <div className="text-right">
                     <div className="text-2xl font-bold text-white">
                       {stat.value}{stat.suffix || ''}
@@ -143,13 +137,13 @@ export const ProfileStats: React.FC<ProfileStatsProps> = ({
               <span className="font-bold tracking-wider uppercase text-sm text-white">
                 REVIEWS CONTRIBUTION
               </span>
-              <span className="text-cyan-400 font-bold">
+              <span className="text-white font-bold">
                 {stats.reviews_count > 0 ? Math.round((stats.reviews_count / (stats.reviews_count + stats.favorites_count)) * 100) : 0}%
               </span>
             </div>
-            <div className="w-full bg-white/10 rounded-full h-2">
+            <div className="w-full bg-white/10 h-1">
               <div 
-                className="bg-cyan-400 h-2 rounded-full transition-all duration-500"
+                className="bg-white h-1 transition-all duration-500"
                 style={{ 
                   width: `${stats.reviews_count > 0 ? Math.round((stats.reviews_count / (stats.reviews_count + stats.favorites_count)) * 100) : 0}%` 
                 }}
@@ -160,13 +154,13 @@ export const ProfileStats: React.FC<ProfileStatsProps> = ({
               <span className="font-bold tracking-wider uppercase text-sm text-white">
                 FAVORITES CONTRIBUTION
               </span>
-              <span className="text-red-400 font-bold">
+              <span className="text-white font-bold">
                 {stats.favorites_count > 0 ? Math.round((stats.favorites_count / (stats.reviews_count + stats.favorites_count)) * 100) : 0}%
               </span>
             </div>
-            <div className="w-full bg-white/10 rounded-full h-2">
+            <div className="w-full bg-white/10 h-1">
               <div 
-                className="bg-red-400 h-2 rounded-full transition-all duration-500"
+                className="bg-white/60 h-1 transition-all duration-500"
                 style={{ 
                   width: `${stats.favorites_count > 0 ? Math.round((stats.favorites_count / (stats.reviews_count + stats.favorites_count)) * 100) : 0}%` 
                 }}
@@ -185,7 +179,7 @@ export const ProfileStats: React.FC<ProfileStatsProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card className="bg-white/5 border border-white/20 p-6">
             <div className="flex items-center gap-3 mb-4">
-              <TrendingUp className="w-6 h-6 text-green-400" />
+              <TrendingUp className="w-6 h-6 text-white/60" />
               <h4 className="font-bold tracking-wider uppercase text-white">
                 ENGAGEMENT LEVEL
               </h4>
@@ -193,13 +187,13 @@ export const ProfileStats: React.FC<ProfileStatsProps> = ({
             <div className="space-y-3">
               <div className="flex justify-between">
                 <span className="text-white/80 text-sm">Active Contributor</span>
-                <span className="text-green-400 font-bold text-sm">
+                <span className="text-white font-bold text-sm">
                   {stats.reviews_count > 5 ? 'HIGH' : stats.reviews_count > 1 ? 'MEDIUM' : 'LOW'}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-white/80 text-sm">Social Activity</span>
-                <span className="text-cyan-400 font-bold text-sm">
+                <span className="text-white font-bold text-sm">
                   {stats.connections_count > 10 ? 'HIGH' : stats.connections_count > 3 ? 'MEDIUM' : 'LOW'}
                 </span>
               </div>
@@ -208,7 +202,7 @@ export const ProfileStats: React.FC<ProfileStatsProps> = ({
 
           <Card className="bg-white/5 border border-white/20 p-6">
             <div className="flex items-center gap-3 mb-4">
-              <Star className="w-6 h-6 text-yellow-400" />
+              <Star className="w-6 h-6 text-white/60" />
               <h4 className="font-bold tracking-wider uppercase text-white">
                 COMMUNITY IMPACT
               </h4>
@@ -216,13 +210,13 @@ export const ProfileStats: React.FC<ProfileStatsProps> = ({
             <div className="space-y-3">
               <div className="flex justify-between">
                 <span className="text-white/80 text-sm">Profile Popularity</span>
-                <span className="text-purple-400 font-bold text-sm">
+                <span className="text-white font-bold text-sm">
                   {stats.profile_views > 50 ? 'HIGH' : stats.profile_views > 10 ? 'MEDIUM' : 'LOW'}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-white/80 text-sm">Content Quality</span>
-                <span className="text-pink-400 font-bold text-sm">
+                <span className="text-white font-bold text-sm">
                   {stats.reviews_count > 3 ? 'ESTABLISHED' : 'GROWING'}
                 </span>
               </div>

@@ -14,7 +14,8 @@ import {
   Settings,
   Share2,
   UserPlus,
-  UserCheck
+  UserCheck,
+  User
 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import Image from 'next/image'
@@ -54,38 +55,30 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   const displayName = profile.display_name || profile.full_name || 'Anonymous User'
   const joinedDate = new Date(profile.created_at)
   
-  const getRoleColor = (role: string) => {
+  const getRoleDisplay = (role: string) => {
     switch (role) {
-      case 'admin': return 'bg-red-400/20 text-red-400 border-red-400/30'
-      case 'artist': return 'bg-purple-400/20 text-purple-400 border-purple-400/30'
-      case 'promoter': return 'bg-yellow-400/20 text-yellow-400 border-yellow-400/30'
-      case 'club_owner': return 'bg-green-400/20 text-green-400 border-green-400/30'
-      default: return 'bg-blue-400/20 text-blue-400 border-blue-400/30'
-    }
-  }
-
-  const getRoleIcon = (role: string) => {
-    switch (role) {
-      case 'artist': return '🎧'
-      case 'promoter': return '🎪'
-      case 'club_owner': return '🏢'
-      case 'admin': return '👑'
-      default: return '🎵'
+      case 'club_owner': return 'VENUE OWNER'
+      default: return role.replace('_', ' ').toUpperCase()
     }
   }
 
   return (
     <div className="relative bg-black border-b border-white/20">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/20 via-transparent to-pink-400/20" />
+      {/* Minimal Grid Pattern */}
+      <div className="absolute inset-0 opacity-5">
         <div className="absolute inset-0" style={{
           backgroundImage: `repeating-linear-gradient(
-            45deg,
+            90deg,
             transparent,
-            transparent 2px,
-            rgba(255,255,255,0.03) 2px,
-            rgba(255,255,255,0.03) 4px
+            transparent 50px,
+            rgba(255,255,255,0.1) 50px,
+            rgba(255,255,255,0.1) 51px
+          ), repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 50px,
+            rgba(255,255,255,0.1) 50px,
+            rgba(255,255,255,0.1) 51px
           )`
         }} />
       </div>
@@ -95,7 +88,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           {/* Avatar Section */}
           <div className="flex-shrink-0">
             <div className="relative">
-              <div className="w-32 h-32 lg:w-40 lg:h-40 bg-white/10 border-2 border-white/30 flex items-center justify-center overflow-hidden">
+              <div className="w-32 h-32 lg:w-40 lg:h-40 bg-white/5 border border-white/20 flex items-center justify-center overflow-hidden">
                 {profile.avatar_url ? (
                   <Image
                     src={profile.avatar_url}
@@ -105,15 +98,17 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="text-6xl lg:text-7xl">
-                    {getRoleIcon(profile.role)}
+                  <div className="w-16 h-16 lg:w-20 lg:h-20 border border-white/30 flex items-center justify-center">
+                    <User className="w-8 h-8 lg:w-10 lg:h-10 text-white/60" />
                   </div>
                 )}
               </div>
               
-              {/* Online Status (if own profile) */}
-              {isOwnProfile && (
-                <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-green-400 border-2 border-black rounded-full" />
+              {/* Verification badge */}
+              {profile.is_verified && (
+                <div className="absolute -top-1 -right-1 w-6 h-6 bg-white border border-black flex items-center justify-center">
+                  <span className="text-black font-bold text-xs">✓</span>
+                </div>
               )}
             </div>
           </div>
@@ -122,20 +117,13 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           <div className="flex-1 space-y-6">
             {/* Name and Role */}
             <div>
-              <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-3xl lg:text-4xl font-bold tracking-wider uppercase">
-                  {displayName}
-                </h1>
-                {profile.is_verified && (
-                  <div className="w-8 h-8 bg-cyan-400 border border-cyan-400 flex items-center justify-center">
-                    <span className="text-black font-bold text-sm">✓</span>
-                  </div>
-                )}
-              </div>
+              <h1 className="text-3xl lg:text-4xl font-bold tracking-wider uppercase mb-2">
+                {displayName}
+              </h1>
               
-              <div className="flex items-center gap-3">
-                <Badge className={`font-bold tracking-wider uppercase ${getRoleColor(profile.role)}`}>
-                  {getRoleIcon(profile.role)} {profile.role.replace('_', ' ')}
+              <div className="flex items-center gap-4">
+                <Badge className="bg-white/10 text-white border-white/20 font-bold tracking-wider uppercase">
+                  {getRoleDisplay(profile.role)}
                 </Badge>
                 {profile.location && (
                   <div className="flex items-center gap-2 text-white/60">
@@ -167,9 +155,9 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                   {profile.favorite_genres.slice(0, 6).map((genre) => (
                     <div
                       key={genre}
-                      className="bg-white/10 border border-white/30 px-3 py-1"
+                      className="bg-white/5 border border-white/20 px-3 py-1"
                     >
-                      <span className="text-white text-sm font-bold tracking-wider uppercase">
+                      <span className="text-white/80 text-sm font-bold tracking-wider uppercase">
                         {genre}
                       </span>
                     </div>
@@ -236,7 +224,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                   </Button>
                   <Button
                     variant="outline"
-                    className="w-full border-white/30 bg-black text-white hover:bg-white/10 font-bold tracking-wider uppercase"
+                    className="w-full border-white/20 bg-white/5 text-white hover:bg-white/10 font-bold tracking-wider uppercase"
                   >
                     <Share2 className="w-4 h-4 mr-2" />
                     SHARE
@@ -244,20 +232,20 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                 </>
               ) : (
                 <>
-                  <Button className="w-full bg-cyan-400 text-black hover:bg-cyan-500 font-bold tracking-wider uppercase">
+                  <Button className="w-full bg-white text-black hover:bg-white/90 font-bold tracking-wider uppercase">
                     <UserPlus className="w-4 h-4 mr-2" />
                     CONNECT
                   </Button>
                   <Button
                     variant="outline"
-                    className="w-full border-white/30 bg-black text-white hover:bg-white/10 font-bold tracking-wider uppercase"
+                    className="w-full border-white/20 bg-white/5 text-white hover:bg-white/10 font-bold tracking-wider uppercase"
                   >
                     <MessageCircle className="w-4 h-4 mr-2" />
                     MESSAGE
                   </Button>
                   <Button
                     variant="outline"
-                    className="w-full border-white/30 bg-black text-white hover:bg-white/10 font-bold tracking-wider uppercase"
+                    className="w-full border-white/20 bg-white/5 text-white hover:bg-white/10 font-bold tracking-wider uppercase"
                   >
                     <Share2 className="w-4 h-4 mr-2" />
                     SHARE

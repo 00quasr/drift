@@ -166,14 +166,6 @@ export const ProfileFavorites: React.FC<ProfileFavoritesProps> = ({
     }
   }
 
-  const getTargetColor = (type: string) => {
-    switch (type) {
-      case 'venue': return 'text-green-400'
-      case 'event': return 'text-yellow-400'
-      case 'artist': return 'text-purple-400'
-      default: return 'text-red-400'
-    }
-  }
 
   const filteredFavorites = favorites.filter(favorite => 
     filter === 'all' || favorite.target_type === filter
@@ -234,12 +226,12 @@ export const ProfileFavorites: React.FC<ProfileFavoritesProps> = ({
           
           <Card 
             className={`bg-white/5 border cursor-pointer transition-all duration-300 ${
-              filter === 'venue' ? 'border-green-400' : 'border-white/20 hover:border-green-400/40'
+              filter === 'venue' ? 'border-white' : 'border-white/20 hover:border-white/40'
             }`}
             onClick={() => setFilter('venue')}
           >
             <div className="p-4 text-center">
-              <div className="text-2xl font-bold text-green-400 mb-1">{stats.venues}</div>
+              <div className="text-2xl font-bold text-white mb-1">{stats.venues}</div>
               <div className="text-white/60 font-bold tracking-wider uppercase text-sm">
                 VENUES
               </div>
@@ -248,12 +240,12 @@ export const ProfileFavorites: React.FC<ProfileFavoritesProps> = ({
           
           <Card 
             className={`bg-white/5 border cursor-pointer transition-all duration-300 ${
-              filter === 'event' ? 'border-yellow-400' : 'border-white/20 hover:border-yellow-400/40'
+              filter === 'event' ? 'border-white' : 'border-white/20 hover:border-white/40'
             }`}
             onClick={() => setFilter('event')}
           >
             <div className="p-4 text-center">
-              <div className="text-2xl font-bold text-yellow-400 mb-1">{stats.events}</div>
+              <div className="text-2xl font-bold text-white mb-1">{stats.events}</div>
               <div className="text-white/60 font-bold tracking-wider uppercase text-sm">
                 EVENTS
               </div>
@@ -262,12 +254,12 @@ export const ProfileFavorites: React.FC<ProfileFavoritesProps> = ({
           
           <Card 
             className={`bg-white/5 border cursor-pointer transition-all duration-300 ${
-              filter === 'artist' ? 'border-purple-400' : 'border-white/20 hover:border-purple-400/40'
+              filter === 'artist' ? 'border-white' : 'border-white/20 hover:border-white/40'
             }`}
             onClick={() => setFilter('artist')}
           >
             <div className="p-4 text-center">
-              <div className="text-2xl font-bold text-purple-400 mb-1">{stats.artists}</div>
+              <div className="text-2xl font-bold text-white mb-1">{stats.artists}</div>
               <div className="text-white/60 font-bold tracking-wider uppercase text-sm">
                 ARTISTS
               </div>
@@ -308,7 +300,6 @@ export const ProfileFavorites: React.FC<ProfileFavoritesProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredFavorites.map((favorite) => {
               const Icon = getTargetIcon(favorite.target_type)
-              const color = getTargetColor(favorite.target_type)
 
               return (
                 <Card key={favorite.id} className="bg-white/5 border border-white/20 overflow-hidden hover:border-white/40 transition-all duration-300 group">
@@ -323,25 +314,25 @@ export const ProfileFavorites: React.FC<ProfileFavoritesProps> = ({
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <Icon className={`w-16 h-16 ${color}`} />
+                          <Icon className="w-16 h-16 text-white/60" />
                         </div>
                       )}
                       
                       <div className="absolute top-4 left-4">
-                        <Badge className={`font-bold tracking-wider uppercase text-xs ${color.replace('text-', 'bg-').replace('400', '400/20')} ${color} border-white/30`}>
+                        <Badge className="font-bold tracking-wider uppercase text-xs bg-white/10 text-white border-white/20">
                           {favorite.target_type}
                         </Badge>
                       </div>
                       
                       <div className="absolute top-4 right-4">
-                        <div className="w-8 h-8 bg-red-400/20 border border-red-400/40 flex items-center justify-center">
-                          <Heart className="w-4 h-4 text-red-400 fill-current" />
+                        <div className="w-8 h-8 bg-white/10 border border-white/20 flex items-center justify-center">
+                          <Heart className="w-4 h-4 text-white fill-current" />
                         </div>
                       </div>
                     </div>
                     
                     <div className="p-4">
-                      <h4 className="text-lg font-bold tracking-wider uppercase text-white mb-2 group-hover:text-cyan-400 transition-colors">
+                      <h4 className="text-lg font-bold tracking-wider uppercase text-white mb-2 group-hover:text-white/80 transition-colors">
                         {favorite.target_name || 'Unknown'}
                       </h4>
                       
@@ -382,7 +373,7 @@ export const ProfileFavorites: React.FC<ProfileFavoritesProps> = ({
                             {formatDistanceToNow(new Date(favorite.created_at), { addSuffix: true })}
                           </span>
                         </div>
-                        <ExternalLink className="w-4 h-4 group-hover:text-cyan-400 transition-colors" />
+                        <ExternalLink className="w-4 h-4 group-hover:text-white transition-colors" />
                       </div>
                     </div>
                   </Link>

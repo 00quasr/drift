@@ -107,16 +107,6 @@ export const ProfileActivity: React.FC<ProfileActivityProps> = ({
     }
   }
 
-  const getActivityColor = (type: string) => {
-    switch (type) {
-      case 'review_posted': return 'text-cyan-400'
-      case 'favorite_added': return 'text-red-400'
-      case 'profile_view': return 'text-green-400'
-      case 'venue_visit': return 'text-purple-400'
-      case 'event_attend': return 'text-yellow-400'
-      default: return 'text-white'
-    }
-  }
 
   const getActivityText = (activity: ActivityItem) => {
     const target = activity.target_name || 'Unknown'
@@ -208,22 +198,21 @@ export const ProfileActivity: React.FC<ProfileActivityProps> = ({
       <div className="space-y-3">
         {activities.map((activity) => {
           const Icon = getActivityIcon(activity.activity_type)
-          const color = getActivityColor(activity.activity_type)
           const link = getActivityLink(activity)
           const activityText = getActivityText(activity)
 
           return (
-            <Card key={activity.id} className="bg-white/5 border border-white/20 p-4 hover:bg-white/10 transition-all duration-300">
+            <Card key={activity.id} className="bg-white/5 border border-white/20 p-4 hover:border-white/30 transition-all duration-300">
               <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 border border-white/30 flex items-center justify-center ${color.replace('text-', 'bg-').replace('400', '400/20')}`}>
-                  <Icon className={`w-6 h-6 ${color}`} />
+                <div className="w-12 h-12 border border-white/20 bg-white/5 flex items-center justify-center">
+                  <Icon className="w-6 h-6 text-white/60" />
                 </div>
                 
                 <div className="flex-1">
                   {link ? (
                     <Link 
                       href={link}
-                      className="font-bold tracking-wider uppercase text-white hover:text-cyan-400 transition-colors"
+                      className="font-bold tracking-wider uppercase text-white hover:text-white/80 transition-colors"
                     >
                       {activityText}
                     </Link>
@@ -255,7 +244,7 @@ export const ProfileActivity: React.FC<ProfileActivityProps> = ({
       {activities.length >= 20 && (
         <Card className="bg-white/5 border border-white/20 p-4">
           <div className="text-center">
-            <button className="text-cyan-400 hover:text-cyan-300 font-bold tracking-wider uppercase text-sm transition-colors">
+            <button className="text-white hover:text-white/80 font-bold tracking-wider uppercase text-sm transition-colors">
               LOAD MORE ACTIVITY
             </button>
           </div>

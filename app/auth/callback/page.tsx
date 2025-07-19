@@ -27,19 +27,30 @@ export default function AuthCallback() {
             .single()
 
           if (!profile) {
-            // Create a basic profile for OAuth users
-            const { error: profileError } = await supabase
-              .from('profiles')
-              .insert({
-                id: data.session.user.id,
-                email: data.session.user.email,
-                full_name: data.session.user.user_metadata.full_name || data.session.user.user_metadata.name,
-                role: 'fan',
-                is_verified: false,
+            // Create a basic profile for OAuth users using the API route
+            try {
+              const response = await fetch('/api/auth/create-profile', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${data.session.access_token}`
+                },
+                body: JSON.stringify({
+                  user_id: data.session.user.id,
+                  email: data.session.user.email,
+                  full_name: data.session.user.user_metadata.full_name || data.session.user.user_metadata.name || 'User',
+                  role: 'fan'
+                })
               })
 
-            if (profileError) {
-              console.error('Profile creation error:', profileError)
+              if (!response.ok) {
+                const errorData = await response.json()
+                console.error('Profile creation error:', errorData)
+              } else {
+                console.log('Profile created successfully')
+              }
+            } catch (error) {
+              console.error('Profile creation request error:', error)
             }
           }
 

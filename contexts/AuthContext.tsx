@@ -6,8 +6,8 @@ import { authService, AuthUser, supabase } from '@/lib/auth'
 interface AuthContextType {
   user: AuthUser | null
   loading: boolean
-  signIn: (data: { email: string; password: string }) => Promise<void>
-  signUp: (data: { email: string; password: string; role: string; fullName?: string }) => Promise<void>
+  signIn: (data: { email: string; password: string } | { provider: 'google' }) => Promise<void>
+  signUp: (data: { email: string; password: string; role: string; fullName?: string } | { provider: 'google' }) => Promise<void>
   signOut: () => Promise<void>
   resetPassword: (email: string) => Promise<void>
 }
@@ -54,39 +54,53 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  const signIn = async (data: { email: string; password: string }) => {
+  const signIn = async (data: { email: string; password: string } | { provider: 'google' }) => {
     setLoading(true)
     try {
-      const result = await authService.signIn(data.email, data.password)
-      
-      // Give more time for the auth state to settle
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // Try to get the current user, but don't fail if it's not immediately available
-      const user = await authService.getCurrentUser()
-      
-      // Set the user even if null - let the auth state change handle it
-      setUser(user)
-      setLoading(false)
-      
-      // The auth state change listener will update the user when it's ready
+      if ('provider' in data && data.provider === 'google') {
+        await authService.signInWithGoogle()
+        // OAuth redirect will handle the rest
+        return
+      } else {
+        const emailData = data as { email: string; password: string }
+        await authService.signIn(emailData.email, emailData.password)
+        
+        // Give more time for the auth state to settle
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        
+        // Try to get the current user, but don't fail if it's not immediately available
+        const user = await authService.getCurrentUser()
+        
+        // Set the user even if null - let the auth state change handle it
+        setUser(user)
+        setLoading(false)
+        
+        // The auth state change listener will update the user when it's ready
+      }
     } catch (error) {
       setLoading(false)
       throw error
     }
   }
 
-  const signUp = async (data: { email: string; password: string; role: string; fullName?: string }) => {
+  const signUp = async (data: { email: string; password: string; role: string; fullName?: string } | { provider: 'google' }) => {
     setLoading(true)
     try {
-      await authService.signUp({
-        email: data.email,
-        password: data.password,
-        role: data.role as any,
-        full_name: data.fullName, // Map fullName to full_name
-      })
-      const user = await authService.getCurrentUser()
-      setUser(user)
+      if ('provider' in data && data.provider === 'google') {
+        await authService.signUpWithGoogle()
+        // OAuth redirect will handle the rest
+        return
+      } else {
+        const emailData = data as { email: string; password: string; role: string; fullName?: string }
+        await authService.signUp({
+          email: emailData.email,
+          password: emailData.password,
+          role: emailData.role as any,
+          full_name: emailData.fullName, // Map fullName to full_name
+        })
+        const user = await authService.getCurrentUser()
+        setUser(user)
+      }
     } catch (error) {
       setLoading(false)
       throw error

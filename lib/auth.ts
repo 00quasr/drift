@@ -222,6 +222,46 @@ export const authService = {
     }
   },
 
+  async signInWithGoogle() {
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      })
+
+      if (error) {
+        throw error
+      }
+
+      return data
+    } catch (error) {
+      console.error('Google sign in error:', error)
+      throw error
+    }
+  },
+
+  async signUpWithGoogle() {
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      })
+
+      if (error) {
+        throw error
+      }
+
+      return data
+    } catch (error) {
+      console.error('Google sign up error:', error)
+      throw error
+    }
+  },
+
   // Auth state change listener
   onAuthStateChange(callback: (user: AuthUser | null) => void) {
     return supabase.auth.onAuthStateChange(async (event, session) => {

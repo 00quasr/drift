@@ -80,9 +80,21 @@ export default function LoginPage() {
     }
   }
 
-  const handleSocialLogin = (provider: string) => {
-    console.log(`Login with ${provider}`)
-    // TODO: Implement social login
+  const handleSocialLogin = async (provider: string) => {
+    if (provider === 'google') {
+      try {
+        setIsLoading(true)
+        setError("")
+        await signIn({ provider: 'google' })
+      } catch (error: any) {
+        console.error('Social login error:', error)
+        setError(error.message || 'Social login failed. Please try again.')
+      } finally {
+        setIsLoading(false)
+      }
+    } else {
+      console.log(`${provider} login not implemented yet`)
+    }
   }
 
   return (
@@ -212,22 +224,13 @@ export default function LoginPage() {
             </div>
 
             {/* Social Login Options */}
-            <div className="space-y-3">
-              <Button
-                type="button"
-                onClick={() => handleSocialLogin("google")}
-                className="w-full h-12 bg-white/10 border border-white/30 hover:bg-white/20 text-white font-bold tracking-wider uppercase transition-all duration-200"
-              >
-                CONTINUE WITH GOOGLE
-              </Button>
-              <Button
-                type="button"
-                onClick={() => handleSocialLogin("discord")}
-                className="w-full h-12 bg-white/10 border border-white/30 hover:bg-white/20 text-white font-bold tracking-wider uppercase transition-all duration-200"
-              >
-                CONTINUE WITH DISCORD
-              </Button>
-            </div>
+            <Button
+              type="button"
+              onClick={() => handleSocialLogin("google")}
+              className="w-full h-12 bg-white/10 border border-white/30 hover:bg-white/20 text-white font-bold tracking-wider uppercase transition-all duration-200"
+            >
+              CONTINUE WITH GOOGLE
+            </Button>
           </form>
         </Card>
 

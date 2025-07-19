@@ -62,3 +62,10 @@ Desktop.ini
 /public/
 
 .claude/
+# Keep MCP configuration but ignore sensitive env files
+!.claude/mcp.json
+!.claude/setup-mcp.md
+!.claude/settings.local.json
+.claude/.env.mcp.local
+
+.mcp.json

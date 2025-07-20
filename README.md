@@ -18,10 +18,12 @@ https://github.com/user-attachments/assets/3a99f07d-f601-41c1-8a00-5ff72eb54857
 - **Venue Discovery** - Find and explore electronic music venues with detailed ratings
 - **Event Management** - Discover upcoming events and manage event listings
 - **Artist Profiles** - Comprehensive artist pages with gig history and reviews
+- **User Profiles** - Complete profile management with avatar uploads and social links
 - **Multi-facet Reviews** - Rate venues and events on sound, vibe, and crowd
-- **Global Search** - Advanced search and filtering across all content
+- **Real-time Search** - Live search across venues, events, and artists with instant results
 - **Role-based Access** - Different access levels for fans, artists, promoters, and venue owners
-- **Content Moderation** - AI-powered content filtering with admin oversight
+- **AI Content Moderation** - OpenAI-powered content filtering for images and text
+- **Secure File Upload** - Profile image uploads with content validation and storage
 - **Mobile-first Design** - Responsive design optimized for all devices
 
 ## Quick Start
@@ -49,11 +51,21 @@ https://github.com/user-attachments/assets/3a99f07d-f601-41c1-8a00-5ff72eb54857
    ```bash
    cp env.example .env.local
    ```
-   Update `.env.local` with your Supabase credentials:
+   Update `.env.local` with your credentials:
    ```env
+   # Supabase Configuration
    NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
    SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+   
+   # OpenAI Configuration (for content moderation)
+   OPENAI_API_KEY=your_openai_api_key
+   
+   # Optional: Mapbox (for venue maps)
+   NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=your_mapbox_token
+   
+   # Site Configuration
+   NEXT_PUBLIC_SITE_URL=http://localhost:3000
    ```
 
 4. **Set up the database**
@@ -89,6 +101,7 @@ https://github.com/user-attachments/assets/3a99f07d-f601-41c1-8a00-5ff72eb54857
 - Supabase (PostgreSQL, Auth, Storage, Realtime)
 - Next.js API Routes
 - TypeScript
+- OpenAI API (Content Moderation)
 
 **Development & Tools**
 - ESLint & Prettier
@@ -122,7 +135,8 @@ drift/
 ### Fan
 - Browse venues, events, and artists
 - Leave reviews and ratings
-- Create basic user profile
+- Create and customize user profile with avatar upload
+- Personalized search and discovery
 
 ### Artist
 - Create and manage artist profile
@@ -171,10 +185,25 @@ drift/
 - Average rating calculations and statistics
 
 ### Search & Discovery
-- Global search across all content types
+- Real-time search across venues, events, and artists
+- Live search suggestions with categorized results
 - Advanced filtering and sorting options
 - Trending and recommended content
 - Location-based discovery
+
+### User Profile Management
+- Complete profile editing with real-time validation
+- Secure avatar upload with AI content moderation
+- Social media links and genre preferences
+- Privacy controls and account settings
+- Activity feed and user statistics
+
+### Content Moderation System
+- OpenAI-powered image content analysis
+- Automated text moderation for inappropriate content
+- Real-time content validation during uploads
+- Admin oversight and manual review capabilities
+- Community reporting and flagging system
 
 ## 🔐 Security & Privacy
 
@@ -192,11 +221,13 @@ The platform provides a comprehensive RESTful API. See [API Documentation](docs/
 ### Quick API Overview
 
 - **Authentication**: `/api/auth/*` - User registration, login, password reset
+- **User Profiles**: `/api/user/profile` - Profile management and updates
 - **Venues**: `/api/venues/*` - Venue CRUD operations
 - **Events**: `/api/events/*` - Event management
 - **Artists**: `/api/artists/*` - Artist profile management
 - **Reviews**: `/api/reviews/*` - Review and rating system
-- **Search**: `/api/search` - Global search functionality
+- **Search**: `/api/search` - Real-time search functionality
+- **Content Moderation**: `/api/moderate/*` - AI-powered content validation
 - **Admin**: `/api/admin/*` - Administrative functions
 
 ## 🛠️ Development
@@ -234,11 +265,14 @@ Please read our [Contributing Guidelines](docs/development/CONTRIBUTING.md) for 
 
 ## 📋 Roadmap
 
-### Phase 1 (Current)
-- ✅ User authentication and profiles
+### Phase 1 (Completed)
+- ✅ User authentication and profile management
+- ✅ Real-time search integration across all content
+- ✅ Complete profile editing with avatar uploads
+- ✅ AI-powered content moderation system
 - ✅ Venue, event, and artist management
 - ✅ Review and rating system
-- ✅ Search and discovery
+- ✅ Secure file upload and storage
 - ✅ Admin moderation tools
 
 ### Phase 2 (Planned)

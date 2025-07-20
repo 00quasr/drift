@@ -19,6 +19,7 @@ import {
 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import Image from 'next/image'
+import Link from 'next/link'
 
 interface ProfileData {
   id: string
@@ -218,10 +219,12 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             <div className="flex flex-col gap-3 w-48">
               {isOwnProfile ? (
                 <>
-                  <Button className="w-full bg-white text-black hover:bg-white/90 font-bold tracking-wider uppercase">
-                    <Settings className="w-4 h-4 mr-2" />
-                    EDIT PROFILE
-                  </Button>
+                  <Link href="/settings/profile">
+                    <Button className="w-full bg-white text-black hover:bg-white/90 font-bold tracking-wider uppercase">
+                      <Settings className="w-4 h-4 mr-2" />
+                      EDIT PROFILE
+                    </Button>
+                  </Link>
                   <Button
                     variant="outline"
                     className="w-full border-white/20 bg-white/5 text-white hover:bg-white/10 font-bold tracking-wider uppercase"

@@ -93,11 +93,12 @@ export async function getEvents(filters?: {
   }
 }
 
-export async function getEvent(id: string): Promise<EventWithDetails | null> {
+export async function getEvent(idOrSlug: string): Promise<EventWithDetails | null> {
   const supabase = createClient()
   
   try {
-    const { data, error } = await supabase
+    // Try to find by ID first, then by slug
+    let query = supabase
       .from('events')
       .select(`
         *,
@@ -106,9 +107,18 @@ export async function getEvent(id: string): Promise<EventWithDetails | null> {
           artist:artists(*)
         )
       `)
-      .eq('id', id)
       .eq('is_active', true)
-      .single()
+    
+    // Check if it looks like a UUID (ID) or a slug
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(idOrSlug)
+    
+    if (isUUID) {
+      query = query.eq('id', idOrSlug)
+    } else {
+      query = query.eq('slug', idOrSlug)
+    }
+    
+    const { data, error } = await query.single()
     
     if (error) {
       console.error('Error fetching event:', error)

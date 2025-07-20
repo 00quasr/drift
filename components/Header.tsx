@@ -1,10 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { Search, Menu, X, Bell, User, LogOut } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { Search, Menu, X, Bell, User, LogOut, MapPin, Calendar, Music } from 'lucide-react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 
 export default function Header() {
@@ -13,10 +13,51 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false)
   const [hoveredItem, setHoveredItem] = useState<string | null>(null)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState({ venues: [], events: [], artists: [] })
+  const [isSearching, setIsSearching] = useState(false)
   const pathname = usePathname()
+  const router = useRouter()
   const { user, signOut, loading } = useAuth()
   
   const isLandingPage = pathname === '/'
+
+  // Debounced search function
+  const searchContent = useCallback(async (query: string) => {
+    if (!query.trim()) {
+      setSearchResults({ venues: [], events: [], artists: [] })
+      return
+    }
+
+    setIsSearching(true)
+    try {
+      const response = await fetch(`/api/search?q=${encodeURIComponent(query)}&limit=6`)
+      const data = await response.json()
+      
+      if (data.success) {
+        setSearchResults(data.data)
+      }
+    } catch (error) {
+      console.error('Search error:', error)
+    } finally {
+      setIsSearching(false)
+    }
+  }, [])
+
+  // Debounce search calls
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      searchContent(searchQuery)
+    }, 300)
+
+    return () => clearTimeout(timer)
+  }, [searchQuery, searchContent])
+
+  const handleSearchSelect = (type: string, slug: string) => {
+    setSearchOpen(false)
+    setSearchQuery('')
+    router.push(`/${type}/${slug}`)
+  }
 
   // Simplified scroll handler
   useEffect(() => {
@@ -285,27 +326,126 @@ export default function Header() {
               <input
                 type="text"
                 placeholder="SEARCH EVENTS, VENUES, ARTISTS..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 bg-black border-2 border-white/30 text-white placeholder-white/60 focus:outline-none focus:border-white transition-colors duration-200 font-bold tracking-wider uppercase"
                 autoFocus
               />
               <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                <div className="w-2 h-2 bg-white animate-pulse" />
+                <div className={`w-2 h-2 ${isSearching ? 'bg-white animate-pulse' : 'bg-white/40'}`} />
               </div>
             </div>
             
-            {/* Quick suggestions */}
-            <div className="mt-4 flex flex-wrap gap-2">
-              {['TECHNO EVENTS', 'BERLIN VENUES', 'TOP ARTISTS', 'THIS WEEKEND'].map((suggestion) => (
-                <motion.button
-                  key={suggestion}
-                  className="px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/30 hover:border-white/50 text-sm text-white font-bold tracking-wider transition-all duration-200 uppercase"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  {suggestion}
-                </motion.button>
-              ))}
-            </div>
+            {/* Search Results */}
+            {searchQuery && (
+              <div className="mt-4 space-y-4">
+                {/* Venues */}
+                {searchResults.venues.length > 0 && (
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <MapPin className="w-4 h-4 text-white/60" />
+                      <span className="text-white/60 text-sm font-bold tracking-wider uppercase">
+                        VENUES ({searchResults.venues.length})
+                      </span>
+                    </div>
+                    <div className="space-y-2">
+                      {searchResults.venues.map((venue: any) => (
+                        <motion.button
+                          key={venue.id}
+                          onClick={() => handleSearchSelect('venue', venue.slug)}
+                          className="w-full text-left p-3 bg-white/5 hover:bg-white/10 border border-white/20 hover:border-white/40 transition-all duration-200"
+                          whileHover={{ scale: 1.01 }}
+                          whileTap={{ scale: 0.99 }}
+                        >
+                          <div className="font-bold tracking-wider uppercase text-white">
+                            {venue.name}
+                          </div>
+                          <div className="text-white/60 text-sm">
+                            {venue.location} • {venue.type}
+                          </div>
+                        </motion.button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Events */}
+                {searchResults.events.length > 0 && (
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Calendar className="w-4 h-4 text-white/60" />
+                      <span className="text-white/60 text-sm font-bold tracking-wider uppercase">
+                        EVENTS ({searchResults.events.length})
+                      </span>
+                    </div>
+                    <div className="space-y-2">
+                      {searchResults.events.map((event: any) => (
+                        <motion.button
+                          key={event.id}
+                          onClick={() => handleSearchSelect('event', event.slug)}
+                          className="w-full text-left p-3 bg-white/5 hover:bg-white/10 border border-white/20 hover:border-white/40 transition-all duration-200"
+                          whileHover={{ scale: 1.01 }}
+                          whileTap={{ scale: 0.99 }}
+                        >
+                          <div className="font-bold tracking-wider uppercase text-white">
+                            {event.title}
+                          </div>
+                          <div className="text-white/60 text-sm">
+                            {new Date(event.start_date).toLocaleDateString()} • {event.venue?.name}
+                          </div>
+                        </motion.button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Artists */}
+                {searchResults.artists.length > 0 && (
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Music className="w-4 h-4 text-white/60" />
+                      <span className="text-white/60 text-sm font-bold tracking-wider uppercase">
+                        ARTISTS ({searchResults.artists.length})
+                      </span>
+                    </div>
+                    <div className="space-y-2">
+                      {searchResults.artists.map((artist: any) => (
+                        <motion.button
+                          key={artist.id}
+                          onClick={() => handleSearchSelect('artist', artist.slug)}
+                          className="w-full text-left p-3 bg-white/5 hover:bg-white/10 border border-white/20 hover:border-white/40 transition-all duration-200"
+                          whileHover={{ scale: 1.01 }}
+                          whileTap={{ scale: 0.99 }}
+                        >
+                          <div className="font-bold tracking-wider uppercase text-white">
+                            {artist.name}
+                          </div>
+                          <div className="text-white/60 text-sm">
+                            {artist.genres?.join(', ')} • {artist.origin}
+                          </div>
+                        </motion.button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* No Results */}
+                {!isSearching && searchQuery && 
+                 searchResults.venues.length === 0 && 
+                 searchResults.events.length === 0 && 
+                 searchResults.artists.length === 0 && (
+                  <div className="text-center py-8">
+                    <div className="text-white/60 font-bold tracking-wider uppercase">
+                      NO RESULTS FOUND
+                    </div>
+                    <div className="text-white/40 text-sm mt-1">
+                      Try different keywords or browse our categories
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
           </div>
         </motion.div>
       )}

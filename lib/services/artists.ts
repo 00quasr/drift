@@ -54,10 +54,13 @@ export async function getArtists(filters?: {
   return data
 }
 
-export async function getArtistById(id: string) {
+export async function getArtistById(idOrSlug: string) {
   const supabase = createClient()
   
-  const { data, error } = await supabase
+  // Check if it looks like a UUID (ID) or a slug
+  const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(idOrSlug)
+  
+  let query = supabase
     .from('artists')
     .select(`
       *,
@@ -77,9 +80,15 @@ export async function getArtistById(id: string) {
         )
       )
     `)
-    .eq('id', id)
     .eq('is_active', true)
-    .single()
+  
+  if (isUUID) {
+    query = query.eq('id', idOrSlug)
+  } else {
+    query = query.eq('slug', idOrSlug)
+  }
+  
+  const { data, error } = await query.single()
 
   if (error) {
     console.error('Error fetching artist:', error)

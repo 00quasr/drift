@@ -73,15 +73,18 @@ export async function getVenues(filters?: {
   }
 }
 
-export async function getVenueById(id: string) {
+export async function getVenueById(idOrSlug: string) {
   const supabase = safeCreateClient()
   if (!supabase) {
-    console.error('Supabase not configured. Cannot fetch venue by ID.')
+    console.error('Supabase not configured. Cannot fetch venue.')
     return null
   }
   
   try {
-    const { data, error } = await supabase
+    // Check if it looks like a UUID (ID) or a slug
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(idOrSlug)
+    
+    let query = supabase
       .from('venues')
       .select(`
         *,
@@ -99,7 +102,14 @@ export async function getVenueById(id: string) {
           )
         )
       `)
-      .eq('id', id)
+    
+    if (isUUID) {
+      query = query.eq('id', idOrSlug)
+    } else {
+      query = query.eq('slug', idOrSlug)
+    }
+    
+    const { data, error } = await query
       .eq('is_active', true)
       .single()
 

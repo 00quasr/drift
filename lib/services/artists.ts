@@ -19,7 +19,7 @@ export async function getArtists(filters?: {
     .from('artists')
     .select(`
       *,
-      user:profiles(full_name, role)
+      user:profiles!artists_user_id_fkey(full_name, role)
     `)
     .eq('is_active', true)
     .order('created_at', { ascending: false })
@@ -64,7 +64,7 @@ export async function getArtistById(idOrSlug: string) {
     .from('artists')
     .select(`
       *,
-      user:profiles(full_name, role),
+      user:profiles!artists_user_id_fkey(full_name, role),
       event_artists(
         performance_order,
         performance_type,
@@ -105,7 +105,7 @@ export async function getArtistBySlug(slug: string) {
     .from('artists')
     .select(`
       *,
-      user:profiles(full_name, role),
+      user:profiles!artists_user_id_fkey(full_name, role),
       event_artists(
         performance_order,
         performance_type,
@@ -226,7 +226,7 @@ export async function searchArtists(query: string, filters?: {
     .from('artists')
     .select(`
       *,
-      user:profiles(full_name, role)
+      user:profiles!artists_user_id_fkey(full_name, role)
     `)
     .eq('is_active', true)
     .or(`name.ilike.%${query}%,bio.ilike.%${query}%,city.ilike.%${query}%`)

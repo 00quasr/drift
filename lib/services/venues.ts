@@ -22,6 +22,7 @@ export async function getVenues(filters?: {
   genres?: string[]
   limit?: number
   offset?: number
+  status?: string
 }) {
   const supabase = safeCreateClient()
   if (!supabase) {
@@ -34,10 +35,19 @@ export async function getVenues(filters?: {
       .from('venues')
       .select(`
         *,
-        owner:profiles(full_name, role)
+        owner:profiles!venues_owner_id_fkey(full_name, role)
       `)
-      .eq('is_active', true)
       .order('created_at', { ascending: false })
+
+    // Handle status filter - default to published for public API, allow override
+    if (filters?.status) {
+      query = query.eq('status', filters.status)
+    } else {
+      query = query.eq('status', 'published')
+    }
+
+    // Keep legacy support for is_active
+    query = query.eq('is_active', true)
 
     if (filters?.city) {
       query = query.ilike('city', `%${filters.city}%`)
@@ -88,7 +98,7 @@ export async function getVenueById(idOrSlug: string) {
       .from('venues')
       .select(`
         *,
-        owner:profiles(full_name, role),
+        owner:profiles!venues_owner_id_fkey(full_name, role),
         events(
           id,
           title,
@@ -137,7 +147,7 @@ export async function getVenueBySlug(slug: string) {
       .from('venues')
       .select(`
         *,
-        owner:profiles(full_name, role),
+        owner:profiles!venues_owner_id_fkey(full_name, role),
         events(
           id,
           title,
@@ -171,6 +181,7 @@ export async function searchVenues(query: string, filters?: {
   city?: string
   genres?: string[]
   limit?: number
+  status?: string
 }) {
   const supabase = safeCreateClient()
   if (!supabase) {
@@ -183,10 +194,19 @@ export async function searchVenues(query: string, filters?: {
       .from('venues')
       .select(`
         *,
-        owner:profiles(full_name, role)
+        owner:profiles!venues_owner_id_fkey(full_name, role)
       `)
-      .eq('is_active', true)
       .or(`name.ilike.%${query}%,description.ilike.%${query}%,city.ilike.%${query}%`)
+
+    // Handle status filter - default to published for public search, allow override
+    if (filters?.status) {
+      searchQuery = searchQuery.eq('status', filters.status)
+    } else {
+      searchQuery = searchQuery.eq('status', 'published')
+    }
+
+    // Keep legacy support for is_active
+    searchQuery = searchQuery.eq('is_active', true)
 
     if (filters?.city) {
       searchQuery = searchQuery.ilike('city', `%${filters.city}%`)

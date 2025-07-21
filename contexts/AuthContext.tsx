@@ -43,6 +43,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Listen for auth changes
     const { data: { subscription } } = authService.onAuthStateChange(async (user) => {
+      console.log('AuthContext: Auth state change:', user)
       if (mounted) {
         setUser(user)
         setLoading(false)
@@ -125,7 +126,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const refreshUser = async () => {
     try {
+      console.log('AuthContext: Refreshing user...')
       const updatedUser = await authService.getCurrentUser()
+      console.log('AuthContext: Refreshed user:', updatedUser)
       setUser(updatedUser)
     } catch (error) {
       console.error('Error refreshing user:', error)

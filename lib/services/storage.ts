@@ -33,9 +33,10 @@ export async function uploadProfileImage(file: File, userId: string): Promise<st
 
 export async function uploadEventImage(file: File, eventId: string): Promise<string> {
   try {
+    // Enhanced file path structure: events/EVENT_ID/filename
     const fileExt = file.name.split('.').pop()
-    const fileName = `${eventId}-${Date.now()}.${fileExt}`
-    const filePath = `events/${fileName}`
+    const fileName = `${Date.now()}.${fileExt}`
+    const filePath = `events/${eventId}/${fileName}`
 
     const { data, error } = await supabase.storage
       .from('public')
@@ -61,9 +62,39 @@ export async function uploadEventImage(file: File, eventId: string): Promise<str
 
 export async function uploadVenueImage(file: File, venueId: string): Promise<string> {
   try {
+    // Enhanced file path structure: venues/VENUE_ID/filename
     const fileExt = file.name.split('.').pop()
-    const fileName = `${venueId}-${Date.now()}.${fileExt}`
-    const filePath = `venues/${fileName}`
+    const fileName = `${Date.now()}.${fileExt}`
+    const filePath = `venues/${venueId}/${fileName}`
+
+    const { data, error } = await supabase.storage
+      .from('public')
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: true
+      })
+
+    if (error) {
+      throw new Error(`Upload failed: ${error.message}`)
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('public')
+      .getPublicUrl(filePath)
+
+    return publicUrl
+  } catch (error: any) {
+    console.error('Upload error:', error)
+    throw new Error(error.message || 'Failed to upload image')
+  }
+}
+
+export async function uploadArtistImage(file: File, artistId: string): Promise<string> {
+  try {
+    // Enhanced file path structure: artists/ARTIST_ID/filename
+    const fileExt = file.name.split('.').pop()
+    const fileName = `${Date.now()}.${fileExt}`
+    const filePath = `artists/${artistId}/${fileName}`
 
     const { data, error } = await supabase.storage
       .from('public')

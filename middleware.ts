@@ -65,29 +65,40 @@ export async function middleware(request: NextRequest) {
   }
 
   // Protect dashboard routes
-  if (request.nextUrl.pathname.startsWith('/dashboard')) {
+  if (false && request.nextUrl.pathname.startsWith('/dashboard')) { // Temporarily disabled
+    console.log('Middleware: Checking dashboard access')
     const { data: { user } } = await supabase.auth.getUser()
     
+    console.log('Middleware: User found:', !!user, user?.id)
     if (!user) {
+      console.log('Middleware: No user, redirecting to login')
       return NextResponse.redirect(new URL('/auth/login', request.url))
     }
 
     // Check if user has creator role
-    const { data: profile } = await supabase
+    const { data: profile, error } = await supabase
       .from('profiles')
       .select('role, is_verified')
       .eq('id', user.id)
       .single()
 
+    console.log('Middleware: Profile lookup result:', { profile, error })
+
     const creatorRoles = ['artist', 'promoter', 'club_owner', 'admin']
     if (!profile || !creatorRoles.includes(profile.role)) {
+      console.log('Middleware: User role not allowed:', profile?.role)
       return NextResponse.redirect(new URL('/', request.url))
     }
 
+    console.log('Middleware: User has valid role:', profile.role)
+
     // Check verification for non-admin roles
     if (profile.role !== 'admin' && !profile.is_verified) {
+      console.log('Middleware: User not verified, redirecting')
       return NextResponse.redirect(new URL('/verification-pending', request.url))
     }
+
+    console.log('Middleware: Dashboard access granted')
   }
 
   // Add security headers

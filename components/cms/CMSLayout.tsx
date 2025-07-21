@@ -62,7 +62,7 @@ export default function CMSLayout({ children }: CMSLayoutProps) {
 
     const adminItems = [
       { 
-        href: '/dashboard/admin/users', 
+        href: '/dashboard/users', 
         label: 'User Management', 
         icon: Users,
         roles: ['admin']

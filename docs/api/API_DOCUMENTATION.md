@@ -78,9 +78,10 @@ This document provides a comprehensive overview of the Drift platform's backend 
 - **Response**: Array of events with venue and artist info
 
 #### POST `/api/events/`
-- **Purpose**: Create new event (requires verified creator)
+- **Purpose**: Create new event (requires verified creator or admin)
 - **Body**: Event data (title, date, venue_id, etc.)
-- **Permissions**: `club_owner`, `promoter`, `admin`
+- **Permissions**: Verified `club_owner`/`promoter`, venue owners, or `admin`
+- **Admin Enhancement**: Admins can create events regardless of verification status
 - **Response**: Created event
 
 #### GET `/api/events/[id]`
@@ -105,9 +106,11 @@ This document provides a comprehensive overview of the Drift platform's backend 
 - **Response**: Array of artists
 
 #### POST `/api/artists/`
-- **Purpose**: Create artist profile (requires verification)
+- **Purpose**: Create artist profile (requires verification or admin)
 - **Body**: Artist data (name, bio, genres, etc.)
-- **Permissions**: `artist`, `promoter`, `admin`
+- **Permissions**: Verified `artist`, or `admin`
+- **Admin Enhancement**: Admins can create artist profiles regardless of verification status
+- **Restriction**: Artists can only create one profile each
 - **Response**: Created artist
 
 #### GET `/api/artists/[id]`
@@ -208,6 +211,34 @@ This document provides a comprehensive overview of the Drift platform's backend 
 - **Body**: `{ review_id, action, notes }`
 - **Actions**: `approve`, `hide`, `remove_flags`
 - **Response**: Moderation result
+
+### User Management Routes (`/api/users/`)
+
+#### GET `/api/users/`
+- **Purpose**: List all users with filtering and search (admin only)
+- **Permissions**: Admin only
+- **Query Params**: `role`, `search`, `limit`, `offset`
+- **Response**: Array of users with profile info and emails
+- **Features**: Role filtering, name/display name search, user statistics
+
+#### GET `/api/users/[id]`
+- **Purpose**: Get specific user by ID
+- **Permissions**: Admin or self
+- **Response**: User profile with email and location data
+- **Email Lookup**: Uses admin client to fetch email from auth.users table
+
+#### PUT `/api/users/[id]`
+- **Purpose**: Update user profile
+- **Permissions**: Admin or self
+- **Body**: `{ full_name, display_name, role, is_verified, city, country, bio }`
+- **Admin Features**: Can change role and verification status of other users
+- **Location Handling**: Combines city/country into location field for storage
+
+#### DELETE `/api/users/[id]`
+- **Purpose**: Delete user profile (admin only)
+- **Permissions**: Admin only (cannot delete own account)
+- **Response**: Success confirmation
+- **Safety**: Prevents self-deletion by admin users
 
 ## Response Format
 

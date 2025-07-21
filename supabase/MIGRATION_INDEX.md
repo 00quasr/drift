@@ -16,6 +16,7 @@ Comprehensive overview of all database migrations with their specific changes an
 | 008 | `008_fix_venue_rls_policy.sql` | Admin venue access permissions | ✅ Applied | 006 |
 | 009 | `009_fix_venue_status.sql` | Venue status management fixes | ✅ Applied | 006, 008 |
 | 010 | `010_storage_policies_cms.sql` | File storage policies for CMS | ✅ Applied | 006 |
+| 011 | `011_admin_user_management_policies.sql` | Admin user management & fixed RLS policies | ✅ Applied | 006 |
 
 ## Detailed Changes
 
@@ -103,6 +104,26 @@ ALTER TABLE table_name ADD COLUMN published_at TIMESTAMPTZ;
 - Sets up organized file path structure
 - Enables public access for published content
 
+### 011_admin_user_management_policies.sql
+**Admin User Management & RLS Policy Fixes**
+- Updates events INSERT policy to allow admins to create events
+- Updates artists INSERT policy to allow admins to create artist profiles
+- Fixes profiles table infinite recursion issues in RLS policies
+- Implements non-recursive admin permission checks
+- Enables comprehensive user management for admin users
+
+**Key Changes:**
+```sql
+-- Fixed infinite recursion by using direct SELECT instead of EXISTS subqueries
+CREATE POLICY "Admins can update any profile" ON profiles
+FOR UPDATE USING (
+  (SELECT role FROM profiles WHERE id = auth.uid() LIMIT 1) = 'admin'
+);
+
+-- Added admin permissions to content creation policies
+-- Admins can now create events and artist profiles regardless of verification status
+```
+
 ## Migration Dependencies
 
 ```mermaid
@@ -117,16 +138,27 @@ graph TD
     F --> H[008_fix_venue_rls_policy]
     H --> I[009_fix_venue_status]
     F --> J[010_storage_policies_cms]
+    F --> K[011_admin_user_management_policies]
 ```
 
 ## Recent Changes Summary
 
-The CMS implementation (migrations 006-010) represents a major platform enhancement:
+The CMS implementation (migrations 006-011) represents a major platform enhancement:
 
 1. **Content Lifecycle Management**: Complete draft → published workflow
 2. **Role-Based Permissions**: Granular access control for different user types  
 3. **Content Moderation**: Automated moderation with audit logging
 4. **Storage Organization**: Structured file storage with proper access policies
 5. **Privacy Controls**: Comprehensive user privacy and visibility settings
+6. **Admin User Management**: Complete user management system with role-based permissions
+
+### Latest Addition (Migration 011)
+**Admin User Management System** - Added comprehensive user management capabilities:
+- Admins can view, edit, and delete any user profiles
+- Role and verification status management
+- Email lookup from auth.users table  
+- Fixed infinite recursion issues in RLS policies
+- Non-recursive admin permission checks
+- Enhanced content creation permissions for admins
 
 All migrations have been tested and applied successfully to the development database.

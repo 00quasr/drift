@@ -10,6 +10,7 @@ interface AuthContextType {
   signUp: (data: { email: string; password: string; role: string; fullName?: string } | { provider: 'google' }) => Promise<void>
   signOut: () => Promise<void>
   resetPassword: (email: string) => Promise<void>
+  refreshUser: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -122,6 +123,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await authService.resetPassword(email)
   }
 
+  const refreshUser = async () => {
+    try {
+      const updatedUser = await authService.getCurrentUser()
+      setUser(updatedUser)
+    } catch (error) {
+      console.error('Error refreshing user:', error)
+    }
+  }
+
   const value = {
     user,
     loading,
@@ -129,6 +139,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signUp,
     signOut,
     resetPassword,
+    refreshUser,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

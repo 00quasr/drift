@@ -14,6 +14,8 @@ export interface AuthUser {
   email: string
   role: UserRole
   is_verified: boolean
+  display_name?: string
+  avatar_url?: string
 }
 
 export interface SignUpData {
@@ -120,7 +122,7 @@ export const authService = {
       // Get profile data with better error handling
       const { data: profile, error } = await supabase
         .from('profiles')
-        .select('role, is_verified, full_name')
+        .select('role, is_verified, full_name, display_name, avatar_url')
         .eq('id', user.id)
         .maybeSingle() // Use maybeSingle instead of single to handle missing profiles gracefully
 
@@ -150,6 +152,8 @@ export const authService = {
         email: user.email!,
         role: profile.role as UserRole,
         is_verified: profile.is_verified,
+        display_name: profile.display_name,
+        avatar_url: profile.avatar_url,
       }
       
       return authUser

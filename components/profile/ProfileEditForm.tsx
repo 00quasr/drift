@@ -17,6 +17,7 @@ import {
 import Image from 'next/image'
 import { supabase } from '@/lib/auth'
 import { uploadProfileImage, moderateImage } from '@/lib/services/storage'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface ProfileEditFormProps {
   profile: any
@@ -33,6 +34,7 @@ export const ProfileEditForm: React.FC<ProfileEditFormProps> = ({
   profile,
   onSuccess
 }) => {
+  const { refreshUser } = useAuth()
   const [formData, setFormData] = useState({
     full_name: profile.full_name || '',
     display_name: profile.display_name || '',
@@ -177,6 +179,10 @@ export const ProfileEditForm: React.FC<ProfileEditFormProps> = ({
       if (!result.success) {
         throw new Error(result.error || 'Failed to update profile')
       }
+      
+      // Refresh the auth context to update the header
+      await refreshUser()
+      
       onSuccess()
       
     } catch (error: any) {

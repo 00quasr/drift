@@ -6,6 +6,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
+import Image from 'next/image'
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -19,6 +20,18 @@ export default function Header() {
   const pathname = usePathname()
   const router = useRouter()
   const { user, signOut, loading } = useAuth()
+  
+  // Debug user data
+  useEffect(() => {
+    if (user) {
+      console.log('Header user data:', {
+        email: user.email,
+        display_name: user.display_name,
+        avatar_url: user.avatar_url,
+        id: user.id
+      })
+    }
+  }, [user])
   
   const isLandingPage = pathname === '/'
 
@@ -217,12 +230,29 @@ export default function Header() {
                 <div className="relative">
                   <motion.button
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
-                    className="relative px-4 py-2 text-sm font-bold tracking-wider text-white/80 hover:text-white border border-white/30 hover:border-white/60 bg-black/50 backdrop-blur-sm transition-all duration-200 uppercase h-10 flex items-center space-x-2 overflow-hidden"
+                    className="relative px-3 py-2 text-sm font-bold tracking-wider text-white/80 hover:text-white border border-white/30 hover:border-white/60 bg-black/50 backdrop-blur-sm transition-all duration-200 uppercase h-10 flex items-center space-x-2 overflow-hidden"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <User className="w-4 h-4 relative z-10" />
-                    <span className="relative z-10">{user.email}</span>
+                    {/* Avatar or User Icon */}
+                    {user.avatar_url ? (
+                      <div className="relative w-6 h-6 rounded-full overflow-hidden border border-white/30">
+                        <Image
+                          src={user.avatar_url}
+                          alt="Profile"
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <User className="w-4 h-4 relative z-10" />
+                    )}
+                    
+                    {/* Display Name or Email */}
+                    <span className="relative z-10 max-w-[120px] truncate">
+                      {user.display_name || user.email}
+                    </span>
+                    
                     <div className="absolute inset-0 bg-white/5 opacity-0 hover:opacity-100 transition-opacity duration-200" />
                   </motion.button>
                   
@@ -475,8 +505,18 @@ export default function Header() {
             <div className="pt-4 border-t border-white/20 space-y-3">
               {user ? (
                 <>
-                  <div className="px-4 py-2 text-white/60 text-sm uppercase tracking-wider">
-                    Welcome, {user.email}
+                  <div className="px-4 py-2 text-white/60 text-sm uppercase tracking-wider flex items-center space-x-2">
+                    {user.avatar_url && (
+                      <div className="relative w-6 h-6 rounded-full overflow-hidden border border-white/30">
+                        <Image
+                          src={user.avatar_url}
+                          alt="Profile"
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    )}
+                    <span>Welcome, {user.display_name || user.email}</span>
                   </div>
                   <Link href="/profile">
                     <motion.div 

@@ -57,7 +57,7 @@ const MUSIC_GENRES = [
 
 const AGE_RESTRICTIONS = [16, 18, 21]
 
-export default function CreateEventPage() {
+export default function EditEventPage({ params }: { params: { id: string } }) {
   const { user, loading } = useAuth()
   const router = useRouter()
   const [event, setEvent] = useState<EventFormData>({
@@ -83,6 +83,7 @@ export default function CreateEventPage() {
   const venueDropdownRef = useRef<HTMLDivElement>(null)
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [loading_event, setLoadingEvent] = useState(true)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
@@ -97,8 +98,9 @@ export default function CreateEventPage() {
   useEffect(() => {
     if (user && user.role === 'promoter') {
       fetchVenues()
+      fetchEvent()
     }
-  }, [user])
+  }, [user, params.id])
 
   // Handle click outside to close dropdown
   useEffect(() => {
@@ -113,6 +115,64 @@ export default function CreateEventPage() {
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [])
+
+  const fetchEvent = async () => {
+    try {
+      const { supabase } = await import('@/lib/auth')
+      const { data: { session } } = await supabase.auth.getSession()
+
+      const response = await fetch(`/api/events/${params.id}?cms=true`, {
+        headers: {
+          ...(session?.access_token && {
+            'Authorization': `Bearer ${session.access_token}`
+          })
+        }
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        const eventData = data.data
+        
+        // Convert the API data to form format
+        const startDateTime = new Date(eventData.start_date || eventData.start_time)
+        const endDateTime = eventData.end_date ? new Date(eventData.end_date || eventData.end_time) : null
+        
+        setEvent({
+          title: eventData.title || '',
+          description: eventData.description || '',
+          venue_id: eventData.venue_id || '',
+          start_date: startDateTime.toISOString().split('T')[0],
+          start_time: startDateTime.toTimeString().slice(0, 5),
+          end_date: endDateTime ? endDateTime.toISOString().split('T')[0] : '',
+          end_time: endDateTime ? endDateTime.toTimeString().slice(0, 5) : '',
+          genres: eventData.genres || [],
+          ticket_info: {
+            price_regular: eventData.ticket_price_min || eventData.price_min,
+            price_vip: eventData.ticket_price_max || eventData.price_max,
+            ticket_url: eventData.ticket_url || '',
+            free_event: !eventData.ticket_price_min && !eventData.price_min
+          },
+          age_restriction: eventData.age_restriction || 18,
+          images: eventData.images || [],
+          status: eventData.status || 'draft'
+        })
+        
+        // Set venue search if venue exists
+        if (eventData.venue) {
+          setVenueSearch(eventData.venue.name)
+        }
+      } else {
+        setError('Failed to load event')
+        router.push('/events/manage')
+      }
+    } catch (error) {
+      console.error('Error fetching event:', error)
+      setError('Failed to load event')
+      router.push('/events/manage')
+    } finally {
+      setLoadingEvent(false)
+    }
+  }
 
   const fetchVenues = async () => {
     try {
@@ -168,24 +228,16 @@ export default function CreateEventPage() {
     setUploading(true)
     setError('')
     
-    console.log('Starting image upload for', files.length, 'files')
-
     try {
-      const uploadPromises = Array.from(files).map(async (file, index) => {
-        console.log(`Processing file ${index + 1}:`, file.name)
-        
+      const uploadPromises = Array.from(files).map(async (file) => {
         // Validate image
         const validation = validateImageFile(file)
         if (!validation.valid) {
           throw new Error(validation.error)
         }
-        console.log(`File ${index + 1} validation passed`)
 
         // Moderate content
-        console.log(`Starting moderation for file ${index + 1}`)
         const approved = await moderateImage(file)
-        console.log(`File ${index + 1} moderation result:`, approved)
-        
         if (!approved) {
           throw new Error(`Image ${file.name} was rejected by content moderation`)
         }
@@ -194,30 +246,22 @@ export default function CreateEventPage() {
         const tempEventId = crypto.randomUUID()
         
         // Upload to storage
-        console.log(`Starting upload for file ${index + 1}`)
         const imageUrl = await uploadEventImage(file, tempEventId)
-        console.log(`File ${index + 1} upload completed:`, imageUrl)
-        
         return imageUrl
       })
 
-      console.log('Waiting for all uploads to complete...')
       const uploadedUrls = await Promise.all(uploadPromises)
-      console.log('All uploads completed:', uploadedUrls)
       
       setEvent(prev => ({
         ...prev,
         images: [...prev.images, ...uploadedUrls]
       }))
-      
-      console.log('Event state updated with new images')
 
     } catch (error: any) {
       console.error('Image upload error:', error)
       setError(error.message || 'Failed to upload images')
     } finally {
       setUploading(false)
-      console.log('Image upload process finished')
     }
   }
 
@@ -229,15 +273,6 @@ export default function CreateEventPage() {
   }
 
   const handleSave = async (publishImmediately = false) => {
-    console.log('Saving event with data:', event)
-    console.log('Validation check:', {
-      title: !!event.title,
-      description: !!event.description,
-      venue_id: !!event.venue_id,
-      start_date: !!event.start_date,
-      start_time: !!event.start_time
-    })
-    
     if (!event.title || !event.description || !event.venue_id || !event.start_date || !event.start_time) {
       const missing = []
       if (!event.title) missing.push('title')
@@ -264,8 +299,8 @@ export default function CreateEventPage() {
         ? new Date(`${event.end_date}T${event.end_time}`)
         : new Date(startDateTime.getTime() + 4 * 60 * 60 * 1000) // Default 4 hours later
 
-      const response = await fetch('/api/events', {
-        method: 'POST',
+      const response = await fetch(`/api/events/${params.id}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           ...(session?.access_token && {
@@ -287,26 +322,25 @@ export default function CreateEventPage() {
       })
 
       if (response.ok) {
-        const data = await response.json()
-        setSuccess(publishImmediately ? 'Event created and published successfully!' : 'Event created successfully!')
+        setSuccess(publishImmediately ? 'Event updated and published successfully!' : 'Event updated successfully!')
         
         setTimeout(() => {
           router.push('/events/manage')
         }, 1500)
       } else {
         const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to create event')
+        throw new Error(errorData.error || 'Failed to update event')
       }
 
     } catch (error: any) {
       console.error('Save error:', error)
-      setError(error.message || 'Failed to create event')
+      setError(error.message || 'Failed to update event')
     } finally {
       setSaving(false)
     }
   }
 
-  if (loading) {
+  if (loading || loading_event) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="w-8 h-8 animate-spin rounded-full border-2 border-white/30 border-t-white" />
@@ -319,7 +353,7 @@ export default function CreateEventPage() {
       <div className="text-center py-12">
         <Calendar className="w-16 h-16 mx-auto text-white/30 mb-4" />
         <h3 className="text-xl font-bold text-white mb-2">Access Denied</h3>
-        <p className="text-white/60 mb-6">Only promoter accounts can create events.</p>
+        <p className="text-white/60 mb-6">Only promoter accounts can edit events.</p>
         <button
           onClick={() => router.push('/')}
           className="px-6 py-3 bg-white text-black hover:bg-white/90 transition-colors font-bold tracking-wider uppercase"
@@ -344,10 +378,10 @@ export default function CreateEventPage() {
           
           <div>
             <h1 className="text-4xl font-bold tracking-wider uppercase text-white mb-2">
-              Create Event
+              Edit Event
             </h1>
             <p className="text-white/60 font-bold tracking-wider uppercase">
-              Promote your next electronic music event
+              Update your electronic music event
             </p>
           </div>
         </div>
@@ -386,20 +420,22 @@ export default function CreateEventPage() {
           whileTap={{ scale: saving ? 1 : 0.98 }}
         >
           <Save className="w-4 h-4" />
-          <span>{saving ? 'Saving...' : 'Save Draft'}</span>
+          <span>{saving ? 'Updating...' : 'Update Event'}</span>
         </motion.button>
 
-        <button
-          onClick={() => handleSave(true)}
-          disabled={saving}
-          className="flex items-center space-x-2 px-4 py-2 border border-green-400 text-green-400 hover:bg-green-400/10 transition-colors font-bold tracking-wider uppercase disabled:opacity-50"
-        >
-          <Eye className="w-4 h-4" />
-          <span>Create & Publish</span>
-        </button>
+        {event.status !== 'published' && (
+          <button
+            onClick={() => handleSave(true)}
+            disabled={saving}
+            className="flex items-center space-x-2 px-4 py-2 border border-green-400 text-green-400 hover:bg-green-400/10 transition-colors font-bold tracking-wider uppercase disabled:opacity-50"
+          >
+            <Eye className="w-4 h-4" />
+            <span>Update & Publish</span>
+          </button>
+        )}
       </div>
 
-      {/* Event Form */}
+      {/* Event Form - Same as create form */}
       <div className="space-y-8">
         {/* Basic Information */}
         <div className="bg-black/50 border border-white/20 p-6 backdrop-blur-sm relative z-20">
@@ -457,7 +493,6 @@ export default function CreateEventPage() {
                   />
                 </div>
                 
-                {/* Regular dropdown with high z-index */}
                 {showVenueDropdown && filteredVenues.length > 0 && (
                   <div 
                     className="absolute top-full left-0 right-0 mt-1 bg-black border border-white/20 max-h-60 overflow-y-auto shadow-2xl backdrop-blur-sm"

@@ -33,10 +33,14 @@ export async function uploadProfileImage(file: File, userId: string): Promise<st
 
 export async function uploadEventImage(file: File, eventId: string): Promise<string> {
   try {
+    console.log('Starting upload for:', file.name, 'to event:', eventId)
+    
     // Enhanced file path structure: events/EVENT_ID/filename
     const fileExt = file.name.split('.').pop()
     const fileName = `${Date.now()}.${fileExt}`
     const filePath = `events/${eventId}/${fileName}`
+    
+    console.log('Upload path:', filePath)
 
     const { data, error } = await supabase.storage
       .from('public')
@@ -44,6 +48,8 @@ export async function uploadEventImage(file: File, eventId: string): Promise<str
         cacheControl: '3600',
         upsert: true
       })
+
+    console.log('Upload result:', { data, error })
 
     if (error) {
       throw new Error(`Upload failed: ${error.message}`)
@@ -53,6 +59,7 @@ export async function uploadEventImage(file: File, eventId: string): Promise<str
       .from('public')
       .getPublicUrl(filePath)
 
+    console.log('Generated public URL:', publicUrl)
     return publicUrl
   } catch (error: any) {
     console.error('Upload error:', error)
@@ -120,31 +127,50 @@ export async function uploadArtistImage(file: File, artistId: string): Promise<s
 
 export async function moderateImage(file: File): Promise<boolean> {
   try {
+    console.log('Starting moderation for:', file.name)
+    
     // Convert file to base64 for OpenAI API
     const base64 = await fileToBase64(file)
+    console.log('File converted to base64, size:', base64.length)
     
     // Use absolute URL for server-side calls  
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
     const url = `${baseUrl}/api/moderate/image`
     
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        image: base64,
-        filename: file.name
-      })
-    })
-
-    const data = await response.json()
+    console.log('Sending moderation request to:', url)
     
-    if (!response.ok) {
-      throw new Error(data.error || 'Moderation failed')
-    }
+    // Add timeout to prevent hanging
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 30000) // 30 second timeout
+    
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          image: base64,
+          filename: file.name
+        }),
+        signal: controller.signal
+      })
 
-    return data.approved
+      clearTimeout(timeoutId)
+      console.log('Moderation response status:', response.status)
+
+      const data = await response.json()
+      console.log('Moderation response data:', data)
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Moderation failed')
+      }
+
+      return data.approved
+    } catch (error: any) {
+      clearTimeout(timeoutId)
+      throw error
+    }
   } catch (error: any) {
     console.error('Moderation error:', error)
     // In case of moderation service failure, default to approved

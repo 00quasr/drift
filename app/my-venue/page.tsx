@@ -23,6 +23,7 @@ import {
   ArrowLeft
 } from 'lucide-react'
 import { uploadVenueImage, moderateImage, validateImageFile } from '@/lib/services/storage'
+import ImageGallery from '@/components/ui/ImageGallery'
 
 interface VenueFormData {
   name: string
@@ -879,25 +880,42 @@ export default function MyVenuePage() {
             </div>
 
             {venue.images.length > 0 && (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {venue.images.map((imageUrl, index) => (
-                  <div key={index} className="relative group">
-                    <div className="aspect-square bg-black/50 border border-white/30 overflow-hidden">
-                      <img
-                        src={imageUrl}
-                        alt={`Venue photo ${index + 1}`}
-                        className="w-full h-full object-cover"
-                      />
+              <div className="space-y-4">
+                {/* Image Gallery with Modal Viewer */}
+                <ImageGallery
+                  images={venue.images}
+                  title="Venue Photos"
+                  className="mb-4"
+                  maxDisplay={6}
+                  aspectRatio="square"
+                />
+                
+                {/* Edit Mode: Show remove buttons */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {venue.images.map((imageUrl, index) => (
+                    <div key={index} className="relative group">
+                      <div className="aspect-square bg-black/50 border border-white/30 overflow-hidden">
+                        <img
+                          src={imageUrl}
+                          alt={`Venue photo ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        title="Remove image"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => removeImage(index)}
-                      className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
+                  ))}
+                </div>
+                
+                <p className="text-white/60 text-sm">
+                  Click on images above to view them in full size. Use the remove button (×) to delete images.
+                </p>
               </div>
             )}
           </div>

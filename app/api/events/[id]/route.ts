@@ -228,8 +228,13 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     }
 
     const body = await request.json()
+    console.log('API UPDATE: Request body received:', JSON.stringify(body, null, 2))
     
-    // Validate required fields
+    // Check if this is a status-only update
+    const isStatusOnlyUpdate = Object.keys(body).length === 1 && 'status' in body
+    console.log('API UPDATE: Is status-only update:', isStatusOnlyUpdate)
+    
+    // Validate required fields for full updates
     const { 
       title, 
       description, 
@@ -244,41 +249,57 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       status
     } = body
 
-    if (!title || !description || !venue_id || !start_time) {
+    // Only validate required fields for full updates, not status-only updates
+    if (!isStatusOnlyUpdate && (!title || !description || !venue_id || !start_time)) {
       return NextResponse.json({ 
         success: false, 
         error: 'Missing required fields: title, description, venue_id, start_time' 
       }, { status: 400 })
     }
 
-    // Moderate text content if changed
-    const textToModerate = `${title} ${description}`
-    const moderation = await moderateText(textToModerate)
+    let moderation = { approved: true }
     
-    if (!moderation.approved) {
-      return NextResponse.json({ 
-        success: false, 
-        error: `Content was rejected: ${moderation.reason || 'Inappropriate content detected'}` 
-      }, { status: 400 })
+    // Only moderate text content for full updates
+    if (!isStatusOnlyUpdate) {
+      const textToModerate = `${title} ${description}`
+      moderation = await moderateText(textToModerate)
+      
+      if (!moderation.approved) {
+        return NextResponse.json({ 
+          success: false, 
+          error: `Content was rejected: ${moderation.reason || 'Inappropriate content detected'}` 
+        }, { status: 400 })
+      }
     }
 
-    // Update event data - map to correct database column names
-    const updateData = {
-      title,
-      description,
-      venue_id,
-      start_date: start_time, // Database uses start_date not start_time
-      end_date: end_time, // Database uses end_date not end_time
-      genres,
-      images,
-      ticket_url,
-      ticket_price_min: price_min, // Database uses ticket_price_min not price_min
-      ticket_price_max: price_max, // Database uses ticket_price_max not price_max
-      status,
+    // Create update data based on update type
+    let updateData: any = {
       updated_by: user.id,
-      updated_at: new Date().toISOString(),
-      // Legacy compatibility
-      is_active: status === 'published'
+      updated_at: new Date().toISOString()
+    }
+
+    if (isStatusOnlyUpdate) {
+      // Status-only update
+      updateData.status = status
+      updateData.is_active = status === 'published'
+    } else {
+      // Full update - map to correct database column names
+      updateData = {
+        ...updateData,
+        title,
+        description,
+        venue_id,
+        start_date: start_time, // Database uses start_date not start_time
+        end_date: end_time, // Database uses end_date not end_time
+        genres,
+        images,
+        ticket_url,
+        ticket_price_min: price_min, // Database uses ticket_price_min not price_min
+        ticket_price_max: price_max, // Database uses ticket_price_max not price_max
+        status,
+        // Legacy compatibility
+        is_active: status === 'published'
+      }
     }
 
     console.log('API UPDATE: Updating event with data:', JSON.stringify(updateData, null, 2))

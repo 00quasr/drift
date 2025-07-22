@@ -7,6 +7,7 @@ import { getArtistById } from "@/lib/services/artists"
 import { getReviews, getReviewStats } from "@/lib/services/reviews"
 import { notFound } from "next/navigation"
 import Image from "next/image"
+import ImageGallery from '@/components/ui/ImageGallery'
 
 interface ArtistPageProps {
   params: { id: string }
@@ -140,6 +141,24 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
                 <p className="text-white/80 leading-relaxed font-medium tracking-wide">
                   {artist.bio}
                 </p>
+              </div>
+            )}
+
+            {/* Artist Images Section */}
+            {artist.images && artist.images.length > 0 && (
+              <div className="relative bg-black border-2 border-white/20 p-6">
+                <div className="absolute top-4 right-4 w-6 h-6 z-10">
+                  <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
+                </div>
+                <h2 className="text-2xl font-bold tracking-widest uppercase mb-6 text-white">
+                  ARTIST PHOTOS
+                </h2>
+                <ImageGallery
+                  images={artist.images}
+                  title={`${artist.name} Photos`}
+                  maxDisplay={8}
+                  aspectRatio="square"
+                />
               </div>
             )}
 

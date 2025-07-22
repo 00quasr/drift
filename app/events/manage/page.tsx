@@ -285,7 +285,12 @@ export default function ManageEventsPage() {
               key={event.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-black/50 border border-white/20 p-6 backdrop-blur-sm hover:border-white/40 transition-colors"
+              className="bg-black/50 border border-white/20 p-6 backdrop-blur-sm hover:border-white/40 transition-colors cursor-pointer"
+              onClick={() => {
+                if (event.status === 'published') {
+                  router.push(`/event/${event.id}`)
+                }
+              }}
             >
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div className="flex-1">
@@ -329,7 +334,7 @@ export default function ManageEventsPage() {
                   </div>
                 </div>
                 
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2" onClick={(e) => e.stopPropagation()}>
                   {event.status === 'published' && (
                     <Link href={`/event/${event.id}`}>
                       <motion.button
@@ -343,7 +348,7 @@ export default function ManageEventsPage() {
                     </Link>
                   )}
                   
-                  <Link href={`/dashboard/events/${event.id}/edit`}>
+                  <Link href={`/events/edit/${event.id}`}>
                     <motion.button
                       className="p-2 border border-white/30 text-white hover:border-white/60 transition-colors"
                       whileHover={{ scale: 1.05 }}
@@ -356,7 +361,10 @@ export default function ManageEventsPage() {
 
                   {event.status === 'published' ? (
                     <motion.button
-                      onClick={() => handleToggleEventStatus(event.id, event.status)}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleToggleEventStatus(event.id, event.status)
+                      }}
                       className="p-2 border border-orange-500/50 text-orange-400 hover:border-orange-500 hover:text-orange-300 transition-colors"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
@@ -366,7 +374,10 @@ export default function ManageEventsPage() {
                     </motion.button>
                   ) : event.status === 'archived' ? (
                     <motion.button
-                      onClick={() => handleToggleEventStatus(event.id, event.status)}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleToggleEventStatus(event.id, event.status)
+                      }}
                       className="p-2 border border-green-500/50 text-green-400 hover:border-green-500 hover:text-green-300 transition-colors"
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
@@ -377,7 +388,10 @@ export default function ManageEventsPage() {
                   ) : null}
                   
                   <motion.button
-                    onClick={() => handleDeleteEvent(event.id)}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleDeleteEvent(event.id)
+                    }}
                     className="p-2 border border-red-500/50 text-red-400 hover:border-red-500 hover:text-red-300 transition-colors"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}

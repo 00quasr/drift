@@ -9,6 +9,7 @@ import { getReviews, getReviewStats } from "@/lib/services/reviews"
 import { getFallbackImage, isValidImageUrl } from '@/lib/utils/imageUtils'
 import { notFound } from "next/navigation"
 import Image from "next/image"
+import ImageGallery from '@/components/ui/ImageGallery'
 
 interface VenuePageProps {
   params: { id: string }
@@ -138,6 +139,24 @@ export default async function VenuePage({ params }: VenuePageProps) {
                 <p className="text-white/80 leading-relaxed font-medium tracking-wide">
                   {venue.description}
                 </p>
+              </div>
+            )}
+
+            {/* Venue Images Section */}
+            {venue.images && venue.images.length > 0 && (
+              <div className="relative bg-black border-2 border-white/20 p-6">
+                <div className="absolute top-4 right-4 w-6 h-6 z-10">
+                  <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
+                </div>
+                <h2 className="text-2xl font-bold tracking-widest uppercase mb-6 text-white">
+                  VENUE PHOTOS
+                </h2>
+                <ImageGallery
+                  images={venue.images}
+                  title={`${venue.name} Photos`}
+                  maxDisplay={8}
+                  aspectRatio="video"
+                />
               </div>
             )}
 

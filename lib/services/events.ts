@@ -27,10 +27,23 @@ export async function getEvents(filters?: {
     let query = supabase
       .from('events')
       .select(`
-        *,
-        venue:venues(*),
+        id,
+        title,
+        slug,
+        description,
+        start_date,
+        end_date,
+        flyer_url,
+        genres,
+        images,
+        ticket_price_min,
+        ticket_price_max,
+        ticket_url,
+        status,
+        created_at,
+        venue:venues(id, name, city, country, address),
         event_artists(
-          artist:artists(*)
+          artist:artists(id, name, slug, genre, avatar_url)
         )
       `)
       .eq('is_active', true)

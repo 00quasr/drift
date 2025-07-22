@@ -67,10 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const emailData = data as { email: string; password: string }
         await authService.signIn(emailData.email, emailData.password)
         
-        // Give more time for the auth state to settle
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        
-        // Try to get the current user, but don't fail if it's not immediately available
+        // Try to get the current user with shorter timeout for better performance
         const user = await authService.getCurrentUser()
         
         // Set the user even if null - let the auth state change handle it

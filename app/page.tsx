@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback, useMemo, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -185,7 +185,7 @@ interface Dot {
   currentRadius: number;
 }
 
-const GeometricGrid: React.FC = () => {
+const GeometricGrid: React.FC = memo(() => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameId = useRef<number | null>(null);
   const dotsRef = useRef<Dot[]>([]);
@@ -313,9 +313,9 @@ const GeometricGrid: React.FC = () => {
       className="absolute inset-0 z-10 pointer-events-none"
     />
   );
-};
+});
 
-const PulsingElement: React.FC<{ children: React.ReactNode; className?: string; delay?: number }> = ({ 
+const PulsingElement: React.FC<{ children: React.ReactNode; className?: string; delay?: number }> = memo(({ 
   children, 
   className = "", 
   delay = 0 
@@ -337,7 +337,7 @@ const PulsingElement: React.FC<{ children: React.ReactNode; className?: string; 
       {children}
     </motion.div>
   );
-};
+});
 
 export default function HomePage() {
   const [isLoaded, setIsLoaded] = useState(false);

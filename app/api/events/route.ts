@@ -50,11 +50,17 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    return NextResponse.json({ 
+    const response = NextResponse.json({ 
       success: true, 
       data,
       count: data.length 
     })
+    
+    // Add caching headers for performance
+    response.headers.set('Cache-Control', 'public, max-age=60, stale-while-revalidate=300')
+    response.headers.set('CDN-Cache-Control', 'public, max-age=300')
+    
+    return response
   } catch (error) {
     console.error('Error in GET /api/events:', error)
     return NextResponse.json({ 

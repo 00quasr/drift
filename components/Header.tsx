@@ -263,13 +263,54 @@ export default function Header() {
                           {user.role} {user.is_verified && '• VERIFIED'}
                         </div>
                         <Link 
-                          href="/profile" 
+                          href="/profile/edit" 
                           className="block px-3 py-2 text-sm text-white hover:bg-white/10 transition-colors uppercase tracking-wider"
                           onClick={() => setUserMenuOpen(false)}
                         >
-                          Profile
+                          My Profile
                         </Link>
-                        {(user.role !== 'fan' && user.is_verified) && (
+                        
+                        {/* Role-specific navigation */}
+                        {user.role === 'artist' && (
+                          <Link 
+                            href="/artist-profile" 
+                            className="block px-3 py-2 text-sm text-white hover:bg-white/10 transition-colors uppercase tracking-wider"
+                            onClick={() => setUserMenuOpen(false)}
+                          >
+                            My Artist Profile
+                          </Link>
+                        )}
+                        
+                        {user.role === 'club_owner' && (
+                          <Link 
+                            href="/my-venue" 
+                            className="block px-3 py-2 text-sm text-white hover:bg-white/10 transition-colors uppercase tracking-wider"
+                            onClick={() => setUserMenuOpen(false)}
+                          >
+                            My Venue
+                          </Link>
+                        )}
+                        
+                        {user.role === 'promoter' && (
+                          <>
+                            <Link 
+                              href="/events/manage" 
+                              className="block px-3 py-2 text-sm text-white hover:bg-white/10 transition-colors uppercase tracking-wider"
+                              onClick={() => setUserMenuOpen(false)}
+                            >
+                              My Events
+                            </Link>
+                            <Link 
+                              href="/events/create" 
+                              className="block px-3 py-2 text-sm text-white hover:bg-white/10 transition-colors uppercase tracking-wider"
+                              onClick={() => setUserMenuOpen(false)}
+                            >
+                              Create Event
+                            </Link>
+                          </>
+                        )}
+                        
+                        {user.role === 'admin' && (
                           <Link 
                             href="/dashboard" 
                             className="block px-3 py-2 text-sm text-white hover:bg-white/10 transition-colors uppercase tracking-wider"
@@ -278,15 +319,14 @@ export default function Header() {
                             Dashboard
                           </Link>
                         )}
-                        {user.role === 'admin' && (
-                          <Link 
-                            href="/admin" 
-                            className="block px-3 py-2 text-sm text-white hover:bg-white/10 transition-colors uppercase tracking-wider"
-                            onClick={() => setUserMenuOpen(false)}
-                          >
-                            Admin
-                          </Link>
-                        )}
+                        
+                        <Link 
+                          href="/settings" 
+                          className="block px-3 py-2 text-sm text-white hover:bg-white/10 transition-colors uppercase tracking-wider"
+                          onClick={() => setUserMenuOpen(false)}
+                        >
+                          Settings
+                        </Link>
                         <button
                           onClick={async () => {
                             await signOut()
@@ -518,17 +558,70 @@ export default function Header() {
                     )}
                     <span>Welcome, {user.display_name || user.email}</span>
                   </div>
-                  <Link href="/profile">
+                  <Link href="/profile/edit">
                     <motion.div 
                       className="block w-full text-left px-4 py-2 text-sm font-bold tracking-wider text-white/80 hover:text-white transition-all duration-200 uppercase"
                       onClick={() => setMobileMenuOpen(false)}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
-                      Profile
+                      My Profile
                     </motion.div>
                   </Link>
-                  {(user.role !== 'fan' && user.is_verified) && (
+                  
+                  {/* Role-specific mobile navigation */}
+                  {user.role === 'artist' && (
+                    <Link href="/artist-profile">
+                      <motion.div 
+                        className="block w-full text-left px-4 py-2 text-sm font-bold tracking-wider text-white/80 hover:text-white transition-all duration-200 uppercase"
+                        onClick={() => setMobileMenuOpen(false)}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        My Artist Profile
+                      </motion.div>
+                    </Link>
+                  )}
+                  
+                  {user.role === 'club_owner' && (
+                    <Link href="/my-venue">
+                      <motion.div 
+                        className="block w-full text-left px-4 py-2 text-sm font-bold tracking-wider text-white/80 hover:text-white transition-all duration-200 uppercase"
+                        onClick={() => setMobileMenuOpen(false)}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        My Venue
+                      </motion.div>
+                    </Link>
+                  )}
+                  
+                  {user.role === 'promoter' && (
+                    <>
+                      <Link href="/events/manage">
+                        <motion.div 
+                          className="block w-full text-left px-4 py-2 text-sm font-bold tracking-wider text-white/80 hover:text-white transition-all duration-200 uppercase"
+                          onClick={() => setMobileMenuOpen(false)}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          My Events
+                        </motion.div>
+                      </Link>
+                      <Link href="/events/create">
+                        <motion.div 
+                          className="block w-full text-left px-4 py-2 text-sm font-bold tracking-wider text-white/80 hover:text-white transition-all duration-200 uppercase"
+                          onClick={() => setMobileMenuOpen(false)}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          Create Event
+                        </motion.div>
+                      </Link>
+                    </>
+                  )}
+                  
+                  {user.role === 'admin' && (
                     <Link href="/dashboard">
                       <motion.div 
                         className="block w-full text-left px-4 py-2 text-sm font-bold tracking-wider text-white/80 hover:text-white transition-all duration-200 uppercase"
@@ -540,18 +633,17 @@ export default function Header() {
                       </motion.div>
                     </Link>
                   )}
-                  {user.role === 'admin' && (
-                    <Link href="/admin">
-                      <motion.div 
-                        className="block w-full text-left px-4 py-2 text-sm font-bold tracking-wider text-white/80 hover:text-white transition-all duration-200 uppercase"
-                        onClick={() => setMobileMenuOpen(false)}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        Admin
-                      </motion.div>
-                    </Link>
-                  )}
+                  
+                  <Link href="/settings">
+                    <motion.div 
+                      className="block w-full text-left px-4 py-2 text-sm font-bold tracking-wider text-white/80 hover:text-white transition-all duration-200 uppercase"
+                      onClick={() => setMobileMenuOpen(false)}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      Settings
+                    </motion.div>
+                  </Link>
                   <motion.button
                     onClick={async () => {
                       await signOut()

@@ -56,6 +56,36 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
   - Real-time API calls to `/api/search`
   - Navigation to individual content pages
 
+### Role-Specific UX System (🆕 July 2025)
+- **Simplified Artist Interface**: `/app/artist-profile/page.tsx`
+  - Single form for complete artist profile management
+  - Publish/Archive/Republish workflow with status indicators
+  - Direct link to public profile page (`/artist/{id}`)
+  - No complex CMS dashboard required
+
+- **Streamlined Venue Management**: `/app/my-venue/page.tsx`
+  - One-page venue creation and editing for club owners
+  - Complete venue information form with image uploads
+  - Status management (draft/published/archived)
+  - Technical specifications and booking information
+
+- **Lightweight Event Management**: `/app/events/manage` + `/app/events/create`
+  - Focused event creation and management for promoters
+  - Archive/republish functionality with confirmation dialogs
+  - Event statistics dashboard with status breakdowns
+  - Simple event lifecycle management
+
+- **Role-Specific Header Navigation**: `/components/Header.tsx`
+  - Smart dropdown menus based on authenticated user role
+  - Direct links to role-appropriate management pages
+  - Eliminates navigation to complex CMS for simple use cases
+  - Universal settings page accessible to all users
+
+- **Admin-Only Dashboard Access**: 
+  - Complex CMS dashboard restricted to administrators only
+  - Other roles get simplified, focused interfaces
+  - Maintains full functionality while improving UX
+
 ### Profile Management System
 - **Profile Editing**: `/app/settings/profile/page.tsx`
 - **Form Component**: `/components/profile/ProfileEditForm.tsx`
@@ -221,5 +251,5 @@ supabase gen types typescript --project-id=YOUR_PROJECT_ID > lib/types/database.
 
 ---
 
-**Last Updated**: January 2025  
-**Development Status**: Core features complete, ready for UI enhancement and additional feature development
+**Last Updated**: July 2025  
+**Development Status**: Role-specific UX redesign complete, core features implemented, ready for testing and deployment

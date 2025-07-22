@@ -15,13 +15,15 @@ Drift solves the fragmented nature of underground electronic music scenes by pro
 
 https://github.com/user-attachments/assets/3a99f07d-f601-41c1-8a00-5ff72eb54857
 
+- **Role-Specific UX Design** - Tailored interfaces for each user type instead of complex CMS dashboards
+- **Simplified Content Management** - Artists create one profile, club owners manage one venue, promoters focus on events
 - **Venue Discovery** - Find and explore electronic music venues with detailed ratings
-- **Event Management** - Discover upcoming events and manage event listings
+- **Event Management** - Discover upcoming events and manage event listings with archive/republish workflows
 - **Artist Profiles** - Comprehensive artist pages with gig history and reviews
 - **User Profiles** - Complete profile management with avatar uploads and social links
 - **Multi-facet Reviews** - Rate venues and events on sound, vibe, and crowd
 - **Real-time Search** - Live search across venues, events, and artists with instant results
-- **Role-based Access** - Different access levels for fans, artists, promoters, and venue owners
+- **Smart Navigation** - Role-based header dropdown menus with contextual options
 - **AI Content Moderation** - OpenAI-powered content filtering for images and text
 - **Secure File Upload** - Profile image uploads with content validation and storage
 - **Mobile-first Design** - Responsive design optimized for all devices
@@ -130,33 +132,42 @@ drift/
 └── public/               # Static assets
 ```
 
-## 🎯 User Roles
+## 🎯 User Roles & Interfaces
 
 ### Fan
 - Browse venues, events, and artists
 - Leave reviews and ratings
 - Create and customize user profile with avatar upload
 - Personalized search and discovery
+- **Interface**: Standard browsing with universal settings page
 
-### Artist
-- Create and manage artist profile
-- View performance history
-- Respond to reviews (planned)
+### Artist (Simplified UX)
+- **Single Artist Profile Management** - Create and edit one comprehensive profile
+- **Direct Public Profile Access** - View how profile appears to fans
+- **Status Control** - Publish, archive, or republish profile with one click
+- **Performance History** - Track gig history and upcoming shows
+- **Interface**: `/artist-profile` - No complex dashboard needed
 
-### Promoter
-- Create and manage events
-- Link events to venues and artists
-- View event analytics (planned)
+### Promoter (Event-Focused)
+- **Event Creation & Management** - Streamlined tools for multiple events
+- **Archive/Republish Events** - Simple lifecycle management
+- **Event Statistics** - Track published, draft, and upcoming events
+- **Event Discovery** - Link events to venues and artists
+- **Interface**: `/events/manage` + `/events/create` - Lightweight event tools
 
-### Venue Owner
-- Create and manage venue profiles
-- Manage venue events
-- View venue analytics (planned)
+### Club Owner (Venue-Focused)
+- **Single Venue Management** - One comprehensive venue profile
+- **Technical Specifications** - Sound system and capacity details
+- **Booking Information** - Contact details for artists and promoters
+- **Status Management** - Draft, publish, or take down venue
+- **Interface**: `/my-venue` - Single-page venue management
 
-### Admin
-- Moderate content and reviews
-- Manage user verifications
-- Access all platform features
+### Admin (Full Platform Access)
+- **Complete CMS Dashboard** - Access to all content management features
+- **User Management** - Verification and role management
+- **Content Moderation** - Review flagged content and user reports
+- **Platform Analytics** - Comprehensive insights across all entities
+- **Interface**: Full dashboard with advanced features
 
 ## 📱 Core Features
 
@@ -265,7 +276,7 @@ Please read our [Contributing Guidelines](docs/development/CONTRIBUTING.md) for 
 
 ## 📋 Roadmap
 
-### Phase 1 (Completed)
+### Phase 1 (Completed ✅)
 - ✅ User authentication and profile management
 - ✅ Real-time search integration across all content
 - ✅ Complete profile editing with avatar uploads
@@ -274,6 +285,9 @@ Please read our [Contributing Guidelines](docs/development/CONTRIBUTING.md) for 
 - ✅ Review and rating system
 - ✅ Secure file upload and storage
 - ✅ Admin moderation tools
+- ✅ **Role-Specific UX Redesign** - Simplified interfaces for non-admin users
+- ✅ **Smart Navigation** - Role-based header dropdown menus
+- ✅ **Content Lifecycle Management** - Publish/Archive/Republish workflows
 
 ### Phase 2 (Planned)
 - 🔄 Advanced AI recommendations

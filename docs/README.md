@@ -57,12 +57,12 @@ Setup and deployment instructions:
 
 ## 🔍 Key Concepts
 
-### User Roles
-- **Fan** - Browse and review venues, events, and artists
-- **Artist** - Manage artist profiles and performance history
-- **Promoter** - Create and manage events
-- **Venue Owner** - Manage venue profiles and associated events
-- **Admin** - Full platform access and content moderation
+### User Roles (Updated July 2025)
+- **Fan** - Browse and review venues, events, and artists with personalized discovery
+- **Artist** - Simplified single-profile management via `/artist-profile` interface
+- **Promoter** - Lightweight event creation and management tools via `/events/manage`
+- **Club Owner** - Streamlined single-venue management via `/my-venue` interface  
+- **Admin** - Full platform access with comprehensive CMS dashboard
 
 ### Core Entities
 - **Venues** - Electronic music venues with ratings and events
@@ -70,12 +70,16 @@ Setup and deployment instructions:
 - **Artists** - DJ/Producer profiles with gig history and ratings
 - **Reviews** - Multi-faceted ratings (sound, vibe, crowd) with comments
 
-### Key Features
-- Role-based access control with verification workflow
-- Multi-faceted review system with AI moderation
-- Real-time search and filtering across all content
-- Admin moderation tools for content oversight
-- Responsive, mobile-first design
+### Key Features (Updated July 2025)
+- **Role-Specific UX Design** - Tailored interfaces instead of complex CMS dashboards
+- **Simplified Content Management** - Single-purpose interfaces for each user type
+- **Smart Navigation** - Role-based header dropdown menus with contextual options
+- **Content Lifecycle Management** - Publish/Archive/Republish workflows across all content types
+- **Role-based access control** with verification workflow
+- **Multi-faceted review system** with AI moderation
+- **Real-time search and filtering** across all content
+- **Admin moderation tools** for content oversight
+- **Responsive, mobile-first design** optimized for all devices
 
 ## 🛠️ Technology Stack
 
@@ -101,10 +105,12 @@ Setup and deployment instructions:
 Drift addresses the fragmented nature of underground electronic music scenes by providing:
 
 1. **Centralized Discovery** - One platform for venues, events, and artists
-2. **Community Reviews** - Detailed ratings with sound, vibe, and crowd assessments
-3. **Verified Content** - Role-based verification for creators and venue owners
-4. **Smart Moderation** - AI-powered content filtering with human oversight
-5. **Real-time Updates** - Live search and notifications for new content
+2. **Role-Specific Experiences** - Tailored interfaces for each user type (artists, club owners, promoters)
+3. **Simplified Content Management** - No complex CMS dashboards for simple use cases
+4. **Community Reviews** - Detailed ratings with sound, vibe, and crowd assessments
+5. **Verified Content** - Role-based verification for creators and venue owners
+6. **Smart Moderation** - AI-powered content filtering with human oversight
+7. **Real-time Updates** - Live search and notifications for new content
 
 ## 📞 Support & Community
 
@@ -118,7 +124,7 @@ This project is licensed under the MIT License. See the main repository for lice
 
 ---
 
-**Last Updated**: January 2025  
-**Documentation Version**: 1.0.0
+**Last Updated**: July 2025  
+**Documentation Version**: 2.0.0 (Role-Specific UX Update)
 
 For the most up-to-date information, always refer to the main [README.md](../README.md) in the repository root.

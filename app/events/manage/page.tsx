@@ -16,7 +16,8 @@ import {
   Users,
   Search,
   Filter,
-  MoreHorizontal
+  MoreHorizontal,
+  Archive
 } from 'lucide-react'
 
 interface Event {
@@ -40,7 +41,7 @@ interface Event {
 const STATUS_COLORS = {
   draft: 'text-yellow-400 border-yellow-400',
   published: 'text-green-400 border-green-400',
-  archived: 'text-gray-400 border-gray-400'
+  archived: 'text-red-400 border-red-400'
 }
 
 export default function ManageEventsPage() {
@@ -95,8 +96,46 @@ export default function ManageEventsPage() {
     }
   }
 
+  const handleToggleEventStatus = async (eventId: string, currentStatus: string) => {
+    const newStatus = currentStatus === 'published' ? 'archived' : 'published'
+    const action = newStatus === 'archived' ? 'take down' : 'republish'
+    
+    if (!confirm(`Are you sure you want to ${action} this event? ${newStatus === 'archived' ? 'It will be hidden from the public but data will be preserved.' : 'It will be visible to the public again.'}`)) {
+      return
+    }
+
+    try {
+      const { supabase } = await import('@/lib/auth')
+      const { data: { session } } = await supabase.auth.getSession()
+
+      const response = await fetch(`/api/events/${eventId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token && {
+            'Authorization': `Bearer ${session.access_token}`
+          })
+        },
+        body: JSON.stringify({ status: newStatus })
+      })
+
+      if (response.ok) {
+        setEvents(events.map(event => 
+          event.id === eventId 
+            ? { ...event, status: newStatus }
+            : event
+        ))
+      } else {
+        setError(`Failed to ${action} event`)
+      }
+    } catch (error) {
+      console.error(`Error ${action}ing event:`, error)
+      setError(`Failed to ${action} event`)
+    }
+  }
+
   const handleDeleteEvent = async (eventId: string) => {
-    if (!confirm('Are you sure you want to delete this event? This action cannot be undone.')) {
+    if (!confirm('Are you sure you want to permanently delete this event? This action cannot be undone.')) {
       return
     }
 
@@ -291,16 +330,18 @@ export default function ManageEventsPage() {
                 </div>
                 
                 <div className="flex items-center space-x-2">
-                  <Link href={`/events/${event.slug}`}>
-                    <motion.button
-                      className="p-2 border border-white/30 text-white hover:border-white/60 transition-colors"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      title="View Event"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </motion.button>
-                  </Link>
+                  {event.status === 'published' && (
+                    <Link href={`/event/${event.id}`}>
+                      <motion.button
+                        className="p-2 border border-white/30 text-white hover:border-white/60 transition-colors"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        title="View Event"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </motion.button>
+                    </Link>
+                  )}
                   
                   <Link href={`/dashboard/events/${event.id}/edit`}>
                     <motion.button
@@ -312,13 +353,35 @@ export default function ManageEventsPage() {
                       <Edit3 className="w-4 h-4" />
                     </motion.button>
                   </Link>
+
+                  {event.status === 'published' ? (
+                    <motion.button
+                      onClick={() => handleToggleEventStatus(event.id, event.status)}
+                      className="p-2 border border-orange-500/50 text-orange-400 hover:border-orange-500 hover:text-orange-300 transition-colors"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      title="Take Down Event"
+                    >
+                      <Archive className="w-4 h-4" />
+                    </motion.button>
+                  ) : event.status === 'archived' ? (
+                    <motion.button
+                      onClick={() => handleToggleEventStatus(event.id, event.status)}
+                      className="p-2 border border-green-500/50 text-green-400 hover:border-green-500 hover:text-green-300 transition-colors"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      title="Republish Event"
+                    >
+                      <Eye className="w-4 h-4" />
+                    </motion.button>
+                  ) : null}
                   
                   <motion.button
                     onClick={() => handleDeleteEvent(event.id)}
                     className="p-2 border border-red-500/50 text-red-400 hover:border-red-500 hover:text-red-300 transition-colors"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    title="Delete Event"
+                    title="Permanently Delete Event"
                   >
                     <Trash2 className="w-4 h-4" />
                   </motion.button>

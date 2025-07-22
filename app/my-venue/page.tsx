@@ -49,8 +49,13 @@ interface VenueFormData {
 }
 
 const VENUE_TYPES = [
-  'Club', 'Bar', 'Warehouse', 'Outdoor', 'Festival Ground', 'Concert Hall',
-  'Underground', 'Rooftop', 'Beach Club', 'Industrial', 'Gallery', 'Theater'
+  { value: 'club', label: 'Club' },
+  { value: 'bar', label: 'Bar' },
+  { value: 'warehouse', label: 'Warehouse' },
+  { value: 'outdoor', label: 'Outdoor Venue' },
+  { value: 'festival_ground', label: 'Festival Ground' },
+  { value: 'concert_hall', label: 'Concert Hall' },
+  { value: 'other', label: 'Other' }
 ]
 
 const SOUND_SYSTEMS = [
@@ -106,7 +111,11 @@ export default function MyVenuePage() {
 
       if (response.ok) {
         const data = await response.json()
-        const userVenue = data.data?.find((v: any) => v.user_id === user?.id)
+        console.log('Venue fetch response:', { 
+          count: data.data?.length, 
+          venues: data.data?.map((v: any) => ({ id: v.id, name: v.name, created_by: v.created_by })) 
+        })
+        const userVenue = data.data?.[0] // API already filters by created_by for club owners
         
         if (userVenue) {
           setExistingVenue(userVenue)
@@ -122,7 +131,7 @@ export default function MyVenuePage() {
             email: userVenue.email || user?.email || '',
             website: userVenue.website || '',
             social_links: userVenue.social_links || {},
-            venue_type: userVenue.venue_type || 'Club',
+            venue_type: userVenue.venue_type || 'club',
             capacity: userVenue.capacity || 100,
             sound_system: userVenue.sound_system || '',
             preferred_genres: userVenue.preferred_genres || [],
@@ -143,7 +152,7 @@ export default function MyVenuePage() {
             email: user?.email || '',
             website: '',
             social_links: {},
-            venue_type: 'Club',
+            venue_type: 'club',
             capacity: 100,
             sound_system: '',
             preferred_genres: [],
@@ -338,6 +347,51 @@ export default function MyVenuePage() {
     }
   }
 
+  const handleArchive = async () => {
+    if (!venue || !isEditing) return
+    
+    if (!confirm('Are you sure you want to take down your venue? This will hide it from the public but keep your data safe. You can republish it later.')) {
+      return
+    }
+    
+    setSaving(true)
+    setError('')
+
+    try {
+      const { supabase } = await import('@/lib/auth')
+      const { data: { session } } = await supabase.auth.getSession()
+
+      const response = await fetch(`/api/venues/${existingVenue.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token && {
+            'Authorization': `Bearer ${session.access_token}`
+          })
+        },
+        body: JSON.stringify({
+          ...venue,
+          status: 'archived'
+        })
+      })
+
+      if (response.ok) {
+        setVenue(prev => prev ? { ...prev, status: 'archived' } : null)
+        setSuccess('Venue taken down successfully! You can republish it anytime.')
+        setTimeout(() => setSuccess(''), 3000)
+      } else {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to archive venue')
+      }
+
+    } catch (error: any) {
+      console.error('Archive error:', error)
+      setError(error.message || 'Failed to archive venue')
+    } finally {
+      setSaving(false)
+    }
+  }
+
   if (loading || isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -403,7 +457,11 @@ export default function MyVenuePage() {
         {isEditing && (
           <div className="flex items-center space-x-3">
             <div className={`px-3 py-2 text-sm font-bold tracking-wider uppercase border bg-black/50 ${
-              venue.status === 'published' ? 'text-green-400 border-green-400' : 'text-yellow-400 border-yellow-400'
+              venue.status === 'published' 
+                ? 'text-green-400 border-green-400' 
+                : venue.status === 'archived'
+                ? 'text-red-400 border-red-400'
+                : 'text-yellow-400 border-yellow-400'
             }`}>
               {venue.status}
             </div>
@@ -458,9 +516,31 @@ export default function MyVenuePage() {
           </button>
         )}
 
-        {isEditing && existingVenue && (
+        {isEditing && venue.status === 'archived' && (
           <button
-            onClick={() => router.push(`/venues/${existingVenue.slug}`)}
+            onClick={handlePublish}
+            disabled={saving}
+            className="flex items-center space-x-2 px-4 py-2 border border-green-400 text-green-400 hover:bg-green-400/10 transition-colors font-bold tracking-wider uppercase disabled:opacity-50"
+          >
+            <Eye className="w-4 h-4" />
+            <span>Republish Venue</span>
+          </button>
+        )}
+
+        {isEditing && venue.status === 'published' && (
+          <button
+            onClick={handleArchive}
+            disabled={saving}
+            className="flex items-center space-x-2 px-4 py-2 border border-red-400 text-red-400 hover:bg-red-400/10 transition-colors font-bold tracking-wider uppercase disabled:opacity-50"
+          >
+            <Archive className="w-4 h-4" />
+            <span>Take Down Venue</span>
+          </button>
+        )}
+
+        {isEditing && existingVenue && venue.status === 'published' && (
+          <button
+            onClick={() => router.push(`/venue/${existingVenue.id}`)}
             className="flex items-center space-x-2 px-4 py-2 border border-white/30 text-white hover:border-white/60 transition-colors font-bold tracking-wider uppercase"
           >
             <Eye className="w-4 h-4" />
@@ -517,8 +597,8 @@ export default function MyVenuePage() {
                 className="w-full bg-black/50 border border-white/30 text-white p-3 focus:border-white/60 outline-none transition-colors"
               >
                 {VENUE_TYPES.map(type => (
-                  <option key={type} value={type} className="bg-black">
-                    {type}
+                  <option key={type.value} value={type.value} className="bg-black">
+                    {type.label}
                   </option>
                 ))}
               </select>

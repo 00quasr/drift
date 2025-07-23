@@ -72,16 +72,16 @@ export default function Header() {
   }, [])
 
   const navigationItems = [
-    { href: '/explore', label: 'Explore' },
-    { href: '/events', label: 'Events' },
-    { href: '/artists', label: 'Artists' },
-    { href: '/venues', label: 'Venues' }
+    { href: '/explore', label: 'EXPLORE' },
+    { href: '/events', label: 'EVENTS' },
+    { href: '/artists', label: 'ARTISTS' },
+    { href: '/venues', label: 'VENUES' }
   ]
 
   return (
     <motion.header 
       className={`
-        fixed top-4 left-4 right-4 z-50 transition-all duration-500 ease-out rounded-3xl
+        fixed top-4 left-4 right-4 z-50 transition-all duration-500 ease-out rounded-xl
         ${scrolled 
           ? 'bg-black/[0.2] bg-gradient-to-b from-white/[0.08] to-white/[0.02] backdrop-blur-3xl border border-white/[0.12] shadow-lg' 
           : isLandingPage 
@@ -133,7 +133,7 @@ export default function Header() {
             {/* Search */}
             <motion.button
               onClick={() => setSearchOpen(!searchOpen)}
-              className="p-2.5 text-white/70 hover:text-white hover:bg-white/[0.04] rounded-2xl backdrop-blur-sm transition-all duration-300 border border-white/[0.04] hover:border-white/[0.08]"
+              className="p-2.5 text-white/70 hover:text-white hover:bg-white/[0.04] rounded-lg backdrop-blur-sm transition-all duration-300 border border-white/[0.04] hover:border-white/[0.08]"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -142,7 +142,7 @@ export default function Header() {
             
             {/* Notifications */}
             <motion.button
-              className="relative p-2.5 text-white/70 hover:text-white hover:bg-white/[0.04] rounded-2xl backdrop-blur-sm transition-all duration-300 border border-white/[0.04] hover:border-white/[0.08]"
+              className="relative p-2.5 text-white/70 hover:text-white hover:bg-white/[0.04] rounded-lg backdrop-blur-sm transition-all duration-300 border border-white/[0.04] hover:border-white/[0.08]"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -158,7 +158,7 @@ export default function Header() {
                 <div className="relative">
                   <motion.button
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
-                    className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white/90 hover:text-white hover:bg-white/[0.04] rounded-2xl backdrop-blur-sm transition-all duration-300 border border-white/[0.04] hover:border-white/[0.08]"
+                    className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white/90 hover:text-white hover:bg-white/[0.04] rounded-lg backdrop-blur-sm transition-all duration-300 border border-white/[0.04] hover:border-white/[0.08]"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
@@ -176,7 +176,7 @@ export default function Header() {
                         <User className="w-4 h-4" />
                       </div>
                     )}
-                    <span className="max-w-[100px] truncate">
+                    <span className="max-w-[100px] truncate uppercase">
                       {user.display_name || user.email?.split('@')[0]}
                     </span>
                   </motion.button>
@@ -184,7 +184,7 @@ export default function Header() {
                   <AnimatePresence>
                     {userMenuOpen && (
                       <motion.div
-                        className="absolute -right-12 top-14 w-64 bg-black/[0.3] bg-gradient-to-b from-white/[0.08] to-white/[0.02] backdrop-blur-3xl border border-white/[0.12] rounded-3xl shadow-2xl overflow-hidden"
+                        className="absolute -right-12 top-14 w-64 bg-black/[0.3] bg-gradient-to-b from-white/[0.08] to-white/[0.02] backdrop-blur-3xl border border-white/[0.12] rounded-xl shadow-2xl overflow-hidden"
                         initial={{ opacity: 0, y: -15, scale: 0.92 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -15, scale: 0.92 }}
@@ -192,40 +192,42 @@ export default function Header() {
                       >
                         <div className="p-4">
                           {/* User info header */}
-                          <div className="flex items-center space-x-3 pb-4 mb-3 border-b border-white/[0.06]">
-                            {user.avatar_url ? (
-                              <div className="relative w-10 h-10 rounded-2xl overflow-hidden ring-1 ring-white/10">
-                                <Image
-                                  src={user.avatar_url}
-                                  alt="Profile"
-                                  fill
-                                  className="object-cover"
-                                />
-                              </div>
-                            ) : (
-                              <div className="w-10 h-10 rounded-2xl bg-white/[0.08] flex items-center justify-center">
-                                <User className="w-5 h-5 text-white/60" />
-                              </div>
-                            )}
-                            <div className="flex-1 min-w-0">
-                              <div className="text-sm font-medium text-white/95 truncate">
-                                {user.display_name || user.email?.split('@')[0]}
-                              </div>
-                              <div className="text-xs text-white/50 capitalize">
-                                {user.role} {user.is_verified && '• Verified'}
+                          <Link href={`/profile/${user.id}`} onClick={() => setUserMenuOpen(false)}>
+                            <div className="flex items-center space-x-3 pb-4 mb-3 border-b border-white/[0.06] hover:bg-white/[0.02] rounded-lg p-2 -m-2 transition-colors duration-200 cursor-pointer">
+                              {user.avatar_url ? (
+                                <div className="relative w-10 h-10 rounded-2xl overflow-hidden ring-1 ring-white/10">
+                                  <Image
+                                    src={user.avatar_url}
+                                    alt="Profile"
+                                    fill
+                                    className="object-cover"
+                                  />
+                                </div>
+                              ) : (
+                                <div className="w-10 h-10 rounded-2xl bg-white/[0.08] flex items-center justify-center">
+                                  <User className="w-5 h-5 text-white/60" />
+                                </div>
+                              )}
+                              <div className="flex-1 min-w-0">
+                                <div className="text-sm font-medium text-white/95 truncate uppercase group-hover:text-white transition-colors">
+                                  {user.display_name || user.email?.split('@')[0]}
+                                </div>
+                                <div className="text-xs text-white/50 uppercase group-hover:text-white/70 transition-colors">
+                                  {user.role} {user.is_verified && '• VERIFIED'}
+                                </div>
                               </div>
                             </div>
-                          </div>
+                          </Link>
                           
                           {/* Navigation links */}
                           <div className="space-y-1">
                                                          <motion.div whileHover={{ x: 2 }} transition={{ duration: 0.2 }}>
                               <Link 
-                                href="/profile/edit" 
-                                className="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-2xl transition-all duration-300 group"
+                                href="/settings/profile" 
+                                className="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-300 group"
                                 onClick={() => setUserMenuOpen(false)}
                               >
-                                Profile
+                                PROFILE
                               </Link>
                              </motion.div>
                             
@@ -234,10 +236,10 @@ export default function Header() {
                               <motion.div whileHover={{ x: 2 }} transition={{ duration: 0.2 }}>
                                 <Link 
                                   href="/artist-profile" 
-                                  className="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-2xl transition-all duration-300"
+                                  className="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-300"
                                   onClick={() => setUserMenuOpen(false)}
                                 >
-                                  My Artist Profile
+                                  MY ARTIST PROFILE
                                 </Link>
                               </motion.div>
                             )}
@@ -246,10 +248,10 @@ export default function Header() {
                               <motion.div whileHover={{ x: 2 }} transition={{ duration: 0.2 }}>
                                 <Link 
                                   href="/my-venue" 
-                                  className="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-2xl transition-all duration-300"
+                                  className="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-300"
                                   onClick={() => setUserMenuOpen(false)}
                                 >
-                                  My Venue
+                                  MY VENUE
                                 </Link>
                               </motion.div>
                             )}
@@ -259,19 +261,19 @@ export default function Header() {
                                 <motion.div whileHover={{ x: 2 }} transition={{ duration: 0.2 }}>
                                   <Link 
                                     href="/events/manage" 
-                                    className="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-2xl transition-all duration-300"
+                                    className="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-300"
                                     onClick={() => setUserMenuOpen(false)}
                                   >
-                                    My Events
+                                    MY EVENTS
                                   </Link>
                                 </motion.div>
                                 <motion.div whileHover={{ x: 2 }} transition={{ duration: 0.2 }}>
                                   <Link 
                                     href="/events/create" 
-                                    className="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-2xl transition-all duration-300"
+                                    className="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-300"
                                     onClick={() => setUserMenuOpen(false)}
                                   >
-                                    Create Event
+                                    CREATE EVENT
                                   </Link>
                                 </motion.div>
                               </>
@@ -281,10 +283,10 @@ export default function Header() {
                               <motion.div whileHover={{ x: 2 }} transition={{ duration: 0.2 }}>
                                 <Link 
                                   href="/dashboard" 
-                                  className="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-2xl transition-all duration-300"
+                                  className="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-300"
                                   onClick={() => setUserMenuOpen(false)}
                                 >
-                                  Dashboard
+                                  DASHBOARD
                                 </Link>
                               </motion.div>
                             )}
@@ -295,7 +297,7 @@ export default function Header() {
                                 className="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-2xl transition-all duration-300"
                                 onClick={() => setUserMenuOpen(false)}
                               >
-                                Settings
+                                SETTINGS
                               </Link>
                             </motion.div>
                           </div>
@@ -307,12 +309,12 @@ export default function Header() {
                                 await signOut()
                                 setUserMenuOpen(false)
                               }}
-                              className="w-full text-left px-4 py-3 text-sm font-medium text-white/70 hover:text-white hover:bg-red-500/[0.08] rounded-2xl transition-all duration-300 flex items-center space-x-3 group"
+                              className="w-full text-left px-4 py-3 text-sm font-medium text-white/70 hover:text-white hover:bg-red-500/[0.08] rounded-lg transition-all duration-300 flex items-center space-x-3 group"
                               whileHover={{ x: 2 }}
                               transition={{ duration: 0.2 }}
                             >
                               <LogOut className="w-4 h-4 text-white/50 group-hover:text-red-400 transition-colors" />
-                              <span className="group-hover:text-red-400 transition-colors">Sign Out</span>
+                              <span className="group-hover:text-red-400 transition-colors">SIGN OUT</span>
                             </motion.button>
                           </div>
                         </div>
@@ -324,20 +326,20 @@ export default function Header() {
                 <>
                   <Link href="/auth/login">
                     <motion.button
-                      className="px-4 py-2 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-2xl backdrop-blur-sm transition-all duration-300 border border-white/[0.04] hover:border-white/[0.08]"
+                      className="px-4 py-2 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg backdrop-blur-sm transition-all duration-300 border border-white/[0.04] hover:border-white/[0.08]"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
-                      Sign In
+                      SIGN IN
                     </motion.button>
                   </Link>
                   <Link href="/auth/register">
                     <motion.button
-                      className="px-4 py-2 bg-white/95 hover:bg-white text-black text-sm font-medium rounded-2xl transition-all duration-300 shadow-lg"
+                      className="px-4 py-2 bg-white/95 hover:bg-white text-black text-sm font-medium rounded-lg transition-all duration-300 shadow-lg"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
-                      Join
+                      JOIN
                     </motion.button>
                   </Link>
                 </>
@@ -347,7 +349,7 @@ export default function Header() {
             {/* Mobile menu button */}
             <motion.button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2.5 text-white/70 hover:text-white hover:bg-white/[0.04] rounded-2xl backdrop-blur-sm transition-all duration-300 border border-white/[0.04] hover:border-white/[0.08]"
+              className="md:hidden p-2.5 text-white/70 hover:text-white hover:bg-white/[0.04] rounded-lg backdrop-blur-sm transition-all duration-300 border border-white/[0.04] hover:border-white/[0.08]"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -361,7 +363,7 @@ export default function Header() {
       <AnimatePresence>
         {searchOpen && (
           <motion.div
-            className="absolute top-full left-0 right-0 mt-2 bg-black/[0.3] bg-gradient-to-b from-white/[0.08] to-white/[0.02] backdrop-blur-3xl border border-white/[0.12] rounded-3xl mx-4"
+            className="absolute top-full left-0 right-0 mt-2 bg-black/[0.3] bg-gradient-to-b from-white/[0.08] to-white/[0.02] backdrop-blur-3xl border border-white/[0.12] rounded-xl mx-4"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
@@ -375,7 +377,7 @@ export default function Header() {
                   placeholder="Search events, venues, artists..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-4 bg-white/[0.03] backdrop-blur-sm border border-white/[0.08] rounded-3xl text-white placeholder-white/60 focus:outline-none focus:border-white/[0.2] focus:bg-white/[0.05] transition-all duration-300"
+                  className="w-full pl-12 pr-4 py-4 bg-white/[0.03] backdrop-blur-sm border border-white/[0.08] rounded-xl text-white placeholder-white/60 focus:outline-none focus:border-white/[0.2] focus:bg-white/[0.05] transition-all duration-300"
                   autoFocus
                 />
                 {isSearching && (
@@ -391,13 +393,13 @@ export default function Header() {
                   {/* Venues */}
                   {searchResults.venues.length > 0 && (
                     <div>
-                      <h3 className="text-white/60 text-sm font-medium mb-3">Venues</h3>
+                      <h3 className="text-white/60 text-sm font-medium mb-3">VENUES</h3>
                       <div className="space-y-2">
                         {searchResults.venues.map((venue: any) => (
                           <motion.button
                             key={venue.id}
                             onClick={() => handleSearchSelect('venue', venue.slug)}
-                            className="w-full text-left p-4 bg-white/[0.03] hover:bg-white/[0.06] rounded-3xl border border-white/[0.06] hover:border-white/[0.12] backdrop-blur-sm transition-all duration-300"
+                            className="w-full text-left p-4 bg-white/[0.03] hover:bg-white/[0.06] rounded-lg border border-white/[0.06] hover:border-white/[0.12] backdrop-blur-sm transition-all duration-300"
                             whileHover={{ scale: 1.01 }}
                             whileTap={{ scale: 0.99 }}
                           >
@@ -412,13 +414,13 @@ export default function Header() {
                   {/* Events */}
                   {searchResults.events.length > 0 && (
                     <div>
-                      <h3 className="text-white/60 text-sm font-medium mb-3">Events</h3>
+                      <h3 className="text-white/60 text-sm font-medium mb-3">EVENTS</h3>
                       <div className="space-y-2">
                         {searchResults.events.map((event: any) => (
                           <motion.button
                             key={event.id}
                             onClick={() => handleSearchSelect('event', event.slug)}
-                            className="w-full text-left p-4 bg-white/[0.03] hover:bg-white/[0.06] rounded-3xl border border-white/[0.06] hover:border-white/[0.12] backdrop-blur-sm transition-all duration-300"
+                            className="w-full text-left p-4 bg-white/[0.03] hover:bg-white/[0.06] rounded-lg border border-white/[0.06] hover:border-white/[0.12] backdrop-blur-sm transition-all duration-300"
                             whileHover={{ scale: 1.01 }}
                             whileTap={{ scale: 0.99 }}
                           >
@@ -435,13 +437,13 @@ export default function Header() {
                   {/* Artists */}
                   {searchResults.artists.length > 0 && (
                     <div>
-                      <h3 className="text-white/60 text-sm font-medium mb-3">Artists</h3>
+                      <h3 className="text-white/60 text-sm font-medium mb-3">ARTISTS</h3>
                       <div className="space-y-2">
                         {searchResults.artists.map((artist: any) => (
                           <motion.button
                             key={artist.id}
                             onClick={() => handleSearchSelect('artist', artist.slug)}
-                            className="w-full text-left p-4 bg-white/[0.03] hover:bg-white/[0.06] rounded-3xl border border-white/[0.06] hover:border-white/[0.12] backdrop-blur-sm transition-all duration-300"
+                            className="w-full text-left p-4 bg-white/[0.03] hover:bg-white/[0.06] rounded-lg border border-white/[0.06] hover:border-white/[0.12] backdrop-blur-sm transition-all duration-300"
                             whileHover={{ scale: 1.01 }}
                             whileTap={{ scale: 0.99 }}
                           >
@@ -461,8 +463,8 @@ export default function Header() {
                    searchResults.events.length === 0 && 
                    searchResults.artists.length === 0 && (
                     <div className="text-center py-8">
-                      <div className="text-white/60">No results found</div>
-                      <div className="text-white/40 text-sm mt-1">Try different keywords</div>
+                      <div className="text-white/60">NO RESULTS FOUND</div>
+                      <div className="text-white/40 text-sm mt-1">TRY DIFFERENT KEYWORDS</div>
                     </div>
                   )}
                 </div>
@@ -476,7 +478,7 @@ export default function Header() {
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
-            className="md:hidden absolute top-full left-0 right-0 mt-2 bg-black/[0.3] bg-gradient-to-b from-white/[0.08] to-white/[0.02] backdrop-blur-3xl border border-white/[0.12] rounded-3xl mx-4"
+            className="md:hidden absolute top-full left-0 right-0 mt-2 bg-black/[0.3] bg-gradient-to-b from-white/[0.08] to-white/[0.02] backdrop-blur-3xl border border-white/[0.12] rounded-xl mx-4"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
@@ -497,35 +499,37 @@ export default function Header() {
               <div className="pt-4 border-t border-white/[0.08] space-y-3">
                 {user ? (
                   <>
-                    <div className="px-4 py-2 text-white/60 text-sm flex items-center space-x-2">
-                      {user.avatar_url && (
-                        <div className="relative w-6 h-6 rounded-full overflow-hidden">
-                          <Image
-                            src={user.avatar_url}
-                            alt="Profile"
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-                      )}
-                      <span>Welcome, {user.display_name || user.email?.split('@')[0]}</span>
-                    </div>
+                    <Link href={`/profile/${user.id}`} onClick={() => setMobileMenuOpen(false)}>
+                      <div className="px-4 py-2 text-white/60 text-sm flex items-center space-x-2 hover:bg-white/[0.02] rounded-lg transition-colors duration-200 cursor-pointer hover:text-white/80">
+                        {user.avatar_url && (
+                          <div className="relative w-6 h-6 rounded-full overflow-hidden">
+                            <Image
+                              src={user.avatar_url}
+                              alt="Profile"
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                        )}
+                        <span className="uppercase">WELCOME, {user.display_name || user.email?.split('@')[0]}</span>
+                      </div>
+                    </Link>
                     
-                    <Link href="/profile/edit">
+                    <Link href="/settings/profile">
                       <button 
-                        className="block w-full text-left px-4 py-3 text-white/80 hover:text-white hover:bg-white/[0.04] rounded-2xl transition-all duration-200"
+                        className="block w-full text-left px-4 py-3 text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-200"
                         onClick={() => setMobileMenuOpen(false)}
                       >
-                        Profile
+                        PROFILE
                       </button>
                     </Link>
                     
                     <Link href="/settings">
                       <button 
-                        className="block w-full text-left px-4 py-3 text-white/80 hover:text-white hover:bg-white/[0.04] rounded-2xl transition-all duration-200"
+                        className="block w-full text-left px-4 py-3 text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-200"
                         onClick={() => setMobileMenuOpen(false)}
                       >
-                        Settings
+                        SETTINGS
                       </button>
                     </Link>
                     
@@ -534,28 +538,28 @@ export default function Header() {
                         await signOut()
                         setMobileMenuOpen(false)
                       }}
-                      className="w-full text-left px-4 py-3 text-white/80 hover:text-white hover:bg-white/[0.04] rounded-2xl transition-all duration-200 flex items-center space-x-2"
+                      className="w-full text-left px-4 py-3 text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-200 flex items-center space-x-2"
                     >
                       <LogOut className="w-4 h-4" />
-                      <span>Sign Out</span>
+                      <span>SIGN OUT</span>
                     </button>
                   </>
                 ) : (
                   <>
                     <Link href="/auth/login">
                       <button 
-                        className="block w-full text-center px-4 py-3 text-white/80 hover:text-white hover:bg-white/[0.04] rounded-2xl transition-all duration-200"
+                        className="block w-full text-center px-4 py-3 text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-200"
                         onClick={() => setMobileMenuOpen(false)}
                       >
-                        Sign In
+                        SIGN IN
                       </button>
                     </Link>
                     <Link href="/auth/register">
                       <button 
-                        className="block w-full text-center px-4 py-3 bg-white/95 hover:bg-white text-black rounded-2xl transition-all duration-200"
+                        className="block w-full text-center px-4 py-3 bg-white/95 hover:bg-white text-black rounded-lg transition-all duration-200"
                         onClick={() => setMobileMenuOpen(false)}
                       >
-                        Join
+                        JOIN
                       </button>
                     </Link>
                   </>

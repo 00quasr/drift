@@ -410,7 +410,7 @@ export default function HomePage() {
           >
             <span>Connect with venues, events, and artists in the </span>
             <AnimatedTextCycle 
-              words={["global underground scene", "electronic music world", "cyber music community", "digital sound space"]}
+              words={["global underground scene", "electronic music world", "music community", "digital sound space"]}
               className="text-white font-bold"
               interval={2500}
             />

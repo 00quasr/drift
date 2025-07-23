@@ -43,7 +43,7 @@ export async function getEvents(filters?: {
         created_at,
         venue:venues(id, name, city, country, address),
         event_artists(
-          artist:artists(id, name, slug, genre, avatar_url)
+          artist:artists(id, name, slug, genres, user_id, profiles!user_id(avatar_url))
         )
       `)
       .eq('is_active', true)

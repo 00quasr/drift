@@ -122,9 +122,6 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center px-6 py-12">
-      {/* Neon accent line */}
-      <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-cyan-400 via-yellow-400 to-pink-400 opacity-60" />
-      
       <div className="w-full max-w-lg">
         {/* Header */}
         <div className="text-center mb-12">

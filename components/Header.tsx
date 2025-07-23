@@ -1,9 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { Search, Menu, X, Bell, User, LogOut, MapPin, Calendar, Music } from 'lucide-react'
+import { Search, Menu, X, Bell, User, LogOut } from 'lucide-react'
 import { useState, useEffect, useCallback } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import Image from 'next/image'
@@ -12,7 +12,6 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
-  const [hoveredItem, setHoveredItem] = useState<string | null>(null)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState({ venues: [], events: [], artists: [] })
@@ -21,19 +20,7 @@ export default function Header() {
   const router = useRouter()
   const { user, signOut, loading } = useAuth()
   
-  // Debug user data
-  useEffect(() => {
-    if (user) {
-      console.log('Header user data:', {
-        email: user.email,
-        display_name: user.display_name,
-        avatar_url: user.avatar_url,
-        id: user.id
-      })
-    }
-  }, [user])
-  
-  const isLandingPage = pathname === '/'
+  const isLandingPage = pathname === '/' || pathname.startsWith('/auth/')
 
   // Debounced search function
   const searchContent = useCallback(async (query: string) => {
@@ -72,171 +59,111 @@ export default function Header() {
     router.push(`/${type}/${slug}`)
   }
 
-  // Simplified scroll handler
+  // Scroll handler
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY
-      setScrolled(scrollPosition > 100)
+      setScrolled(scrollPosition > 20)
     }
     
-    // Initial check
     handleScroll()
-    
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   const navigationItems = [
-    { href: '/', label: 'HOME' },
-    { href: '/explore', label: 'EXPLORE' },
-    { href: '/events', label: 'EVENTS' },
-    { href: '/venues', label: 'VENUES' },
-    { href: '/artists', label: 'ARTISTS' }
+    { href: '/explore', label: 'Explore' },
+    { href: '/events', label: 'Events' },
+    { href: '/artists', label: 'Artists' },
+    { href: '/venues', label: 'Venues' }
   ]
 
-  const GeometricBorder = ({ isActive }: { isActive: boolean }) => (
-    <div className={`absolute inset-0 pointer-events-none transition-all duration-300 ${isActive ? 'opacity-60' : 'opacity-0'}`}>
-      <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-white/80" />
-      <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-white/80" />
-      <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-white/80" />
-      <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-white/80" />
-    </div>
-  )
-
-  const ScanLine = ({ isActive }: { isActive: boolean }) => (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      <motion.div
-        className={`absolute top-0 left-0 h-px bg-white transition-opacity duration-200 ${isActive ? 'opacity-30' : 'opacity-0'}`}
-        style={{ width: '100%' }}
-        animate={isActive ? { 
-          x: ['-100%', '0%', '100%'],
-          scaleX: [0, 1, 0]
-        } : { 
-          x: '-100%',
-          scaleX: 0
-        }}
-        transition={{ 
-          duration: 1.2, 
-          ease: 'easeInOut',
-          times: [0, 0.5, 1]
-        }}
-      />
-    </div>
-  )
-
-  // Determine header visibility and styling
-  const shouldShowHeader = !isLandingPage || scrolled
-
   return (
-    <header 
+    <motion.header 
       className={`
-        fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out
-        ${shouldShowHeader ? 'translate-y-0' : '-translate-y-full'}
+        fixed top-4 left-4 right-4 z-50 transition-all duration-500 ease-out rounded-3xl
         ${scrolled 
-          ? 'bg-black/95 backdrop-blur-md border-b-2 border-white/20' 
-          : 'bg-black/90 border-b-2 border-white/10'
+          ? 'bg-black/[0.2] bg-gradient-to-b from-white/[0.08] to-white/[0.02] backdrop-blur-3xl border border-white/[0.12] shadow-lg' 
+          : isLandingPage 
+            ? 'bg-transparent border border-transparent' 
+            : 'bg-black/[0.2] bg-gradient-to-b from-white/[0.08] to-white/[0.02] backdrop-blur-xl border border-white/[0.1]'
         }
       `}
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
     >
-      {/* Scan lines overlay */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(transparent_98%,rgba(255,255,255,0.02)_100%)] bg-[length:100%_2px]" />
-      </div>
-      
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
+      <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-center justify-between h-16">
           
-          {/* Brand Name Only */}
-          <Link href="/" className="group">
-            <span className="text-xl font-bold tracking-widest text-white uppercase hover:text-white/80 transition-colors duration-200">
-              DRIFT
-            </span>
-          </Link>
-
-          {/* Navigation */}
-          <nav className="hidden lg:flex items-center space-x-2">
-            {navigationItems.map(({ href, label }) => (
-              <div 
-                key={href}
-                className="relative"
-                onMouseEnter={() => setHoveredItem(label)}
-                onMouseLeave={() => setHoveredItem(null)}
+          {/* Left side: Logo + Navigation */}
+          <div className="flex items-center space-x-8">
+            {/* Logo */}
+            <Link href="/" className="group">
+              <motion.span 
+                className="text-xl font-semibold text-white/95 hover:text-white transition-colors duration-300"
+                whileHover={{ scale: 1.02 }}
               >
-                <Link href={href}>
-                  <motion.div
-                    className={`
-                      relative px-4 py-2 font-mono text-sm font-bold tracking-wider text-white/80 uppercase
-                      border border-white/20 bg-black/50 backdrop-blur-sm
-                      transition-all duration-300 ease-out overflow-hidden
-                      ${hoveredItem === label 
-                        ? 'border-white text-white bg-black/80' 
-                        : 'hover:border-white/60 hover:bg-black/70 hover:text-white'
-                      }
-                    `}
-                    style={{
-                      clipPath: hoveredItem === label 
-                        ? 'polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px))'
-                        : 'polygon(0 0, 100% 0, 100% 100%, 0 100%)'
-                    }}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <span className="relative z-10">{label}</span>
-                    
-                    {/* Geometric corners */}
-                    <GeometricBorder isActive={hoveredItem === label} />
-                    
-                    {/* Scan line effect */}
-                    <ScanLine isActive={hoveredItem === label} />
-                    
-                    {/* Subtle glow effect */}
-                    <div className={`absolute inset-0 bg-white/5 transition-opacity duration-200 ${hoveredItem === label ? 'opacity-20' : 'opacity-0'}`} />
-                  </motion.div>
-                </Link>
-              </div>
-            ))}
-          </nav>
+                DRIFT<span className="text-white/60 text-sm">®</span>
+              </motion.span>
+            </Link>
 
-          {/* Actions */}
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center space-x-6">
+              {navigationItems.map(({ href, label }) => (
+                <Link 
+                  key={href} 
+                  href={href}
+                  className={`
+                    text-sm font-medium transition-all duration-300
+                    ${pathname === href 
+                      ? 'text-white' 
+                      : 'text-white/70 hover:text-white'
+                    }
+                  `}
+                >
+                  {label}
+                </Link>
+              ))}
+            </nav>
+          </div>
+
+          {/* Right side: Actions */}
           <div className="flex items-center space-x-3">
-            {/* Search Button */}
+            {/* Search */}
             <motion.button
               onClick={() => setSearchOpen(!searchOpen)}
-              className="relative p-2 text-white/80 hover:text-white border border-white/20 hover:border-white/50 bg-black/50 backdrop-blur-sm transition-all duration-200 overflow-hidden"
-              aria-label="Search"
+              className="p-2.5 text-white/70 hover:text-white hover:bg-white/[0.04] rounded-2xl backdrop-blur-sm transition-all duration-300 border border-white/[0.04] hover:border-white/[0.08]"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <Search className="w-5 h-5 relative z-10" />
-              <div className="absolute inset-0 bg-white/5 opacity-0 hover:opacity-100 transition-opacity duration-200" />
+              <Search className="w-5 h-5" />
             </motion.button>
             
             {/* Notifications */}
             <motion.button
-              className="relative p-2 text-white/80 hover:text-white border border-white/20 hover:border-white/50 bg-black/50 backdrop-blur-sm transition-all duration-200 overflow-hidden"
-              aria-label="Notifications"
+              className="relative p-2.5 text-white/70 hover:text-white hover:bg-white/[0.04] rounded-2xl backdrop-blur-sm transition-all duration-300 border border-white/[0.04] hover:border-white/[0.08]"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <Bell className="w-5 h-5 relative z-10" />
-              <div className="absolute top-1.5 right-1.5 w-2 h-2 bg-white border border-black animate-pulse" />
-              <div className="absolute inset-0 bg-white/5 opacity-0 hover:opacity-100 transition-opacity duration-200" />
+              <Bell className="w-5 h-5" />
+              <div className="absolute top-2 right-2 w-2 h-2 bg-white rounded-full opacity-90 animate-pulse" />
             </motion.button>
             
-            <div className="hidden lg:flex items-center space-x-3">
+            {/* User Section */}
+            <div className="hidden md:flex items-center space-x-3">
               {loading ? (
-                <div className="w-8 h-8 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                <div className="w-8 h-8 animate-spin rounded-full border-2 border-white/20 border-t-white/80" />
               ) : user ? (
                 <div className="relative">
                   <motion.button
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
-                    className="relative px-3 py-2 text-sm font-bold tracking-wider text-white/80 hover:text-white border border-white/30 hover:border-white/60 bg-black/50 backdrop-blur-sm transition-all duration-200 uppercase h-10 flex items-center space-x-2 overflow-hidden"
+                    className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white/90 hover:text-white hover:bg-white/[0.04] rounded-2xl backdrop-blur-sm transition-all duration-300 border border-white/[0.04] hover:border-white/[0.08]"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    {/* Avatar or User Icon */}
                     {user.avatar_url ? (
-                      <div className="relative w-6 h-6 rounded-full overflow-hidden border border-white/30">
+                      <div className="relative w-6 h-6 rounded-full overflow-hidden ring-1 ring-white/20">
                         <Image
                           src={user.avatar_url}
                           alt="Profile"
@@ -245,122 +172,173 @@ export default function Header() {
                         />
                       </div>
                     ) : (
-                      <User className="w-4 h-4 relative z-10" />
+                      <div className="w-6 h-6 rounded-full bg-white/[0.08] flex items-center justify-center">
+                        <User className="w-4 h-4" />
+                      </div>
                     )}
-                    
-                    {/* Display Name or Email */}
-                    <span className="relative z-10 max-w-[120px] truncate">
-                      {user.display_name || user.email}
+                    <span className="max-w-[100px] truncate">
+                      {user.display_name || user.email?.split('@')[0]}
                     </span>
-                    
-                    <div className="absolute inset-0 bg-white/5 opacity-0 hover:opacity-100 transition-opacity duration-200" />
                   </motion.button>
                   
-                  {userMenuOpen && (
-                    <div className="absolute right-0 top-12 w-48 bg-black border border-white/20 shadow-lg z-50">
-                      <div className="p-2">
-                        <div className="px-3 py-2 text-xs text-white/60 uppercase tracking-wider border-b border-white/10">
-                          {user.role} {user.is_verified && '• VERIFIED'}
+                  <AnimatePresence>
+                    {userMenuOpen && (
+                      <motion.div
+                        className="absolute -right-12 top-14 w-64 bg-black/[0.3] bg-gradient-to-b from-white/[0.08] to-white/[0.02] backdrop-blur-3xl border border-white/[0.12] rounded-3xl shadow-2xl overflow-hidden"
+                        initial={{ opacity: 0, y: -15, scale: 0.92 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -15, scale: 0.92 }}
+                        transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+                      >
+                        <div className="p-4">
+                          {/* User info header */}
+                          <div className="flex items-center space-x-3 pb-4 mb-3 border-b border-white/[0.06]">
+                            {user.avatar_url ? (
+                              <div className="relative w-10 h-10 rounded-2xl overflow-hidden ring-1 ring-white/10">
+                                <Image
+                                  src={user.avatar_url}
+                                  alt="Profile"
+                                  fill
+                                  className="object-cover"
+                                />
+                              </div>
+                            ) : (
+                              <div className="w-10 h-10 rounded-2xl bg-white/[0.08] flex items-center justify-center">
+                                <User className="w-5 h-5 text-white/60" />
+                              </div>
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <div className="text-sm font-medium text-white/95 truncate">
+                                {user.display_name || user.email?.split('@')[0]}
+                              </div>
+                              <div className="text-xs text-white/50 capitalize">
+                                {user.role} {user.is_verified && '• Verified'}
+                              </div>
+                            </div>
+                          </div>
+                          
+                          {/* Navigation links */}
+                          <div className="space-y-1">
+                                                         <motion.div whileHover={{ x: 2 }} transition={{ duration: 0.2 }}>
+                              <Link 
+                                href="/profile/edit" 
+                                className="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-2xl transition-all duration-300 group"
+                                onClick={() => setUserMenuOpen(false)}
+                              >
+                                Profile
+                              </Link>
+                             </motion.div>
+                            
+                            {/* Role-specific links */}
+                            {user.role === 'artist' && (
+                              <motion.div whileHover={{ x: 2 }} transition={{ duration: 0.2 }}>
+                                <Link 
+                                  href="/artist-profile" 
+                                  className="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-2xl transition-all duration-300"
+                                  onClick={() => setUserMenuOpen(false)}
+                                >
+                                  My Artist Profile
+                                </Link>
+                              </motion.div>
+                            )}
+                            
+                            {user.role === 'club_owner' && (
+                              <motion.div whileHover={{ x: 2 }} transition={{ duration: 0.2 }}>
+                                <Link 
+                                  href="/my-venue" 
+                                  className="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-2xl transition-all duration-300"
+                                  onClick={() => setUserMenuOpen(false)}
+                                >
+                                  My Venue
+                                </Link>
+                              </motion.div>
+                            )}
+                            
+                            {user.role === 'promoter' && (
+                              <>
+                                <motion.div whileHover={{ x: 2 }} transition={{ duration: 0.2 }}>
+                                  <Link 
+                                    href="/events/manage" 
+                                    className="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-2xl transition-all duration-300"
+                                    onClick={() => setUserMenuOpen(false)}
+                                  >
+                                    My Events
+                                  </Link>
+                                </motion.div>
+                                <motion.div whileHover={{ x: 2 }} transition={{ duration: 0.2 }}>
+                                  <Link 
+                                    href="/events/create" 
+                                    className="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-2xl transition-all duration-300"
+                                    onClick={() => setUserMenuOpen(false)}
+                                  >
+                                    Create Event
+                                  </Link>
+                                </motion.div>
+                              </>
+                            )}
+                            
+                            {user.role === 'admin' && (
+                              <motion.div whileHover={{ x: 2 }} transition={{ duration: 0.2 }}>
+                                <Link 
+                                  href="/dashboard" 
+                                  className="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-2xl transition-all duration-300"
+                                  onClick={() => setUserMenuOpen(false)}
+                                >
+                                  Dashboard
+                                </Link>
+                              </motion.div>
+                            )}
+                            
+                            <motion.div whileHover={{ x: 2 }} transition={{ duration: 0.2 }}>
+                              <Link 
+                                href="/settings" 
+                                className="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-2xl transition-all duration-300"
+                                onClick={() => setUserMenuOpen(false)}
+                              >
+                                Settings
+                              </Link>
+                            </motion.div>
+                          </div>
+                          
+                          {/* Sign out */}
+                          <div className="border-t border-white/[0.06] mt-3 pt-3">
+                            <motion.button
+                              onClick={async () => {
+                                await signOut()
+                                setUserMenuOpen(false)
+                              }}
+                              className="w-full text-left px-4 py-3 text-sm font-medium text-white/70 hover:text-white hover:bg-red-500/[0.08] rounded-2xl transition-all duration-300 flex items-center space-x-3 group"
+                              whileHover={{ x: 2 }}
+                              transition={{ duration: 0.2 }}
+                            >
+                              <LogOut className="w-4 h-4 text-white/50 group-hover:text-red-400 transition-colors" />
+                              <span className="group-hover:text-red-400 transition-colors">Sign Out</span>
+                            </motion.button>
+                          </div>
                         </div>
-                        <Link 
-                          href="/profile/edit" 
-                          className="block px-3 py-2 text-sm text-white hover:bg-white/10 transition-colors uppercase tracking-wider"
-                          onClick={() => setUserMenuOpen(false)}
-                        >
-                          My Profile
-                        </Link>
-                        
-                        {/* Role-specific navigation */}
-                        {user.role === 'artist' && (
-                          <Link 
-                            href="/artist-profile" 
-                            className="block px-3 py-2 text-sm text-white hover:bg-white/10 transition-colors uppercase tracking-wider"
-                            onClick={() => setUserMenuOpen(false)}
-                          >
-                            My Artist Profile
-                          </Link>
-                        )}
-                        
-                        {user.role === 'club_owner' && (
-                          <Link 
-                            href="/my-venue" 
-                            className="block px-3 py-2 text-sm text-white hover:bg-white/10 transition-colors uppercase tracking-wider"
-                            onClick={() => setUserMenuOpen(false)}
-                          >
-                            My Venue
-                          </Link>
-                        )}
-                        
-                        {user.role === 'promoter' && (
-                          <>
-                            <Link 
-                              href="/events/manage" 
-                              className="block px-3 py-2 text-sm text-white hover:bg-white/10 transition-colors uppercase tracking-wider"
-                              onClick={() => setUserMenuOpen(false)}
-                            >
-                              My Events
-                            </Link>
-                            <Link 
-                              href="/events/create" 
-                              className="block px-3 py-2 text-sm text-white hover:bg-white/10 transition-colors uppercase tracking-wider"
-                              onClick={() => setUserMenuOpen(false)}
-                            >
-                              Create Event
-                            </Link>
-                          </>
-                        )}
-                        
-                        {user.role === 'admin' && (
-                          <Link 
-                            href="/dashboard" 
-                            className="block px-3 py-2 text-sm text-white hover:bg-white/10 transition-colors uppercase tracking-wider"
-                            onClick={() => setUserMenuOpen(false)}
-                          >
-                            Dashboard
-                          </Link>
-                        )}
-                        
-                        <Link 
-                          href="/settings" 
-                          className="block px-3 py-2 text-sm text-white hover:bg-white/10 transition-colors uppercase tracking-wider"
-                          onClick={() => setUserMenuOpen(false)}
-                        >
-                          Settings
-                        </Link>
-                        <button
-                          onClick={async () => {
-                            await signOut()
-                            setUserMenuOpen(false)
-                          }}
-                          className="w-full text-left px-3 py-2 text-sm text-white hover:bg-white/10 transition-colors uppercase tracking-wider flex items-center space-x-2"
-                        >
-                          <LogOut className="w-4 h-4" />
-                          <span>Sign Out</span>
-                        </button>
-                      </div>
-                    </div>
-                  )}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               ) : (
                 <>
                   <Link href="/auth/login">
-                    <motion.div
-                      className="relative px-4 py-2 text-sm font-bold tracking-wider text-white/80 hover:text-white border border-white/30 hover:border-white/60 bg-black/50 backdrop-blur-sm transition-all duration-200 uppercase h-10 flex items-center overflow-hidden"
+                    <motion.button
+                      className="px-4 py-2 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-2xl backdrop-blur-sm transition-all duration-300 border border-white/[0.04] hover:border-white/[0.08]"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
-                      <span className="relative z-10">SIGN IN</span>
-                      <div className="absolute inset-0 bg-white/5 opacity-0 hover:opacity-100 transition-opacity duration-200" />
-                    </motion.div>
+                      Sign In
+                    </motion.button>
                   </Link>
                   <Link href="/auth/register">
-                    <motion.div
-                      className="relative px-4 py-2 bg-white text-black text-sm font-bold tracking-wider hover:bg-white/90 transition-all duration-200 uppercase border-2 border-white h-10 flex items-center overflow-hidden"
+                    <motion.button
+                      className="px-4 py-2 bg-white/95 hover:bg-white text-black text-sm font-medium rounded-2xl transition-all duration-300 shadow-lg"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
-                      <span className="relative z-10">REGISTER</span>
-                    </motion.div>
+                      Join
+                    </motion.button>
                   </Link>
                 </>
               )}
@@ -369,322 +347,224 @@ export default function Header() {
             {/* Mobile menu button */}
             <motion.button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden relative p-2 text-white/80 hover:text-white border border-white/20 bg-black/50 backdrop-blur-sm transition-all duration-200 overflow-hidden"
-              aria-label="Menu"
+              className="md:hidden p-2.5 text-white/70 hover:text-white hover:bg-white/[0.04] rounded-2xl backdrop-blur-sm transition-all duration-300 border border-white/[0.04] hover:border-white/[0.08]"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              {mobileMenuOpen ? <X className="w-5 h-5 relative z-10" /> : <Menu className="w-5 h-5 relative z-10" />}
-              <div className="absolute inset-0 bg-white/5 opacity-0 hover:opacity-100 transition-opacity duration-200" />
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </motion.button>
           </div>
         </div>
       </div>
 
-      {/* Search overlay */}
-      {searchOpen && (
-        <motion.div
-          className="absolute top-full left-0 right-0 bg-black/95 border-b-2 border-white/20 backdrop-blur-md"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.2 }}
-        >
-          <div className="max-w-7xl mx-auto px-6 py-6">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white w-5 h-5" />
-              <input
-                type="text"
-                placeholder="SEARCH EVENTS, VENUES, ARTISTS..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-black border-2 border-white/30 text-white placeholder-white/60 focus:outline-none focus:border-white transition-colors duration-200 font-bold tracking-wider uppercase"
-                autoFocus
-              />
-              <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                <div className={`w-2 h-2 ${isSearching ? 'bg-white animate-pulse' : 'bg-white/40'}`} />
+      {/* Search Overlay */}
+      <AnimatePresence>
+        {searchOpen && (
+          <motion.div
+            className="absolute top-full left-0 right-0 mt-2 bg-black/[0.3] bg-gradient-to-b from-white/[0.08] to-white/[0.02] backdrop-blur-3xl border border-white/[0.12] rounded-3xl mx-4"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+          >
+            <div className="max-w-7xl mx-auto px-6 py-8">
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/60 w-5 h-5" />
+                <input
+                  type="text"
+                  placeholder="Search events, venues, artists..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-12 pr-4 py-4 bg-white/[0.03] backdrop-blur-sm border border-white/[0.08] rounded-3xl text-white placeholder-white/60 focus:outline-none focus:border-white/[0.2] focus:bg-white/[0.05] transition-all duration-300"
+                  autoFocus
+                />
+                {isSearching && (
+                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                    <div className="w-4 h-4 border-2 border-white/20 border-t-white/80 rounded-full animate-spin" />
+                  </div>
+                )}
               </div>
+              
+              {/* Search Results */}
+              {searchQuery && (
+                <div className="mt-6 space-y-4 max-h-96 overflow-y-auto">
+                  {/* Venues */}
+                  {searchResults.venues.length > 0 && (
+                    <div>
+                      <h3 className="text-white/60 text-sm font-medium mb-3">Venues</h3>
+                      <div className="space-y-2">
+                        {searchResults.venues.map((venue: any) => (
+                          <motion.button
+                            key={venue.id}
+                            onClick={() => handleSearchSelect('venue', venue.slug)}
+                            className="w-full text-left p-4 bg-white/[0.03] hover:bg-white/[0.06] rounded-3xl border border-white/[0.06] hover:border-white/[0.12] backdrop-blur-sm transition-all duration-300"
+                            whileHover={{ scale: 1.01 }}
+                            whileTap={{ scale: 0.99 }}
+                          >
+                            <div className="font-medium text-white">{venue.name}</div>
+                            <div className="text-white/60 text-sm">{venue.location} • {venue.type}</div>
+                          </motion.button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Events */}
+                  {searchResults.events.length > 0 && (
+                    <div>
+                      <h3 className="text-white/60 text-sm font-medium mb-3">Events</h3>
+                      <div className="space-y-2">
+                        {searchResults.events.map((event: any) => (
+                          <motion.button
+                            key={event.id}
+                            onClick={() => handleSearchSelect('event', event.slug)}
+                            className="w-full text-left p-4 bg-white/[0.03] hover:bg-white/[0.06] rounded-3xl border border-white/[0.06] hover:border-white/[0.12] backdrop-blur-sm transition-all duration-300"
+                            whileHover={{ scale: 1.01 }}
+                            whileTap={{ scale: 0.99 }}
+                          >
+                            <div className="font-medium text-white">{event.title}</div>
+                            <div className="text-white/60 text-sm">
+                              {new Date(event.start_date).toLocaleDateString()} • {event.venue?.name}
+                            </div>
+                          </motion.button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Artists */}
+                  {searchResults.artists.length > 0 && (
+                    <div>
+                      <h3 className="text-white/60 text-sm font-medium mb-3">Artists</h3>
+                      <div className="space-y-2">
+                        {searchResults.artists.map((artist: any) => (
+                          <motion.button
+                            key={artist.id}
+                            onClick={() => handleSearchSelect('artist', artist.slug)}
+                            className="w-full text-left p-4 bg-white/[0.03] hover:bg-white/[0.06] rounded-3xl border border-white/[0.06] hover:border-white/[0.12] backdrop-blur-sm transition-all duration-300"
+                            whileHover={{ scale: 1.01 }}
+                            whileTap={{ scale: 0.99 }}
+                          >
+                            <div className="font-medium text-white">{artist.name}</div>
+                            <div className="text-white/60 text-sm">
+                              {artist.genres?.join(', ')} • {artist.origin}
+                            </div>
+                          </motion.button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* No Results */}
+                  {!isSearching && searchQuery && 
+                   searchResults.venues.length === 0 && 
+                   searchResults.events.length === 0 && 
+                   searchResults.artists.length === 0 && (
+                    <div className="text-center py-8">
+                      <div className="text-white/60">No results found</div>
+                      <div className="text-white/40 text-sm mt-1">Try different keywords</div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
-            
-            {/* Search Results */}
-            {searchQuery && (
-              <div className="mt-4 space-y-4">
-                {/* Venues */}
-                {searchResults.venues.length > 0 && (
-                  <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <MapPin className="w-4 h-4 text-white/60" />
-                      <span className="text-white/60 text-sm font-bold tracking-wider uppercase">
-                        VENUES ({searchResults.venues.length})
-                      </span>
-                    </div>
-                    <div className="space-y-2">
-                      {searchResults.venues.map((venue: any) => (
-                        <motion.button
-                          key={venue.id}
-                          onClick={() => handleSearchSelect('venue', venue.slug)}
-                          className="w-full text-left p-3 bg-white/5 hover:bg-white/10 border border-white/20 hover:border-white/40 transition-all duration-200"
-                          whileHover={{ scale: 1.01 }}
-                          whileTap={{ scale: 0.99 }}
-                        >
-                          <div className="font-bold tracking-wider uppercase text-white">
-                            {venue.name}
-                          </div>
-                          <div className="text-white/60 text-sm">
-                            {venue.location} • {venue.type}
-                          </div>
-                        </motion.button>
-                      ))}
-                    </div>
-                  </div>
-                )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-                {/* Events */}
-                {searchResults.events.length > 0 && (
-                  <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <Calendar className="w-4 h-4 text-white/60" />
-                      <span className="text-white/60 text-sm font-bold tracking-wider uppercase">
-                        EVENTS ({searchResults.events.length})
-                      </span>
-                    </div>
-                    <div className="space-y-2">
-                      {searchResults.events.map((event: any) => (
-                        <motion.button
-                          key={event.id}
-                          onClick={() => handleSearchSelect('event', event.slug)}
-                          className="w-full text-left p-3 bg-white/5 hover:bg-white/10 border border-white/20 hover:border-white/40 transition-all duration-200"
-                          whileHover={{ scale: 1.01 }}
-                          whileTap={{ scale: 0.99 }}
-                        >
-                          <div className="font-bold tracking-wider uppercase text-white">
-                            {event.title}
-                          </div>
-                          <div className="text-white/60 text-sm">
-                            {new Date(event.start_date).toLocaleDateString()} • {event.venue?.name}
-                          </div>
-                        </motion.button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Artists */}
-                {searchResults.artists.length > 0 && (
-                  <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <Music className="w-4 h-4 text-white/60" />
-                      <span className="text-white/60 text-sm font-bold tracking-wider uppercase">
-                        ARTISTS ({searchResults.artists.length})
-                      </span>
-                    </div>
-                    <div className="space-y-2">
-                      {searchResults.artists.map((artist: any) => (
-                        <motion.button
-                          key={artist.id}
-                          onClick={() => handleSearchSelect('artist', artist.slug)}
-                          className="w-full text-left p-3 bg-white/5 hover:bg-white/10 border border-white/20 hover:border-white/40 transition-all duration-200"
-                          whileHover={{ scale: 1.01 }}
-                          whileTap={{ scale: 0.99 }}
-                        >
-                          <div className="font-bold tracking-wider uppercase text-white">
-                            {artist.name}
-                          </div>
-                          <div className="text-white/60 text-sm">
-                            {artist.genres?.join(', ')} • {artist.origin}
-                          </div>
-                        </motion.button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* No Results */}
-                {!isSearching && searchQuery && 
-                 searchResults.venues.length === 0 && 
-                 searchResults.events.length === 0 && 
-                 searchResults.artists.length === 0 && (
-                  <div className="text-center py-8">
-                    <div className="text-white/60 font-bold tracking-wider uppercase">
-                      NO RESULTS FOUND
-                    </div>
-                    <div className="text-white/40 text-sm mt-1">
-                      Try different keywords or browse our categories
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-          </div>
-        </motion.div>
-      )}
-
-      {/* Mobile menu */}
-      {mobileMenuOpen && (
-        <motion.div
-          className="lg:hidden absolute top-full left-0 right-0 bg-black/95 border-b-2 border-white/20 backdrop-blur-md"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.2 }}
-        >
-          <div className="px-6 py-6 space-y-4">
-            {navigationItems.map(({ href, label }) => (
-              <motion.div key={href} whileHover={{ x: 4 }}>
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            className="md:hidden absolute top-full left-0 right-0 mt-2 bg-black/[0.3] bg-gradient-to-b from-white/[0.08] to-white/[0.02] backdrop-blur-3xl border border-white/[0.12] rounded-3xl mx-4"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+          >
+            <div className="px-6 py-6 space-y-4">
+              {navigationItems.map(({ href, label }) => (
                 <Link 
+                  key={href}
                   href={href} 
-                  className="block text-lg font-bold tracking-wider text-white/80 hover:text-white transition-colors duration-200 uppercase py-2 border-l-2 border-transparent hover:border-white pl-4"
+                  className="block text-lg font-medium text-white/80 hover:text-white transition-colors py-2"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {label}
                 </Link>
-              </motion.div>
-            ))}
-            
-            <div className="pt-4 border-t border-white/20 space-y-3">
-              {user ? (
-                <>
-                  <div className="px-4 py-2 text-white/60 text-sm uppercase tracking-wider flex items-center space-x-2">
-                    {user.avatar_url && (
-                      <div className="relative w-6 h-6 rounded-full overflow-hidden border border-white/30">
-                        <Image
-                          src={user.avatar_url}
-                          alt="Profile"
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                    )}
-                    <span>Welcome, {user.display_name || user.email}</span>
-                  </div>
-                  <Link href="/profile/edit">
-                    <motion.div 
-                      className="block w-full text-left px-4 py-2 text-sm font-bold tracking-wider text-white/80 hover:text-white transition-all duration-200 uppercase"
-                      onClick={() => setMobileMenuOpen(false)}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      My Profile
-                    </motion.div>
-                  </Link>
-                  
-                  {/* Role-specific mobile navigation */}
-                  {user.role === 'artist' && (
-                    <Link href="/artist-profile">
-                      <motion.div 
-                        className="block w-full text-left px-4 py-2 text-sm font-bold tracking-wider text-white/80 hover:text-white transition-all duration-200 uppercase"
+              ))}
+              
+              <div className="pt-4 border-t border-white/[0.08] space-y-3">
+                {user ? (
+                  <>
+                    <div className="px-4 py-2 text-white/60 text-sm flex items-center space-x-2">
+                      {user.avatar_url && (
+                        <div className="relative w-6 h-6 rounded-full overflow-hidden">
+                          <Image
+                            src={user.avatar_url}
+                            alt="Profile"
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                      )}
+                      <span>Welcome, {user.display_name || user.email?.split('@')[0]}</span>
+                    </div>
+                    
+                    <Link href="/profile/edit">
+                      <button 
+                        className="block w-full text-left px-4 py-3 text-white/80 hover:text-white hover:bg-white/[0.04] rounded-2xl transition-all duration-200"
                         onClick={() => setMobileMenuOpen(false)}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
                       >
-                        My Artist Profile
-                      </motion.div>
+                        Profile
+                      </button>
                     </Link>
-                  )}
-                  
-                  {user.role === 'club_owner' && (
-                    <Link href="/my-venue">
-                      <motion.div 
-                        className="block w-full text-left px-4 py-2 text-sm font-bold tracking-wider text-white/80 hover:text-white transition-all duration-200 uppercase"
+                    
+                    <Link href="/settings">
+                      <button 
+                        className="block w-full text-left px-4 py-3 text-white/80 hover:text-white hover:bg-white/[0.04] rounded-2xl transition-all duration-200"
                         onClick={() => setMobileMenuOpen(false)}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
                       >
-                        My Venue
-                      </motion.div>
+                        Settings
+                      </button>
                     </Link>
-                  )}
-                  
-                  {user.role === 'promoter' && (
-                    <>
-                      <Link href="/events/manage">
-                        <motion.div 
-                          className="block w-full text-left px-4 py-2 text-sm font-bold tracking-wider text-white/80 hover:text-white transition-all duration-200 uppercase"
-                          onClick={() => setMobileMenuOpen(false)}
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                        >
-                          My Events
-                        </motion.div>
-                      </Link>
-                      <Link href="/events/create">
-                        <motion.div 
-                          className="block w-full text-left px-4 py-2 text-sm font-bold tracking-wider text-white/80 hover:text-white transition-all duration-200 uppercase"
-                          onClick={() => setMobileMenuOpen(false)}
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                        >
-                          Create Event
-                        </motion.div>
-                      </Link>
-                    </>
-                  )}
-                  
-                  {user.role === 'admin' && (
-                    <Link href="/dashboard">
-                      <motion.div 
-                        className="block w-full text-left px-4 py-2 text-sm font-bold tracking-wider text-white/80 hover:text-white transition-all duration-200 uppercase"
+                    
+                    <button
+                      onClick={async () => {
+                        await signOut()
+                        setMobileMenuOpen(false)
+                      }}
+                      className="w-full text-left px-4 py-3 text-white/80 hover:text-white hover:bg-white/[0.04] rounded-2xl transition-all duration-200 flex items-center space-x-2"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span>Sign Out</span>
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/auth/login">
+                      <button 
+                        className="block w-full text-center px-4 py-3 text-white/80 hover:text-white hover:bg-white/[0.04] rounded-2xl transition-all duration-200"
                         onClick={() => setMobileMenuOpen(false)}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
                       >
-                        Dashboard
-                      </motion.div>
+                        Sign In
+                      </button>
                     </Link>
-                  )}
-                  
-                  <Link href="/settings">
-                    <motion.div 
-                      className="block w-full text-left px-4 py-2 text-sm font-bold tracking-wider text-white/80 hover:text-white transition-all duration-200 uppercase"
-                      onClick={() => setMobileMenuOpen(false)}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      Settings
-                    </motion.div>
-                  </Link>
-                  <motion.button
-                    onClick={async () => {
-                      await signOut()
-                      setMobileMenuOpen(false)
-                    }}
-                    className="block w-full text-left px-4 py-2 text-sm font-bold tracking-wider text-white/80 hover:text-white transition-all duration-200 uppercase flex items-center space-x-2"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <LogOut className="w-4 h-4" />
-                    <span>Sign Out</span>
-                  </motion.button>
-                </>
-              ) : (
-                <>
-                  <Link href="/auth/login">
-                    <motion.div 
-                      className="block w-full text-center px-4 py-2 text-sm font-bold tracking-wider text-white/80 hover:text-white border border-white/30 hover:border-white/60 transition-all duration-200 uppercase"
-                      onClick={() => setMobileMenuOpen(false)}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      SIGN IN
-                    </motion.div>
-                  </Link>
-                  <Link href="/auth/register">
-                    <motion.div 
-                      className="block w-full text-center px-4 py-2 bg-white text-black text-sm font-bold tracking-wider hover:bg-white/90 transition-all duration-200 uppercase"
-                      onClick={() => setMobileMenuOpen(false)}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      REGISTER
-                    </motion.div>
-                  </Link>
-                </>
-              )}
+                    <Link href="/auth/register">
+                      <button 
+                        className="block w-full text-center px-4 py-3 bg-white/95 hover:bg-white text-black rounded-2xl transition-all duration-200"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Join
+                      </button>
+                    </Link>
+                  </>
+                )}
+              </div>
             </div>
-          </div>
-        </motion.div>
-      )}
-    </header>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.header>
   )
 } 

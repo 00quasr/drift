@@ -3,6 +3,7 @@ import { Calendar, Clock, MapPin, Users, Star, Music } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Badge } from './badge';
+import { getRandomBackgroundImage } from '@/lib/utils/imageUtils';
 
 interface BaseEntityCardProps {
   id: string;
@@ -47,18 +48,32 @@ type EntityCardProps = VenueCardProps | EventCardProps | ArtistCardProps;
 
 export const EntityCard: React.FC<EntityCardProps> = (props) => {
   const { id, title, imageUrl, category, href, type } = props;
+  const backgroundImage = getRandomBackgroundImage(id);
 
   return (
     <Link href={href}>
       <div className="group relative overflow-hidden h-[380px] bg-black border-2 border-white/20 hover:border-white/60 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl">
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <Image
+            src={backgroundImage}
+            alt=""
+            fill
+            className="object-cover opacity-50 group-hover:opacity-70 transition-opacity duration-300"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+          {/* Dark overlay for text readability */}
+          <div className="absolute inset-0 bg-black/40" />
+        </div>
+
         {/* Angular Corner Design */}
-        <div className="absolute top-4 right-4 w-8 h-8">
+        <div className="absolute top-4 right-4 w-8 h-8 z-20">
           <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
         </div>
         
         {/* Category Tag - 90s Style */}
         <div className="absolute top-4 left-4 z-20">
-          <div className="bg-black border border-white/60 px-3 py-1">
+          <div className="bg-black/80 backdrop-blur-sm border border-white/60 px-3 py-1">
             <span className="text-white text-xs font-bold tracking-widest uppercase font-mono">
               {category}
             </span>
@@ -91,7 +106,7 @@ export const EntityCard: React.FC<EntityCardProps> = (props) => {
         </div>
 
         {/* Glitch Effect Overlay */}
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-300 pointer-events-none">
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-300 pointer-events-none z-30">
           <div className="h-full w-full bg-gradient-to-r from-transparent via-white/10 to-transparent transform skew-x-12" />
         </div>
       </div>

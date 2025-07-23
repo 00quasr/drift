@@ -92,4 +92,20 @@ export function isValidImageUrl(url: string | null | undefined): boolean {
   } catch {
     return false;
   }
+}
+
+/**
+ * Get a random background image from the Supabase assets bucket
+ * Uses entity ID for consistent selection across renders
+ */
+export function getRandomBackgroundImage(entityId: string): string {
+  // Convert string ID to numeric hash for consistent selection
+  const hash = entityId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  
+  // We have 29 background images (001.jpg through 029.jpg)
+  const imageNumber = (hash % 29) + 1;
+  const paddedNumber = imageNumber.toString().padStart(3, '0');
+  
+  // Return Supabase storage URL for the assets bucket
+  return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/assets/${paddedNumber}.jpg`;
 } 

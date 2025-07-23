@@ -158,63 +158,10 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Profile Header */}
-      <ProfileHeader 
-        profile={profile} 
-        stats={stats} 
-        isOwnProfile={isOwnProfile}
-      />
-
-      {/* Profile Content */}
-      <div className="max-w-6xl mx-auto px-6 py-8">
-        <Tabs defaultValue="activity" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 bg-white/5 border border-white/20">
-            <TabsTrigger 
-              value="activity" 
-              className="data-[state=active]:bg-white data-[state=active]:text-black font-bold tracking-wider uppercase"
-            >
-              ACTIVITY
-            </TabsTrigger>
-            <TabsTrigger 
-              value="reviews" 
-              className="data-[state=active]:bg-white data-[state=active]:text-black font-bold tracking-wider uppercase"
-            >
-              REVIEWS
-            </TabsTrigger>
-            <TabsTrigger 
-              value="favorites" 
-              className="data-[state=active]:bg-white data-[state=active]:text-black font-bold tracking-wider uppercase"
-            >
-              FAVORITES
-            </TabsTrigger>
-            <TabsTrigger 
-              value="stats" 
-              className="data-[state=active]:bg-white data-[state=active]:text-black font-bold tracking-wider uppercase"
-            >
-              STATS
-            </TabsTrigger>
-          </TabsList>
-
-          <div className="mt-8">
-            <TabsContent value="activity" className="mt-0">
-              <ProfileActivity profileId={profileId} isOwnProfile={isOwnProfile} />
-            </TabsContent>
-
-            <TabsContent value="reviews" className="mt-0">
-              <ProfileReviews profileId={profileId} isOwnProfile={isOwnProfile} />
-            </TabsContent>
-
-            <TabsContent value="favorites" className="mt-0">
-              <ProfileFavorites profileId={profileId} isOwnProfile={isOwnProfile} />
-            </TabsContent>
-
-            <TabsContent value="stats" className="mt-0">
-              <ProfileStats profileId={profileId} stats={stats} />
-            </TabsContent>
-          </div>
-        </Tabs>
-      </div>
-    </div>
+    <ProfileHeader 
+      profile={profile} 
+      stats={stats} 
+      isOwnProfile={isOwnProfile}
+    />
   )
 }

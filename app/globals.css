@@ -2,6 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Mapbox popup custom styles to match Drift design */
+.mapbox-popup-drift .mapboxgl-popup-content {
+  background: black !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+}
+
+.mapbox-popup-drift .mapboxgl-popup-tip {
+  border-top-color: black !important;
+  border-bottom-color: black !important;
+}
+
+.mapbox-popup-drift .mapboxgl-popup-close-button {
+  color: rgba(255, 255, 255, 0.8) !important;
+  font-size: 16px !important;
+  padding: 8px !important;
+  font-weight: bold !important;
+}
+
+.mapbox-popup-drift .mapboxgl-popup-close-button:hover {
+  color: white !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
 :root {
   /* 90s Rave Theme - Authentic Underground Aesthetic */
   --color-bg: #000000; /* Pure black */

@@ -10,6 +10,7 @@ import { getFallbackImage, isValidImageUrl } from '@/lib/utils/imageUtils'
 import { notFound } from "next/navigation"
 import Image from "next/image"
 import ImageGallery from '@/components/ui/ImageGallery'
+import MapboxMap from '@/components/ui/MapboxMap'
 
 interface VenuePageProps {
   params: { id: string }
@@ -302,11 +303,13 @@ export default async function VenuePage({ params }: VenuePageProps) {
               <h3 className="text-xl font-bold tracking-widest uppercase mb-4 text-white">
                 LOCATION
               </h3>
-              <div className="bg-white/5 border border-white/20 p-8 text-center">
-                <MapPin className="w-12 h-12 text-white/60 mx-auto mb-4" />
-                <div className="text-white/80 font-bold tracking-wider uppercase text-sm">
-                  MAP COMING SOON
-                </div>
+              <div className="mt-4">
+                <MapboxMap
+                  latitude={venue.latitude}
+                  longitude={venue.longitude}
+                  venueName={venue.name}
+                  address={venue.address}
+                />
               </div>
             </div>
 

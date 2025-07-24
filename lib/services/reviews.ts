@@ -13,6 +13,7 @@ export async function getReviews(
   targetId: string,
   filters?: {
     status?: 'visible' | 'pending_review' | 'hidden'
+    sort?: 'newest' | 'oldest' | 'helpful'
     limit?: number
     offset?: number
   }
@@ -23,16 +24,29 @@ export async function getReviews(
     .from('reviews')
     .select(`
       *,
-      user:profiles(full_name, role)
+      user:profiles(full_name, display_name, role, avatar_url)
     `)
     .eq('target_type', targetType)
     .eq('target_id', targetId)
-    .order('created_at', { ascending: false })
 
   if (filters?.status) {
     query = query.eq('status', filters.status)
   } else {
     query = query.eq('status', 'visible') // Default to visible reviews
+  }
+
+  // Apply sorting
+  switch (filters?.sort) {
+    case 'oldest':
+      query = query.order('created_at', { ascending: true })
+      break
+    case 'helpful':
+      query = query.order('helpful_count', { ascending: false })
+      break
+    case 'newest':
+    default:
+      query = query.order('created_at', { ascending: false })
+      break
   }
 
   if (filters?.limit) {
@@ -48,6 +62,26 @@ export async function getReviews(
   if (error) {
     console.error('Error fetching reviews:', error)
     throw error
+  }
+
+  // Get current user's votes for these reviews
+  const { data: { user: currentUser } } = await supabase.auth.getUser()
+  
+  if (currentUser && data && data.length > 0) {
+    const reviewIds = data.map(review => review.id)
+    const { data: userVotes } = await supabase
+      .from('review_votes')
+      .select('review_id, vote_type')
+      .eq('user_id', currentUser.id)
+      .in('review_id', reviewIds)
+
+    // Add user votes to reviews
+    const reviewsWithVotes = data.map(review => ({
+      ...review,
+      user_vote: userVotes?.find(vote => vote.review_id === review.id)?.vote_type || null
+    }))
+
+    return reviewsWithVotes
   }
 
   return data
@@ -145,7 +179,7 @@ export async function getReviewStats(
       soundRating: 0,
       vibeRating: 0,
       crowdRating: 0,
-      ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
+      ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0 }
     }
   }
 
@@ -170,9 +204,9 @@ export async function getReviewStats(
     ? crowdRatings.reduce((sum, r) => sum + (r.rating_crowd || 0), 0) / crowdRatings.length
     : 0
 
-  const ratingDistribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
+  const ratingDistribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0 }
   validRatings.forEach(r => {
-    if (r.rating_overall && r.rating_overall >= 1 && r.rating_overall <= 5) {
+    if (r.rating_overall && r.rating_overall >= 1 && r.rating_overall <= 10) {
       ratingDistribution[r.rating_overall as keyof typeof ratingDistribution]++
     }
   })

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase-server'
+import { createServerClient } from '@supabase/ssr'
 import { createReview, getReviews, validateRating, sanitizeComment, calculateOverallRating } from '@/lib/services/reviews'
 
 export async function GET(request: NextRequest) {
@@ -8,6 +8,7 @@ export async function GET(request: NextRequest) {
     const targetType = searchParams.get('target_type') as 'venue' | 'event' | 'artist'
     const targetId = searchParams.get('target_id')
     const status = searchParams.get('status') as 'visible' | 'pending_review' | 'hidden' | undefined
+    const sort = searchParams.get('sort') as 'newest' | 'oldest' | 'helpful' | undefined
     const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 10
     const offset = searchParams.get('offset') ? parseInt(searchParams.get('offset')!) : 0
 
@@ -18,7 +19,7 @@ export async function GET(request: NextRequest) {
       }, { status: 400 })
     }
 
-    const data = await getReviews(targetType, targetId, { status, limit, offset })
+    const data = await getReviews(targetType, targetId, { status, sort, limit, offset })
 
     return NextResponse.json({ 
       success: true, 
@@ -36,14 +37,39 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient()
+    // Get the authorization header
+    const authHeader = request.headers.get('Authorization')
+    const token = authHeader?.replace('Bearer ', '')
+    
+    if (!token) {
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Authentication required - no token provided' 
+      }, { status: 401 })
+    }
+    
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          get() { return undefined }, // Don't use cookies
+        },
+        global: {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      }
+    )
     
     // Check authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (authError || !user) {
       return NextResponse.json({ 
         success: false, 
-        error: 'Authentication required' 
+        error: 'Authentication required',
+        debug: { authError: authError?.message, hasUser: !!user }
       }, { status: 401 })
     }
 
@@ -76,10 +102,10 @@ export async function POST(request: NextRequest) {
     }
 
     for (const rating of ratings) {
-      if (!validateRating(rating)) {
+      if (!Number.isInteger(rating) || rating < 1 || rating > 10) {
         return NextResponse.json({ 
           success: false, 
-          error: 'Ratings must be integers between 1 and 5' 
+          error: 'Ratings must be integers between 1 and 10' 
         }, { status: 400 })
       }
     }
@@ -101,19 +127,48 @@ export async function POST(request: NextRequest) {
       updated_at: new Date().toISOString()
     }
 
-    const data = await createReview(reviewData)
+    // Create review directly with authenticated supabase client
+    // Check if user already has a review for this target
+    const { data: existingReview } = await supabase
+      .from('reviews')
+      .select('id')
+      .eq('user_id', reviewData.user_id)
+      .eq('target_type', reviewData.target_type)
+      .eq('target_id', reviewData.target_id)
+      .maybeSingle()
+
+    if (existingReview) {
+      return NextResponse.json({ 
+        success: false, 
+        error: 'You have already reviewed this item' 
+      }, { status: 409 })
+    }
+
+    // Set status to visible by default (TODO: Add AI moderation)
+    const moderatedReviewData = {
+      ...reviewData,
+      status: 'visible' as const
+    }
+
+    const { data, error: insertError } = await supabase
+      .from('reviews')
+      .insert(moderatedReviewData)
+      .select()
+      .single()
+
+    if (insertError) {
+      console.error('Error creating review:', insertError)
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Failed to create review' 
+      }, { status: 500 })
+    }
 
     return NextResponse.json({ 
       success: true, 
       data 
     }, { status: 201 })
   } catch (error) {
-    if (error instanceof Error && error.message === 'User has already reviewed this item') {
-      return NextResponse.json({ 
-        success: false, 
-        error: 'You have already reviewed this item' 
-      }, { status: 409 })
-    }
 
     console.error('Error in POST /api/reviews:', error)
     return NextResponse.json({ 

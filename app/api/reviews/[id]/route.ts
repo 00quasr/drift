@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase-server'
+import { createServerClient } from '@supabase/ssr'
 import { getReviewById, updateReview, deleteReview, validateRating, sanitizeComment, calculateOverallRating } from '@/lib/services/reviews'
 
 export async function GET(
@@ -34,14 +34,39 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = await createClient()
+    // Get the authorization header
+    const authHeader = request.headers.get('Authorization')
+    const token = authHeader?.replace('Bearer ', '')
+    
+    if (!token) {
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Authentication required - no token provided' 
+      }, { status: 401 })
+    }
+    
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          get() { return undefined }, // Don't use cookies
+        },
+        global: {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      }
+    )
     
     // Check authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (authError || !user) {
       return NextResponse.json({ 
         success: false, 
-        error: 'Authentication required' 
+        error: 'Authentication required',
+        debug: { authError: authError?.message, hasUser: !!user }
       }, { status: 401 })
     }
 
@@ -72,37 +97,43 @@ export async function PUT(
     }
 
     const body = await request.json()
-    const { rating_sound, rating_vibe, rating_crowd, comment } = body
+    const { rating_sound, rating_vibe, rating_crowd, rating_overall, comment } = body
 
-    // Validate ratings if provided
-    const newRatings = [rating_sound, rating_vibe, rating_crowd].filter(r => r !== null && r !== undefined)
+    // Validate ratings if provided (1-10 scale)
+    const newRatings = [rating_sound, rating_vibe, rating_crowd, rating_overall].filter(r => r !== null && r !== undefined)
     for (const rating of newRatings) {
-      if (!validateRating(rating)) {
+      if (!Number.isInteger(rating) || rating < 1 || rating > 10) {
         return NextResponse.json({ 
           success: false, 
-          error: 'Ratings must be integers between 1 and 5' 
+          error: 'Ratings must be integers between 1 and 10' 
         }, { status: 400 })
       }
     }
 
-    // Calculate new overall rating if any ratings are being updated
-    let rating_overall = review.rating_overall
-    if (newRatings.length > 0) {
-      rating_overall = calculateOverallRating(
-        rating_sound !== undefined ? rating_sound : review.rating_sound,
-        rating_vibe !== undefined ? rating_vibe : review.rating_vibe,
-        rating_crowd !== undefined ? rating_crowd : review.rating_crowd
-      )
-    }
-
     const reviewData = {
-      ...body,
-      rating_overall,
-      comment: comment ? sanitizeComment(comment) : review.comment,
+      rating_overall: rating_overall || null,
+      rating_sound: rating_sound || null,
+      rating_vibe: rating_vibe || null,
+      rating_crowd: rating_crowd || null,
+      comment: comment ? comment.trim() : null,
       updated_at: new Date().toISOString()
     }
 
-    const data = await updateReview(params.id, reviewData)
+    // Update review directly with authenticated client
+    const { data, error: updateError } = await supabase
+      .from('reviews')
+      .update(reviewData)
+      .eq('id', params.id)
+      .select()
+      .single()
+
+    if (updateError) {
+      console.error('Error updating review:', updateError)
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Failed to update review' 
+      }, { status: 500 })
+    }
 
     return NextResponse.json({ 
       success: true, 
@@ -122,14 +153,39 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = await createClient()
+    // Get the authorization header
+    const authHeader = request.headers.get('Authorization')
+    const token = authHeader?.replace('Bearer ', '')
+    
+    if (!token) {
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Authentication required - no token provided' 
+      }, { status: 401 })
+    }
+    
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          get() { return undefined }, // Don't use cookies
+        },
+        global: {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      }
+    )
     
     // Check authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (authError || !user) {
       return NextResponse.json({ 
         success: false, 
-        error: 'Authentication required' 
+        error: 'Authentication required',
+        debug: { authError: authError?.message, hasUser: !!user }
       }, { status: 401 })
     }
 
@@ -159,7 +215,19 @@ export async function DELETE(
       }, { status: 403 })
     }
 
-    await deleteReview(params.id)
+    // Delete review directly with authenticated client
+    const { error: deleteError } = await supabase
+      .from('reviews')
+      .delete()
+      .eq('id', params.id)
+
+    if (deleteError) {
+      console.error('Error deleting review:', deleteError)
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Failed to delete review' 
+      }, { status: 500 })
+    }
 
     return NextResponse.json({ 
       success: true, 

@@ -266,6 +266,17 @@ export const authService = {
     }
   },
 
+  // Get access token for API requests
+  async getAccessToken(): Promise<string | null> {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      return session?.access_token || null
+    } catch (error) {
+      console.error('Error getting access token:', error)
+      return null
+    }
+  },
+
   // Auth state change listener
   onAuthStateChange(callback: (user: AuthUser | null) => void) {
     return supabase.auth.onAuthStateChange(async (event, session) => {

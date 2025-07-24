@@ -1,3 +1,5 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -12,14 +14,101 @@ import Image from "next/image"
 import ImageGallery from '@/components/ui/ImageGallery'
 import MapboxMap from '@/components/ui/MapboxMap'
 import { VenueReviews } from '@/components/reviews/VenueReviews'
+import { useState, useEffect } from 'react'
+import { useAuth } from '@/contexts/AuthContext'
+import { ReviewModal } from '@/components/reviews/ReviewModal'
+import { favoritesService } from '@/lib/services/favorites'
 
 interface VenuePageProps {
   params: { id: string }
 }
 
-export default async function VenuePage({ params }: VenuePageProps) {
-  const venue = await getVenueById(params.id)
-  
+export default function VenuePage({ params }: VenuePageProps) {
+  const [venue, setVenue] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false)
+  const [isLiked, setIsLiked] = useState(false)
+  const [likesLoading, setLikesLoading] = useState(false)
+  const [shareStatus, setShareStatus] = useState<'idle' | 'copied' | 'error'>('idle')
+  const { user } = useAuth()
+
+  useEffect(() => {
+    const fetchVenue = async () => {
+      try {
+        const venueData = await getVenueById(params.id)
+        setVenue(venueData)
+      } catch (error) {
+        console.error('Error fetching venue:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchVenue()
+  }, [params.id])
+
+  // Check if venue is favorited when component mounts and user changes
+  useEffect(() => {
+    const checkFavoriteStatus = async () => {
+      if (user && venue) {
+        try {
+          const isFavorited = await favoritesService.isFavorited('venue', venue.id)
+          setIsLiked(isFavorited)
+        } catch (error) {
+          console.error('Error checking favorite status:', error)
+        }
+      }
+    }
+    checkFavoriteStatus()
+  }, [user, venue])
+
+  const handleShare = async () => {
+    try {
+      const url = window.location.href
+      await navigator.clipboard.writeText(url)
+      setShareStatus('copied')
+      setTimeout(() => setShareStatus('idle'), 2000)
+    } catch (err) {
+      setShareStatus('error')
+      setTimeout(() => setShareStatus('idle'), 2000)
+    }
+  }
+
+  const handleLike = async () => {
+    if (!user) {
+      alert('Please sign in to like venues')
+      return
+    }
+    
+    if (likesLoading) return
+    
+    setLikesLoading(true)
+    try {
+      const newLikedState = await favoritesService.toggleFavorite('venue', venue.id)
+      setIsLiked(newLikedState)
+    } catch (error) {
+      console.error('Error toggling favorite:', error)
+      alert('Failed to update favorite. Please try again.')
+    } finally {
+      setLikesLoading(false)
+    }
+  }
+
+  const handleRate = () => {
+    if (!user) {
+      alert('Please sign in to rate venues')
+      return
+    }
+    setIsReviewModalOpen(true)
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-white/20 border-t-white/80 rounded-full animate-spin" />
+      </div>
+    )
+  }
+
   if (!venue) {
     notFound()
   }
@@ -112,13 +201,39 @@ export default async function VenuePage({ params }: VenuePageProps) {
 
             {/* Action Buttons */}
             <div className="flex gap-4">
-              <button className="p-3 bg-white/10 hover:bg-white/20 border border-white/30 hover:border-white/60 text-white transition-all duration-200">
-                <Heart className="w-5 h-5" />
+              <button 
+                onClick={handleLike}
+                disabled={likesLoading}
+                className={`p-3 border transition-all duration-200 disabled:opacity-50 ${
+                  isLiked 
+                    ? 'bg-red-500/20 border-red-500/60 text-red-400' 
+                    : 'bg-white/10 hover:bg-white/20 border-white/30 hover:border-white/60 text-white'
+                }`}
+                title={isLiked ? 'Unlike Venue' : 'Like Venue'}
+              >
+                {likesLoading ? (
+                  <div className="w-5 h-5 border border-white/30 border-t-white/80 rounded-full animate-spin" />
+                ) : (
+                  <Heart className={`w-5 h-5 ${isLiked ? 'fill-red-400' : ''}`} />
+                )}
               </button>
-              <button className="p-3 bg-white/10 hover:bg-white/20 border border-white/30 hover:border-white/60 text-white transition-all duration-200">
-                <Share2 className="w-5 h-5" />
+              <button 
+                onClick={handleShare}
+                className="p-3 bg-white/10 hover:bg-white/20 border border-white/30 hover:border-white/60 text-white transition-all duration-200"
+                title={shareStatus === 'copied' ? 'Copied!' : shareStatus === 'error' ? 'Error' : 'Share Venue'}
+              >
+                {shareStatus === 'copied' ? (
+                  <span className="text-xs font-bold tracking-wider uppercase">✓</span>
+                ) : shareStatus === 'error' ? (
+                  <span className="text-xs font-bold tracking-wider uppercase">!</span>
+                ) : (
+                  <Share2 className="w-5 h-5" />
+                )}
               </button>
-              <button className="px-6 py-3 bg-white text-black hover:bg-white/90 border-2 border-white font-bold tracking-wider uppercase transition-all duration-200">
+              <button 
+                onClick={handleRate}
+                className="px-6 py-3 bg-white text-black hover:bg-white/90 border-2 border-white font-bold tracking-wider uppercase transition-all duration-200"
+              >
                 RATE VENUE
               </button>
             </div>
@@ -307,6 +422,18 @@ export default async function VenuePage({ params }: VenuePageProps) {
           </div>
         </div>
       </div>
+      
+      <ReviewModal
+        isOpen={isReviewModalOpen}
+        onClose={() => setIsReviewModalOpen(false)}
+        targetType="venue"
+        targetId={venue.id}
+        targetName={venue.name}
+        onSubmit={() => {
+          setIsReviewModalOpen(false)
+          // The VenueReviews component will refresh automatically
+        }}
+      />
     </div>
   )
 } 

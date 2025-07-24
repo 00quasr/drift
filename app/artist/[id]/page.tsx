@@ -1,3 +1,5 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -8,14 +10,101 @@ import { EntityReviews } from "@/components/reviews/EntityReviews"
 import { notFound } from "next/navigation"
 import Image from "next/image"
 import ImageGallery from '@/components/ui/ImageGallery'
+import { useState, useEffect } from 'react'
+import { useAuth } from '@/contexts/AuthContext'
+import { ReviewModal } from '@/components/reviews/ReviewModal'
+import { favoritesService } from '@/lib/services/favorites'
 
 interface ArtistPageProps {
   params: { id: string }
 }
 
-export default async function ArtistPage({ params }: ArtistPageProps) {
-  const artist = await getArtistById(params.id)
-  
+export default function ArtistPage({ params }: ArtistPageProps) {
+  const [artist, setArtist] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false)
+  const [isLiked, setIsLiked] = useState(false)
+  const [likesLoading, setLikesLoading] = useState(false)
+  const [shareStatus, setShareStatus] = useState<'idle' | 'copied' | 'error'>('idle')
+  const { user } = useAuth()
+
+  useEffect(() => {
+    const fetchArtist = async () => {
+      try {
+        const artistData = await getArtistById(params.id)
+        setArtist(artistData)
+      } catch (error) {
+        console.error('Error fetching artist:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchArtist()
+  }, [params.id])
+
+  // Check if artist is favorited when component mounts and user changes
+  useEffect(() => {
+    const checkFavoriteStatus = async () => {
+      if (user && artist) {
+        try {
+          const isFavorited = await favoritesService.isFavorited('artist', artist.id)
+          setIsLiked(isFavorited)
+        } catch (error) {
+          console.error('Error checking favorite status:', error)
+        }
+      }
+    }
+    checkFavoriteStatus()
+  }, [user, artist])
+
+  const handleShare = async () => {
+    try {
+      const url = window.location.href
+      await navigator.clipboard.writeText(url)
+      setShareStatus('copied')
+      setTimeout(() => setShareStatus('idle'), 2000)
+    } catch (err) {
+      setShareStatus('error')
+      setTimeout(() => setShareStatus('idle'), 2000)
+    }
+  }
+
+  const handleLike = async () => {
+    if (!user) {
+      alert('Please sign in to like artists')
+      return
+    }
+    
+    if (likesLoading) return
+    
+    setLikesLoading(true)
+    try {
+      const newLikedState = await favoritesService.toggleFavorite('artist', artist.id)
+      setIsLiked(newLikedState)
+    } catch (error) {
+      console.error('Error toggling favorite:', error)
+      alert('Failed to update favorite. Please try again.')
+    } finally {
+      setLikesLoading(false)
+    }
+  }
+
+  const handleRate = () => {
+    if (!user) {
+      alert('Please sign in to rate artists')
+      return
+    }
+    setIsReviewModalOpen(true)
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-white/20 border-t-white/80 rounded-full animate-spin" />
+      </div>
+    )
+  }
+
   if (!artist) {
     notFound()
   }
@@ -112,13 +201,39 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
 
             {/* Action Buttons */}
             <div className="flex flex-wrap gap-3">
-              <button className="p-3 bg-white/10 hover:bg-white/20 border border-white/30 hover:border-white/60 text-white transition-all duration-200">
-                <Heart className="w-5 h-5" />
+              <button 
+                onClick={handleLike}
+                disabled={likesLoading}
+                className={`p-3 border transition-all duration-200 disabled:opacity-50 ${
+                  isLiked 
+                    ? 'bg-red-500/20 border-red-500/60 text-red-400' 
+                    : 'bg-white/10 hover:bg-white/20 border-white/30 hover:border-white/60 text-white'
+                }`}
+                title={isLiked ? 'Unlike Artist' : 'Like Artist'}
+              >
+                {likesLoading ? (
+                  <div className="w-5 h-5 border border-white/30 border-t-white/80 rounded-full animate-spin" />
+                ) : (
+                  <Heart className={`w-5 h-5 ${isLiked ? 'fill-red-400' : ''}`} />
+                )}
               </button>
-              <button className="p-3 bg-white/10 hover:bg-white/20 border border-white/30 hover:border-white/60 text-white transition-all duration-200">
-                <Share2 className="w-5 h-5" />
+              <button 
+                onClick={handleShare}
+                className="p-3 bg-white/10 hover:bg-white/20 border border-white/30 hover:border-white/60 text-white transition-all duration-200"
+                title={shareStatus === 'copied' ? 'Copied!' : shareStatus === 'error' ? 'Error' : 'Share Artist'}
+              >
+                {shareStatus === 'copied' ? (
+                  <span className="text-xs font-bold tracking-wider uppercase">✓</span>
+                ) : shareStatus === 'error' ? (
+                  <span className="text-xs font-bold tracking-wider uppercase">!</span>
+                ) : (
+                  <Share2 className="w-5 h-5" />
+                )}
               </button>
-              <button className="px-6 py-3 bg-white text-black hover:bg-white/90 border-2 border-white font-bold tracking-wider uppercase transition-all duration-200">
+              <button 
+                onClick={handleRate}
+                className="px-6 py-3 bg-white text-black hover:bg-white/90 border-2 border-white font-bold tracking-wider uppercase transition-all duration-200"
+              >
                 RATE ARTIST
               </button>
             </div>
@@ -334,6 +449,18 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
 
         </div>
       </div>
+      
+      <ReviewModal
+        isOpen={isReviewModalOpen}
+        onClose={() => setIsReviewModalOpen(false)}
+        targetType="artist"
+        targetId={artist.id}
+        targetName={artist.name}
+        onSubmit={() => {
+          setIsReviewModalOpen(false)
+          // The EntityReviews component will refresh automatically
+        }}
+      />
     </div>
   )
 } 

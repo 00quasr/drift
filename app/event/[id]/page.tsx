@@ -1,3 +1,5 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -10,14 +12,101 @@ import Image from "next/image"
 import { isValidImageUrl, getFallbackImage } from "@/lib/utils/imageUtils"
 import ImageGallery from '@/components/ui/ImageGallery'
 import EventLineup from '@/components/event/EventLineup'
+import { useState, useEffect } from 'react'
+import { useAuth } from '@/contexts/AuthContext'
+import { ReviewModal } from '@/components/reviews/ReviewModal'
+import { favoritesService } from '@/lib/services/favorites'
 
 interface EventPageProps {
   params: { id: string }
 }
 
-export default async function EventPage({ params }: EventPageProps) {
-  const event = await getEvent(params.id)
-  
+export default function EventPage({ params }: EventPageProps) {
+  const [event, setEvent] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false)
+  const [isLiked, setIsLiked] = useState(false)
+  const [likesLoading, setLikesLoading] = useState(false)
+  const [shareStatus, setShareStatus] = useState<'idle' | 'copied' | 'error'>('idle')
+  const { user } = useAuth()
+
+  useEffect(() => {
+    const fetchEvent = async () => {
+      try {
+        const eventData = await getEvent(params.id)
+        setEvent(eventData)
+      } catch (error) {
+        console.error('Error fetching event:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchEvent()
+  }, [params.id])
+
+  // Check if event is favorited when component mounts and user changes
+  useEffect(() => {
+    const checkFavoriteStatus = async () => {
+      if (user && event) {
+        try {
+          const isFavorited = await favoritesService.isFavorited('event', event.id)
+          setIsLiked(isFavorited)
+        } catch (error) {
+          console.error('Error checking favorite status:', error)
+        }
+      }
+    }
+    checkFavoriteStatus()
+  }, [user, event])
+
+  const handleShare = async () => {
+    try {
+      const url = window.location.href
+      await navigator.clipboard.writeText(url)
+      setShareStatus('copied')
+      setTimeout(() => setShareStatus('idle'), 2000)
+    } catch (err) {
+      setShareStatus('error')
+      setTimeout(() => setShareStatus('idle'), 2000)
+    }
+  }
+
+  const handleLike = async () => {
+    if (!user) {
+      alert('Please sign in to like events')
+      return
+    }
+    
+    if (likesLoading) return
+    
+    setLikesLoading(true)
+    try {
+      const newLikedState = await favoritesService.toggleFavorite('event', event.id)
+      setIsLiked(newLikedState)
+    } catch (error) {
+      console.error('Error toggling favorite:', error)
+      alert('Failed to update favorite. Please try again.')
+    } finally {
+      setLikesLoading(false)
+    }
+  }
+
+  const handleRate = () => {
+    if (!user) {
+      alert('Please sign in to rate events')
+      return
+    }
+    setIsReviewModalOpen(true)
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-white/20 border-t-white/80 rounded-full animate-spin" />
+      </div>
+    )
+  }
+
   if (!event) {
     notFound()
   }
@@ -128,20 +217,51 @@ export default async function EventPage({ params }: EventPageProps) {
 
             {/* Action Buttons */}
             <div className="flex gap-4">
-              <button className="p-3 bg-white/10 hover:bg-white/20 border border-white/30 hover:border-white/60 text-white transition-all duration-200">
-                <Heart className="w-5 h-5" />
+              <button 
+                onClick={handleLike}
+                disabled={likesLoading}
+                className={`p-3 border transition-all duration-200 disabled:opacity-50 ${
+                  isLiked 
+                    ? 'bg-red-500/20 border-red-500/60 text-red-400' 
+                    : 'bg-white/10 hover:bg-white/20 border-white/30 hover:border-white/60 text-white'
+                }`}
+                title={isLiked ? 'Unlike Event' : 'Like Event'}
+              >
+                {likesLoading ? (
+                  <div className="w-5 h-5 border border-white/30 border-t-white/80 rounded-full animate-spin" />
+                ) : (
+                  <Heart className={`w-5 h-5 ${isLiked ? 'fill-red-400' : ''}`} />
+                )}
               </button>
-              <button className="p-3 bg-white/10 hover:bg-white/20 border border-white/30 hover:border-white/60 text-white transition-all duration-200">
-                <Share2 className="w-5 h-5" />
+              <button 
+                onClick={handleShare}
+                className="p-3 bg-white/10 hover:bg-white/20 border border-white/30 hover:border-white/60 text-white transition-all duration-200"
+                title={shareStatus === 'copied' ? 'Copied!' : shareStatus === 'error' ? 'Error' : 'Share Event'}
+              >
+                {shareStatus === 'copied' ? (
+                  <span className="text-xs font-bold tracking-wider uppercase">✓</span>
+                ) : shareStatus === 'error' ? (
+                  <span className="text-xs font-bold tracking-wider uppercase">!</span>
+                ) : (
+                  <Share2 className="w-5 h-5" />
+                )}
               </button>
-              <button className="px-6 py-3 bg-white text-black hover:bg-white/90 border-2 border-white font-bold tracking-wider uppercase transition-all duration-200">
+              <button 
+                onClick={handleRate}
+                className="px-6 py-3 bg-white text-black hover:bg-white/90 border-2 border-white font-bold tracking-wider uppercase transition-all duration-200"
+              >
                 RATE EVENT
               </button>
               {event.ticket_url && isUpcoming && (
-                <button className="px-6 py-3 bg-white text-black hover:bg-white/90 border-2 border-white font-bold tracking-wider uppercase transition-all duration-200">
-                  <Ticket className="w-4 h-4 mr-2 inline" />
+                <a 
+                  href={event.ticket_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-6 py-3 bg-white text-black hover:bg-white/90 border-2 border-white font-bold tracking-wider uppercase transition-all duration-200 inline-flex items-center"
+                >
+                  <Ticket className="w-4 h-4 mr-2" />
                   BUY TICKETS
-                </button>
+                </a>
               )}
             </div>
           </div>
@@ -296,6 +416,18 @@ export default async function EventPage({ params }: EventPageProps) {
 
         </div>
       </div>
+      
+      <ReviewModal
+        isOpen={isReviewModalOpen}
+        onClose={() => setIsReviewModalOpen(false)}
+        targetType="event"
+        targetId={event.id}
+        targetName={event.title}
+        onSubmit={() => {
+          setIsReviewModalOpen(false)
+          // The EntityReviews component will refresh automatically
+        }}
+      />
     </div>
   )
 } 

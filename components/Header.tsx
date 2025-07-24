@@ -231,6 +231,16 @@ export default function Header() {
                               </Link>
                              </motion.div>
                             
+                            <motion.div whileHover={{ x: 2 }} transition={{ duration: 0.2 }}>
+                              <Link 
+                                href="/favorites" 
+                                className="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-300 group"
+                                onClick={() => setUserMenuOpen(false)}
+                              >
+                                FAVORITES
+                              </Link>
+                            </motion.div>
+                            
                             {/* Role-specific links */}
                             {user.role === 'artist' && (
                               <motion.div whileHover={{ x: 2 }} transition={{ duration: 0.2 }}>

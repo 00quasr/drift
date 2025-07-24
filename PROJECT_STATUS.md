@@ -93,11 +93,25 @@
 - [ ] **Venue/Event/Artist Pages** - Content management UI
 - [ ] **Admin Dashboard** - Moderation interface
 
+#### Subpages for EXPLORE / EVENTS / ARTITS / VENUES 
+- [ ] **Explore - Trending** - Discover what’s popular across events, artists, and venues
+- [ ] **Explore - This Weekend** - Curated list of events happening this weekend
+- [ ] **Explore - Labels & Collectives** - Curated list of events happening this weekend
+- [ ] **EVENTS - Festivals** - Multi-day events with lineups and open-air vibes
+- [ ] **EVENTS - Mapview** - Browse upcoming events visually by location
+- [ ] **Artists - Newcomers** - Recently added or debuting artists
+- [ ] **Artists - Trending Artists** - Most followed, searched, or booked artists
+
 #### Advanced Features
-- [ ] **Mapbox Integration** - Interactive venue location maps
+- [x] **Mapbox Integration** - Interactive venue location maps
 - [ ] **Email Notifications** - Automated email system
 - [ ] **Mobile Optimization** - Enhanced mobile experience
 - [ ] **Push Notifications** - Real-time user notifications
+- [ ] **Spotify Integration** - Spotify mini player embeds for users who connected their Spotify account
+- [ ] **Real time chating** - Real-time chat with diffrent users
+- [ ] **Docs for Developers** - usage based api options 
+
+
 
 ## 🏗️ Architecture
 

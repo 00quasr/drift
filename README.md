@@ -11,9 +11,9 @@
 
 Drift solves the fragmented nature of underground electronic music scenes by providing a centralized platform where fans can discover venues and events, artists can showcase their work, and promoters can connect with their audience. The platform features a comprehensive review system, real-time search, role-based access control, and AI-powered content moderation.
 
-### Key Features
+https://github.com/user-attachments/assets/e02c2b94-c1e2-41dd-89f4-699c446ef7cf
 
-https://github.com/user-attachments/assets/3a99f07d-f601-41c1-8a00-5ff72eb54857
+### Key Features
 
 - **Role-Specific UX Design** - Tailored interfaces for each user type instead of complex CMS dashboards
 - **Simplified Content Management** - Artists create one profile, club owners manage one venue, promoters focus on events

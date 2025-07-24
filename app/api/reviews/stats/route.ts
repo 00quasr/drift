@@ -4,7 +4,7 @@ import { getReviewStats } from '@/lib/services/reviews'
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const targetType = searchParams.get('target_type') as 'venue' | 'event' | 'artist'
+    const targetType = searchParams.get('target_type') as 'venue' | 'event' | 'artist' | 'label' | 'collective'
     const targetId = searchParams.get('target_id')
 
     if (!targetType || !targetId) {
@@ -14,10 +14,10 @@ export async function GET(request: NextRequest) {
       }, { status: 400 })
     }
 
-    if (!['venue', 'event', 'artist'].includes(targetType)) {
+    if (!['venue', 'event', 'artist', 'label', 'collective'].includes(targetType)) {
       return NextResponse.json({ 
         success: false, 
-        error: 'Invalid target_type. Must be venue, event, or artist' 
+        error: 'Invalid target_type. Must be venue, event, artist, label, or collective' 
       }, { status: 400 })
     }
 

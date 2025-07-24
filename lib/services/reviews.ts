@@ -9,7 +9,7 @@ type ReviewFlagInsert = Database['public']['Tables']['review_flags']['Insert']
 
 // Client-side functions
 export async function getReviews(
-  targetType: 'venue' | 'event' | 'artist',
+  targetType: 'venue' | 'event' | 'artist' | 'label' | 'collective',
   targetId: string,
   filters?: {
     status?: 'visible' | 'pending_review' | 'hidden'
@@ -154,7 +154,7 @@ export async function getUserReviewForTarget(
 }
 
 export async function getReviewStats(
-  targetType: 'venue' | 'event' | 'artist',
+  targetType: 'venue' | 'event' | 'artist' | 'label' | 'collective',
   targetId: string
 ) {
   const supabase = createClient()

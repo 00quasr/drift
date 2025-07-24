@@ -179,6 +179,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
             <FourCategoryRating
               ratings={ratings}
               onChange={setRatings}
+              entityType={targetType}
             />
           </div>
 

@@ -5,7 +5,7 @@ import { createReview, getReviews, validateRating, sanitizeComment, calculateOve
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const targetType = searchParams.get('target_type') as 'venue' | 'event' | 'artist'
+    const targetType = searchParams.get('target_type') as 'venue' | 'event' | 'artist' | 'label' | 'collective'
     const targetId = searchParams.get('target_id')
     const status = searchParams.get('status') as 'visible' | 'pending_review' | 'hidden' | undefined
     const sort = searchParams.get('sort') as 'newest' | 'oldest' | 'helpful' | undefined
@@ -85,10 +85,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate target type
-    if (!['venue', 'event', 'artist'].includes(target_type)) {
+    if (!['venue', 'event', 'artist', 'label', 'collective'].includes(target_type)) {
       return NextResponse.json({ 
         success: false, 
-        error: 'Invalid target_type. Must be venue, event, or artist' 
+        error: 'Invalid target_type. Must be venue, event, artist, label, or collective' 
       }, { status: 400 })
     }
 

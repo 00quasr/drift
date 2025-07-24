@@ -123,12 +123,14 @@ interface RatingFormProps {
   }
   onChange: (ratings: { sound: number; vibe: number; crowd: number; overall: number }) => void
   readonly?: boolean
+  entityType?: 'venue' | 'event' | 'artist' | 'label'
 }
 
 export const FourCategoryRating: React.FC<RatingFormProps> = ({
   ratings,
   onChange,
-  readonly = false
+  readonly = false,
+  entityType = 'venue'
 }) => {
   const handleRatingChange = (category: keyof typeof ratings, value: number) => {
     onChange({
@@ -137,12 +139,35 @@ export const FourCategoryRating: React.FC<RatingFormProps> = ({
     })
   }
 
-  const categories = [
-    { key: 'sound' as const, label: 'SOUND', description: 'Audio quality & mixing' },
-    { key: 'vibe' as const, label: 'VIBE', description: 'Atmosphere & energy' },
-    { key: 'crowd' as const, label: 'CROWD', description: 'People & dancing' },
-    { key: 'overall' as const, label: 'OVERALL', description: 'General experience' }
-  ]
+  // Define different rating criteria based on entity type
+  const getCategoriesForEntityType = (type: string) => {
+    switch (type) {
+      case 'artist':
+        return [
+          { key: 'sound' as const, label: 'SOUND', description: 'Audio quality & mixing' },
+          { key: 'vibe' as const, label: 'PERFORMANCE', description: 'Stage presence & skill' },
+          { key: 'crowd' as const, label: 'ENERGY', description: 'Crowd engagement & vibe' },
+          { key: 'overall' as const, label: 'OVERALL', description: 'General experience' }
+        ]
+      case 'event':
+        return [
+          { key: 'sound' as const, label: 'SOUND', description: 'Audio quality & mixing' },
+          { key: 'vibe' as const, label: 'ORGANIZATION', description: 'Planning & logistics' },
+          { key: 'crowd' as const, label: 'ATMOSPHERE', description: 'Vibe & experience' },
+          { key: 'overall' as const, label: 'OVERALL', description: 'General experience' }
+        ]
+      case 'venue':
+      default:
+        return [
+          { key: 'sound' as const, label: 'SOUND', description: 'Audio quality & mixing' },
+          { key: 'vibe' as const, label: 'VIBE', description: 'Atmosphere & energy' },
+          { key: 'crowd' as const, label: 'CROWD', description: 'People & dancing' },
+          { key: 'overall' as const, label: 'OVERALL', description: 'General experience' }
+        ]
+    }
+  }
+
+  const categories = getCategoriesForEntityType(entityType)
 
   return (
     <div className="space-y-6">

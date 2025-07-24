@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge"
 import { MapPin, Calendar, Clock, Users, ExternalLink, Star, Heart, Share2, Ticket, Music } from "lucide-react"
 import Link from "next/link"
 import { getEvent } from "@/lib/services/events"
-import { getReviews, getReviewStats } from "@/lib/services/reviews"
+import { EntityReviews } from "@/components/reviews/EntityReviews"
 import { notFound } from "next/navigation"
 import Image from "next/image"
 import { isValidImageUrl, getFallbackImage } from "@/lib/utils/imageUtils"
@@ -215,34 +215,12 @@ export default async function EventPage({ params }: EventPageProps) {
             )}
 
             {/* Reviews Section */}
-            <div className="relative bg-black border-2 border-white/20 p-6">
-              <div className="absolute top-4 right-4 w-6 h-6 z-10">
-                <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
-              </div>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold tracking-widest uppercase text-white">
-                  REVIEWS & RATINGS
-                </h2>
-                <button className="px-4 py-2 bg-white text-black hover:bg-white/90 border-2 border-white font-bold tracking-wider uppercase transition-all duration-200 text-sm">
-                  WRITE REVIEW
-                </button>
-              </div>
-              
-              <div className="text-center py-12">
-                <div className="w-12 h-12 bg-white border-2 border-white mx-auto mb-4 relative">
-                  <div className="absolute inset-1 bg-black" />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Star className="w-4 h-4 text-white" />
-                  </div>
-                </div>
-                <h3 className="text-white font-bold tracking-widest uppercase mb-2">
-                  NO REVIEWS YET
-                </h3>
-                <p className="text-white/60 font-medium tracking-wider uppercase text-sm">
-                  BE THE FIRST TO REVIEW
-                </p>
-              </div>
-            </div>
+            <EntityReviews
+              entityType="event"
+              entityId={event.id}
+              entityName={event.title}
+              isPastEvent={!isUpcoming}
+            />
           </div>
 
           {/* Sidebar */}
@@ -340,6 +318,7 @@ export default async function EventPage({ params }: EventPageProps) {
               </div>
             )}
           </div>
+
         </div>
       </div>
     </div>

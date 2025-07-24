@@ -106,7 +106,7 @@ export async function getEvents(filters?: {
   }
 }
 
-export async function getEvent(idOrSlug: string): Promise<EventWithDetails | null> {
+export async function getEvent(idOrSlug: string, status?: string): Promise<EventWithDetails | null> {
   const supabase = createClient()
   
   try {
@@ -117,10 +117,17 @@ export async function getEvent(idOrSlug: string): Promise<EventWithDetails | nul
         *,
         venue:venues(*),
         event_artists(
+          performance_order,
+          performance_type,
           artist:artists(*)
         )
       `)
       .eq('is_active', true)
+    
+    // Filter by status if provided
+    if (status) {
+      query = query.eq('status', status)
+    }
     
     // Check if it looks like a UUID (ID) or a slug
     const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(idOrSlug)
@@ -143,7 +150,11 @@ export async function getEvent(idOrSlug: string): Promise<EventWithDetails | nul
     return {
       ...data,
       venue: data.venue,
-      artists: data.event_artists?.map((ea: any) => ea.artist) || []
+      artists: data.event_artists?.map((ea: any) => ({
+        ...ea.artist,
+        performance_order: ea.performance_order,
+        performance_type: ea.performance_type
+      })) || []
     }
   } catch (error) {
     console.error('Error in getEvent:', error)

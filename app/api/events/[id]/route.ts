@@ -96,7 +96,12 @@ async function handleCMSGet(request: NextRequest, eventId: string) {
     .select(`
       *,
       venue:venues(id, name, city, country),
-      created_by_profile:profiles!events_created_by_fkey(full_name, role, display_name)
+      created_by_profile:profiles!events_created_by_fkey(full_name, role, display_name),
+      artists:event_artists(
+        performance_order,
+        performance_type,
+        artist:artists(id, name, genres, city, country)
+      )
     `)
     .eq('id', eventId)
 
@@ -138,7 +143,21 @@ async function handleCMSGet(request: NextRequest, eventId: string) {
     start_time: data.start_date, // Map start_date to start_time for API consistency
     end_time: data.end_date, // Map end_date to end_time for API consistency
     price_min: data.ticket_price_min, // Map ticket_price_min to price_min
-    price_max: data.ticket_price_max // Map ticket_price_max to price_max
+    price_max: data.ticket_price_max, // Map ticket_price_max to price_max
+    // Transform artists data to match expected format
+    artists: data.artists?.map((eventArtist: any) => ({
+      id: eventArtist.artist?.id,
+      name: eventArtist.artist?.name,
+      genres: eventArtist.artist?.genres,
+      city: eventArtist.artist?.city,
+      country: eventArtist.artist?.country,
+      performance_order: eventArtist.performance_order,
+      performance_type: eventArtist.performance_type,
+      event_artists: {
+        performance_order: eventArtist.performance_order,
+        performance_type: eventArtist.performance_type
+      }
+    })) || []
   }
 
   return NextResponse.json({ 

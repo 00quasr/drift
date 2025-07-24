@@ -19,7 +19,10 @@ import {
   Archive,
   Trash2,
   Music,
-  ExternalLink
+  ExternalLink,
+  Users,
+  Plus,
+  Search
 } from 'lucide-react'
 import { uploadEventImage, moderateImage, validateImageFile } from '@/lib/services/storage'
 
@@ -35,6 +38,7 @@ interface EventFormData {
   price_min?: number
   price_max?: number
   status: string
+  artists: { id: string; name: string; performance_order?: number; performance_type?: string }[]
 }
 
 interface Venue {
@@ -42,6 +46,14 @@ interface Venue {
   name: string
   city: string
   country: string
+}
+
+interface Artist {
+  id: string
+  name: string
+  genres?: string[]
+  city?: string
+  country?: string
 }
 
 interface EventEditPageProps {
@@ -67,6 +79,11 @@ export default function EventEditPage({ params }: EventEditPageProps) {
   const [eventId, setEventId] = useState<string | null>(null)
   const [success, setSuccess] = useState('')
   const [loadingVenues, setLoadingVenues] = useState(true)
+  
+  // Artist management state
+  const [artistSearch, setArtistSearch] = useState('')
+  const [artistResults, setArtistResults] = useState<Artist[]>([])
+  const [loadingArtists, setLoadingArtists] = useState(false)
 
   useEffect(() => {
     async function getEventId() {
@@ -85,6 +102,14 @@ export default function EventEditPage({ params }: EventEditPageProps) {
       fetchEvent()
     }
   }, [eventId])
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      searchArtists(artistSearch)
+    }, 300)
+
+    return () => clearTimeout(timeout)
+  }, [artistSearch])
 
   const fetchVenues = async () => {
     try {
@@ -126,7 +151,8 @@ export default function EventEditPage({ params }: EventEditPageProps) {
           start_time: formatDateTimeLocal(new Date(data.data.start_time)),
           end_time: data.data.end_time ? formatDateTimeLocal(new Date(data.data.end_time)) : '',
           ticket_url: data.data.ticket_url || '',
-          genres: data.data.genres || []
+          genres: data.data.genres || [],
+          artists: data.data.artists || []
         }
         setEvent(eventData)
       } else {
@@ -212,6 +238,130 @@ export default function EventEditPage({ params }: EventEditPageProps) {
     setEvent(prev => prev ? ({
       ...prev,
       images: prev.images.filter((_, i) => i !== index)
+    }) : null)
+  }
+
+  // Artist management functions
+  const searchArtists = async (query: string) => {
+    if (!query.trim()) {
+      setArtistResults([])
+      return
+    }
+
+    setLoadingArtists(true)
+    try {
+      const response = await fetch(`/api/artists/search?q=${encodeURIComponent(query)}`)
+      if (response.ok) {
+        const data = await response.json()
+        setArtistResults(data.data || [])
+      }
+    } catch (error) {
+      console.error('Error searching artists:', error)
+    } finally {
+      setLoadingArtists(false)
+    }
+  }
+
+  const addArtist = async (artist: Artist) => {
+    if (!event || !eventId) return
+    
+    // Check if artist is already added
+    if (event.artists.some(a => a.id === artist.id)) {
+      setError('Artist is already in the lineup')
+      return
+    }
+
+    try {
+      const { supabase } = await import('@/lib/auth')
+      const { data: { session } } = await supabase.auth.getSession()
+
+      const response = await fetch(`/api/events/${eventId}/artists`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token && {
+            'Authorization': `Bearer ${session.access_token}`
+          })
+        },
+        body: JSON.stringify({
+          artist_id: artist.id,
+          performance_order: event.artists.length + 1,
+          performance_type: 'live'
+        })
+      })
+
+      if (response.ok) {
+        // Add to local state
+        setEvent(prev => prev ? ({
+          ...prev,
+          artists: [...prev.artists, {
+            id: artist.id,
+            name: artist.name,
+            performance_order: prev.artists.length + 1,
+            performance_type: 'live'
+          }]
+        }) : null)
+        
+        setArtistSearch('')
+        setArtistResults([])
+        setSuccess('Artist added to lineup')
+        setTimeout(() => setSuccess(''), 3000)
+      } else {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to add artist')
+      }
+    } catch (error: any) {
+      console.error('Error adding artist:', error)
+      setError(error.message || 'Failed to add artist')
+    }
+  }
+
+  const removeArtist = async (artistId: string) => {
+    if (!event || !eventId) return
+
+    try {
+      const { supabase } = await import('@/lib/auth')
+      const { data: { session } } = await supabase.auth.getSession()
+
+      const response = await fetch(`/api/events/${eventId}/artists`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session?.access_token && {
+            'Authorization': `Bearer ${session.access_token}`
+          })
+        },
+        body: JSON.stringify({ artist_id: artistId })
+      })
+
+      if (response.ok) {
+        // Remove from local state
+        setEvent(prev => prev ? ({
+          ...prev,
+          artists: prev.artists.filter(a => a.id !== artistId)
+        }) : null)
+        
+        setSuccess('Artist removed from lineup')
+        setTimeout(() => setSuccess(''), 3000)
+      } else {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to remove artist')
+      }
+    } catch (error: any) {
+      console.error('Error removing artist:', error)
+      setError(error.message || 'Failed to remove artist')
+    }
+  }
+
+  const updateArtistDetails = (artistId: string, field: 'performance_order' | 'performance_type', value: any) => {
+    if (!event) return
+    setEvent(prev => prev ? ({
+      ...prev,
+      artists: prev.artists.map(artist => 
+        artist.id === artistId 
+          ? { ...artist, [field]: value }
+          : artist
+      )
     }) : null)
   }
 
@@ -645,6 +795,117 @@ export default function EventEditPage({ params }: EventEditPageProps) {
                 placeholder="https://tickets.example.com"
               />
             </div>
+          </div>
+        </div>
+
+        {/* Artist Lineup Management */}
+        <div className="bg-black/50 border border-white/20 p-6 backdrop-blur-sm">
+          <h2 className="text-2xl font-bold tracking-wider uppercase text-white mb-6 flex items-center">
+            <Users className="w-6 h-6 mr-3" />
+            Artist Lineup
+          </h2>
+
+          <div className="space-y-6">
+            <div>
+              <label className="block text-white/80 font-bold tracking-wider uppercase text-sm mb-2">
+                Add Artists
+              </label>
+              <div className="relative">
+                <div className="flex items-center space-x-2">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-white/40" />
+                    <input
+                      type="text"
+                      value={artistSearch}
+                      onChange={(e) => setArtistSearch(e.target.value)}
+                      placeholder="Search for artists..."
+                      className="w-full bg-black/50 border border-white/30 text-white pl-10 pr-4 py-3 focus:border-white/60 outline-none transition-colors"
+                    />
+                  </div>
+                </div>
+                
+                {artistSearch && artistResults.length > 0 && (
+                  <div className="absolute z-10 w-full mt-1 bg-black border border-white/30 max-h-48 overflow-y-auto">
+                    {artistResults.map(artist => (
+                      <button
+                        key={artist.id}
+                        onClick={() => addArtist(artist)}
+                        className="w-full px-4 py-3 text-left text-white hover:bg-white/10 border-b border-white/10 last:border-b-0 transition-colors"
+                      >
+                        <div className="font-bold">{artist.name}</div>
+                        {artist.city && artist.country && (
+                          <div className="text-sm text-white/60">{artist.city}, {artist.country}</div>
+                        )}
+                        {artist.genres && artist.genres.length > 0 && (
+                          <div className="text-xs text-white/40 mt-1">
+                            {artist.genres.slice(0, 3).join(', ')}
+                          </div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                
+                {loadingArtists && (
+                  <div className="absolute z-10 w-full mt-1 bg-black border border-white/30 p-4 text-center text-white/60">
+                    Searching...
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {event.artists.length > 0 && (
+              <div>
+                <h3 className="text-lg font-bold tracking-wider uppercase text-white mb-4">
+                  Current Lineup ({event.artists.length} artists)
+                </h3>
+                <div className="space-y-3">
+                  {event.artists
+                    .sort((a, b) => (a.performance_order || 999) - (b.performance_order || 999))
+                    .map((artist, index) => (
+                    <div key={artist.id} className="bg-black/30 border border-white/20 p-4 flex items-center justify-between">
+                      <div className="flex-1">
+                        <div className="font-bold text-white">{artist.name}</div>
+                      </div>
+                      
+                      <div className="flex items-center space-x-4">
+                        <div className="flex items-center space-x-2">
+                          <label className="text-white/60 text-sm">Order:</label>
+                          <input
+                            type="number"
+                            min="1"
+                            value={artist.performance_order || index + 1}
+                            onChange={(e) => updateArtistDetails(artist.id, 'performance_order', parseInt(e.target.value))}
+                            className="w-16 bg-black/50 border border-white/30 text-white px-2 py-1 text-sm focus:border-white/60 outline-none"
+                          />
+                        </div>
+                        
+                        <div className="flex items-center space-x-2">
+                          <label className="text-white/60 text-sm">Type:</label>
+                          <select
+                            value={artist.performance_type || 'live'}
+                            onChange={(e) => updateArtistDetails(artist.id, 'performance_type', e.target.value)}
+                            className="bg-black/50 border border-white/30 text-white px-2 py-1 text-sm focus:border-white/60 outline-none"
+                          >
+                            <option value="live">Live</option>
+                            <option value="dj">DJ Set</option>
+                            <option value="hybrid">Hybrid</option>
+                          </select>
+                        </div>
+                        
+                        <button
+                          onClick={() => removeArtist(artist.id)}
+                          className="p-2 text-red-400 hover:text-red-300 hover:bg-red-400/10 transition-colors"
+                          title="Remove artist"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

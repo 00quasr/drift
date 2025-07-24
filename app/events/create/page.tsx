@@ -30,6 +30,7 @@ interface EventFormData {
   end_date: string
   end_time: string
   genres: string[]
+  artists: { id: string; name: string; performance_order?: number; performance_type?: string }[]
   ticket_info: {
     price_regular?: number
     price_vip?: number
@@ -47,6 +48,14 @@ interface Venue {
   city: string
   country: string
   address: string
+}
+
+interface Artist {
+  id: string
+  name: string
+  genres: string[]
+  city: string
+  country: string
 }
 
 const MUSIC_GENRES = [
@@ -69,6 +78,7 @@ export default function CreateEventPage() {
     end_date: '',
     end_time: '',
     genres: [],
+    artists: [],
     ticket_info: {
       free_event: false
     },
@@ -81,6 +91,12 @@ export default function CreateEventPage() {
   const [venueSearch, setVenueSearch] = useState('')
   const [showVenueDropdown, setShowVenueDropdown] = useState(false)
   const venueDropdownRef = useRef<HTMLDivElement>(null)
+  
+  const [artists, setArtists] = useState<Artist[]>([])
+  const [artistSearch, setArtistSearch] = useState('')
+  const [showArtistDropdown, setShowArtistDropdown] = useState(false)
+  const artistDropdownRef = useRef<HTMLDivElement>(null)
+  
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
@@ -97,14 +113,18 @@ export default function CreateEventPage() {
   useEffect(() => {
     if (user && user.role === 'promoter') {
       fetchVenues()
+      fetchArtists()
     }
   }, [user])
 
-  // Handle click outside to close dropdown
+  // Handle click outside to close dropdowns
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (venueDropdownRef.current && !venueDropdownRef.current.contains(event.target as Node)) {
         setShowVenueDropdown(false)
+      }
+      if (artistDropdownRef.current && !artistDropdownRef.current.contains(event.target as Node)) {
+        setShowArtistDropdown(false)
       }
     }
 
@@ -123,6 +143,18 @@ export default function CreateEventPage() {
       }
     } catch (error) {
       console.error('Error fetching venues:', error)
+    }
+  }
+
+  const fetchArtists = async () => {
+    try {
+      const response = await fetch('/api/artists?status=published&limit=100')
+      if (response.ok) {
+        const data = await response.json()
+        setArtists(data.data || [])
+      }
+    } catch (error) {
+      console.error('Error fetching artists:', error)
     }
   }
 
@@ -159,6 +191,58 @@ export default function CreateEventPage() {
   const filteredVenues = venues.filter(venue =>
     venue.name.toLowerCase().includes(venueSearch.toLowerCase()) ||
     venue.city.toLowerCase().includes(venueSearch.toLowerCase())
+  )
+
+  const handleArtistSelect = (artist: Artist) => {
+    // Check if artist is already added
+    if (event.artists.some(a => a.id === artist.id)) {
+      setError('Artist is already in the lineup')
+      return
+    }
+
+    setEvent(prev => ({
+      ...prev,
+      artists: [...prev.artists, {
+        id: artist.id,
+        name: artist.name,
+        performance_order: prev.artists.length + 1,
+        performance_type: 'headliner'
+      }]
+    }))
+    setArtistSearch('')
+    setShowArtistDropdown(false)
+    setError('') // Clear any previous errors
+  }
+
+  const removeArtist = (artistId: string) => {
+    setEvent(prev => ({
+      ...prev,
+      artists: prev.artists.filter(a => a.id !== artistId)
+    }))
+  }
+
+  const updateArtistOrder = (artistId: string, newOrder: number) => {
+    setEvent(prev => ({
+      ...prev,
+      artists: prev.artists.map(a =>
+        a.id === artistId ? { ...a, performance_order: newOrder } : a
+      )
+    }))
+  }
+
+  const updateArtistType = (artistId: string, newType: string) => {
+    setEvent(prev => ({
+      ...prev,
+      artists: prev.artists.map(a =>
+        a.id === artistId ? { ...a, performance_type: newType } : a
+      )
+    }))
+  }
+
+  const filteredArtists = artists.filter(artist =>
+    artist.name.toLowerCase().includes(artistSearch.toLowerCase()) ||
+    artist.city?.toLowerCase().includes(artistSearch.toLowerCase()) ||
+    artist.genres?.some(genre => genre.toLowerCase().includes(artistSearch.toLowerCase()))
   )
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -288,6 +372,41 @@ export default function CreateEventPage() {
 
       if (response.ok) {
         const data = await response.json()
+        const eventId = data.data.id
+
+        // Save artist lineup if any artists are selected
+        if (event.artists.length > 0) {
+          console.log('Saving artist lineup for event:', eventId)
+          
+          const artistPromises = event.artists.map(async (artist) => {
+            const artistResponse = await fetch(`/api/events/${eventId}/artists`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                ...(session?.access_token && {
+                  'Authorization': `Bearer ${session.access_token}`
+                })
+              },
+              body: JSON.stringify({
+                artist_id: artist.id,
+                performance_order: artist.performance_order,
+                performance_type: artist.performance_type
+              })
+            })
+            
+            if (!artistResponse.ok) {
+              const errorData = await artistResponse.json()
+              console.error('Failed to add artist to event:', errorData)
+              throw new Error(`Failed to add ${artist.name} to lineup`)
+            }
+            
+            return artistResponse.json()
+          })
+
+          await Promise.all(artistPromises)
+          console.log('Artist lineup saved successfully')
+        }
+        
         setSuccess(publishImmediately ? 'Event created and published successfully!' : 'Event created successfully!')
         
         setTimeout(() => {
@@ -572,6 +691,141 @@ export default function CreateEventPage() {
               </p>
             </div>
           )}
+        </div>
+
+        {/* Artist Lineup */}
+        <div className="bg-black/50 border border-white/20 p-6 backdrop-blur-sm">
+          <h2 className="text-2xl font-bold tracking-wider uppercase text-white mb-6 flex items-center">
+            <Users className="w-6 h-6 mr-3" />
+            Artist Lineup
+          </h2>
+          
+          <div className="space-y-6">
+            {/* Artist Search */}
+            <div>
+              <label className="block text-white/80 font-bold tracking-wider uppercase text-sm mb-2">
+                Add Artists to Lineup
+              </label>
+              <div className="relative" ref={artistDropdownRef}>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 w-4 h-4" />
+                  <input
+                    type="text"
+                    value={artistSearch}
+                    onChange={(e) => {
+                      setArtistSearch(e.target.value)
+                      setShowArtistDropdown(true)
+                    }}
+                    onFocus={() => setShowArtistDropdown(true)}
+                    className="w-full pl-10 pr-4 py-3 bg-black/50 border border-white/30 text-white focus:border-white/60 outline-none transition-colors"
+                    placeholder="Search for artists..."
+                  />
+                </div>
+                
+                {/* Artist dropdown */}
+                {showArtistDropdown && filteredArtists.length > 0 && (
+                  <div 
+                    className="absolute top-full left-0 right-0 mt-1 bg-black border border-white/20 max-h-60 overflow-y-auto shadow-2xl backdrop-blur-sm"
+                    style={{ zIndex: 999999 }}
+                  >
+                    {filteredArtists.slice(0, 10).map((artist) => (
+                      <button
+                        key={artist.id}
+                        type="button"
+                        onClick={() => handleArtistSelect(artist)}
+                        className="w-full text-left p-3 hover:bg-white/10 transition-colors border-b border-white/10 last:border-b-0"
+                      >
+                        <div className="font-bold text-white">{artist.name}</div>
+                        <div className="text-white/60 text-sm">
+                          {artist.city}, {artist.country} • {artist.genres?.slice(0, 2).join(', ')}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Selected Artists */}
+            {event.artists.length > 0 && (
+              <div>
+                <h3 className="text-white font-bold tracking-wider uppercase text-sm mb-4">
+                  Lineup ({event.artists.length} artists)
+                </h3>
+                <div className="space-y-3">
+                  {event.artists
+                    .sort((a, b) => (a.performance_order || 0) - (b.performance_order || 0))
+                    .map((artist, index) => (
+                    <div key={artist.id} className="bg-white/5 border border-white/20 p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4">
+                          <div className="text-white font-bold text-lg">
+                            #{artist.performance_order || index + 1}
+                          </div>
+                          <div>
+                            <div className="text-white font-bold tracking-wider uppercase">
+                              {artist.name}
+                            </div>
+                            <div className="text-white/60 text-sm uppercase tracking-wider">
+                              {artist.performance_type || 'headliner'}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center space-x-3">
+                          {/* Performance Order */}
+                          <select
+                            value={artist.performance_order || index + 1}
+                            onChange={(e) => updateArtistOrder(artist.id, parseInt(e.target.value))}
+                            className="bg-black/50 border border-white/30 text-white text-sm px-2 py-1 focus:border-white/60 outline-none"
+                          >
+                            {Array.from({ length: event.artists.length }, (_, i) => (
+                              <option key={i + 1} value={i + 1} className="bg-black">
+                                #{i + 1}
+                              </option>
+                            ))}
+                          </select>
+                          
+                          {/* Performance Type */}
+                          <select
+                            value={artist.performance_type || 'headliner'}
+                            onChange={(e) => updateArtistType(artist.id, e.target.value)}
+                            className="bg-black/50 border border-white/30 text-white text-sm px-2 py-1 focus:border-white/60 outline-none"
+                          >
+                            <option value="headliner" className="bg-black">Headliner</option>
+                            <option value="support" className="bg-black">Support</option>
+                            <option value="opener" className="bg-black">Opener</option>
+                          </select>
+                          
+                          {/* Remove Button */}
+                          <button
+                            type="button"
+                            onClick={() => removeArtist(artist.id)}
+                            className="p-2 text-white/60 hover:text-red-400 hover:bg-red-500/10 border border-white/20 hover:border-red-500/30 transition-all duration-200"
+                            title="Remove Artist"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {event.artists.length === 0 && (
+              <div className="text-center py-8 border-2 border-dashed border-white/20">
+                <Users className="w-12 h-12 mx-auto mb-4 text-white/30" />
+                <p className="text-white/60 font-bold tracking-wider uppercase text-sm">
+                  No artists added yet
+                </p>
+                <p className="text-white/40 text-xs mt-2">
+                  Search and add artists to build your lineup
+                </p>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Ticketing */}

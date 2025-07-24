@@ -9,6 +9,7 @@ import { notFound } from "next/navigation"
 import Image from "next/image"
 import { isValidImageUrl, getFallbackImage } from "@/lib/utils/imageUtils"
 import ImageGallery from '@/components/ui/ImageGallery'
+import EventLineup from '@/components/event/EventLineup'
 
 interface EventPageProps {
   params: { id: string }
@@ -185,33 +186,7 @@ export default async function EventPage({ params }: EventPageProps) {
 
             {/* Lineup Section */}
             {event.artists && event.artists.length > 0 && (
-              <div className="relative bg-black border-2 border-white/20 p-6">
-                <div className="absolute top-4 right-4 w-6 h-6 z-10">
-                  <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
-                </div>
-                <h2 className="text-2xl font-bold tracking-widest uppercase mb-6 text-white">
-                  LINEUP
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {event.artists.map((artist) => (
-                    <div key={artist.id} className="bg-white/5 border border-white/20 p-4 hover:bg-white/10 transition-all duration-200">
-                      <div className="flex items-center gap-3">
-                        <Music className="w-6 h-6 text-white" />
-                        <div>
-                          <div className="text-white font-bold tracking-wider uppercase">
-                            {artist.name}
-                          </div>
-                          {artist.genres && artist.genres.length > 0 && (
-                            <div className="text-white/60 text-sm font-bold tracking-widest uppercase">
-                              {artist.genres.slice(0, 2).join(', ')}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <EventLineup artists={event.artists} />
             )}
 
             {/* Reviews Section */}

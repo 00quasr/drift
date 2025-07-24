@@ -363,25 +363,25 @@ export default function Header() {
       <AnimatePresence>
         {searchOpen && (
           <motion.div
-            className="absolute top-full left-0 right-0 mt-2 bg-black/[0.3] bg-gradient-to-b from-white/[0.08] to-white/[0.02] backdrop-blur-3xl border border-white/[0.12] rounded-xl mx-4"
+            className="absolute top-full left-0 right-0 mt-2 bg-black/[0.3] bg-gradient-to-b from-white/[0.08] to-white/[0.02] backdrop-blur-3xl border border-white/[0.12] rounded-xl"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
           >
-            <div className="max-w-7xl mx-auto px-6 py-8">
+            <div className="max-w-7xl mx-auto px-6 py-4">
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/60 w-5 h-5" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 w-4 h-4" />
                 <input
                   type="text"
                   placeholder="Search events, venues, artists..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-4 bg-white/[0.03] backdrop-blur-sm border border-white/[0.08] rounded-xl text-white placeholder-white/60 focus:outline-none focus:border-white/[0.2] focus:bg-white/[0.05] transition-all duration-300"
+                  className="w-full pl-10 pr-4 py-3 bg-white/[0.03] backdrop-blur-sm border border-white/[0.08] rounded-lg text-white placeholder-white/60 focus:outline-none focus:border-white/[0.2] focus:bg-white/[0.05] transition-all duration-300"
                   autoFocus
                 />
                 {isSearching && (
-                  <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                     <div className="w-4 h-4 border-2 border-white/20 border-t-white/80 rounded-full animate-spin" />
                   </div>
                 )}

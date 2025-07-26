@@ -133,7 +133,7 @@ export default function Header() {
             {/* Search */}
             <motion.button
               onClick={() => setSearchOpen(!searchOpen)}
-              className="p-2.5 text-white/70 hover:text-white hover:bg-white/[0.04] rounded-lg backdrop-blur-sm transition-all duration-300 border border-white/[0.04] hover:border-white/[0.08]"
+              className="p-3 md:p-2.5 text-white/70 hover:text-white hover:bg-white/[0.04] rounded-lg backdrop-blur-sm transition-all duration-300 border border-white/[0.04] hover:border-white/[0.08] min-h-[44px] min-w-[44px] flex items-center justify-center"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -142,7 +142,7 @@ export default function Header() {
             
             {/* Notifications */}
             <motion.button
-              className="relative p-2.5 text-white/70 hover:text-white hover:bg-white/[0.04] rounded-lg backdrop-blur-sm transition-all duration-300 border border-white/[0.04] hover:border-white/[0.08]"
+              className="relative p-3 md:p-2.5 text-white/70 hover:text-white hover:bg-white/[0.04] rounded-lg backdrop-blur-sm transition-all duration-300 border border-white/[0.04] hover:border-white/[0.08] min-h-[44px] min-w-[44px] flex items-center justify-center"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -359,7 +359,7 @@ export default function Header() {
             {/* Mobile menu button */}
             <motion.button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2.5 text-white/70 hover:text-white hover:bg-white/[0.04] rounded-lg backdrop-blur-sm transition-all duration-300 border border-white/[0.04] hover:border-white/[0.08]"
+              className="md:hidden p-3 text-white/70 hover:text-white hover:bg-white/[0.04] rounded-lg backdrop-blur-sm transition-all duration-300 border border-white/[0.04] hover:border-white/[0.08] min-h-[44px] min-w-[44px] flex items-center justify-center"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -381,13 +381,13 @@ export default function Header() {
           >
             <div className="max-w-7xl mx-auto px-6 py-4">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 w-4 h-4" />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/60 w-5 h-5" />
                 <input
                   type="text"
                   placeholder="Search events, venues, artists..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-white/[0.03] backdrop-blur-sm border border-white/[0.08] rounded-lg text-white placeholder-white/60 focus:outline-none focus:border-white/[0.2] focus:bg-white/[0.05] transition-all duration-300"
+                  className="w-full pl-12 pr-4 py-4 text-base bg-white/[0.03] backdrop-blur-sm border border-white/[0.08] rounded-lg text-white placeholder-white/60 focus:outline-none focus:border-white/[0.2] focus:bg-white/[0.05] transition-all duration-300"
                   autoFocus
                 />
                 {isSearching && (
@@ -495,24 +495,29 @@ export default function Header() {
             transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
           >
             <div className="px-6 py-6 space-y-4">
-              {navigationItems.map(({ href, label }) => (
-                <Link 
-                  key={href}
-                  href={href} 
-                  className="block text-lg font-medium text-white/80 hover:text-white transition-colors py-2"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  {label}
-                </Link>
-              ))}
+              {/* Main Navigation */}
+              <div className="space-y-2">
+                {navigationItems.map(({ href, label }) => (
+                  <Link 
+                    key={href}
+                    href={href} 
+                    className="block px-4 py-4 text-lg font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-200 min-h-[48px] flex items-center"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {label}
+                  </Link>
+                ))}
+              </div>
               
-              <div className="pt-4 border-t border-white/[0.08] space-y-3">
+              {/* User Section */}
+              <div className="pt-4 border-t border-white/[0.08] space-y-2">
                 {user ? (
                   <>
+                    {/* User Profile Header */}
                     <Link href={`/profile/${user.id}`} onClick={() => setMobileMenuOpen(false)}>
-                      <div className="px-4 py-2 text-white/60 text-sm flex items-center space-x-2 hover:bg-white/[0.02] rounded-lg transition-colors duration-200 cursor-pointer hover:text-white/80">
-                        {user.avatar_url && (
-                          <div className="relative w-6 h-6 rounded-full overflow-hidden">
+                      <div className="px-4 py-3 text-white/60 text-sm flex items-center space-x-3 hover:bg-white/[0.02] rounded-lg transition-colors duration-200 cursor-pointer hover:text-white/80 min-h-[48px]">
+                        {user.avatar_url ? (
+                          <div className="relative w-8 h-8 rounded-full overflow-hidden ring-1 ring-white/20">
                             <Image
                               src={user.avatar_url}
                               alt="Profile"
@@ -520,14 +525,90 @@ export default function Header() {
                               className="object-cover"
                             />
                           </div>
+                        ) : (
+                          <div className="w-8 h-8 rounded-full bg-white/[0.08] flex items-center justify-center">
+                            <User className="w-4 h-4 text-white/60" />
+                          </div>
                         )}
-                        <span className="uppercase">WELCOME, {user.display_name || user.email?.split('@')[0]}</span>
+                        <div className="flex-1">
+                          <div className="text-white/95 font-medium uppercase">
+                            {user.display_name || user.email?.split('@')[0]}
+                          </div>
+                          <div className="text-xs text-white/50 uppercase">
+                            {user.role} {user.is_verified && '• VERIFIED'}
+                          </div>
+                        </div>
                       </div>
+                    </Link>
+                    
+                    {/* Role-specific navigation */}
+                    {user.role === 'artist' && (
+                      <Link href="/artist-profile">
+                        <button 
+                          className="block w-full text-left px-4 py-4 text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-200 min-h-[48px] flex items-center"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          MY ARTIST PROFILE
+                        </button>
+                      </Link>
+                    )}
+                    
+                    {user.role === 'club_owner' && (
+                      <Link href="/my-venue">
+                        <button 
+                          className="block w-full text-left px-4 py-4 text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-200 min-h-[48px] flex items-center"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          MY VENUE
+                        </button>
+                      </Link>
+                    )}
+                    
+                    {user.role === 'promoter' && (
+                      <>
+                        <Link href="/events/manage">
+                          <button 
+                            className="block w-full text-left px-4 py-4 text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-200 min-h-[48px] flex items-center"
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            MY EVENTS
+                          </button>
+                        </Link>
+                        <Link href="/events/create">
+                          <button 
+                            className="block w-full text-left px-4 py-4 text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-200 min-h-[48px] flex items-center"
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            CREATE EVENT
+                          </button>
+                        </Link>
+                      </>
+                    )}
+                    
+                    {user.role === 'admin' && (
+                      <Link href="/dashboard">
+                        <button 
+                          className="block w-full text-left px-4 py-4 text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-200 min-h-[48px] flex items-center"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          DASHBOARD
+                        </button>
+                      </Link>
+                    )}
+                    
+                    {/* Common user links */}
+                    <Link href="/favorites">
+                      <button 
+                        className="block w-full text-left px-4 py-4 text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-200 min-h-[48px] flex items-center"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        FAVORITES
+                      </button>
                     </Link>
                     
                     <Link href="/settings/profile">
                       <button 
-                        className="block w-full text-left px-4 py-3 text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-200"
+                        className="block w-full text-left px-4 py-4 text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-200 min-h-[48px] flex items-center"
                         onClick={() => setMobileMenuOpen(false)}
                       >
                         PROFILE
@@ -536,29 +617,32 @@ export default function Header() {
                     
                     <Link href="/settings">
                       <button 
-                        className="block w-full text-left px-4 py-3 text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-200"
+                        className="block w-full text-left px-4 py-4 text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-200 min-h-[48px] flex items-center"
                         onClick={() => setMobileMenuOpen(false)}
                       >
                         SETTINGS
                       </button>
                     </Link>
                     
-                    <button
-                      onClick={async () => {
-                        await signOut()
-                        setMobileMenuOpen(false)
-                      }}
-                      className="w-full text-left px-4 py-3 text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-200 flex items-center space-x-2"
-                    >
-                      <LogOut className="w-4 h-4" />
-                      <span>SIGN OUT</span>
-                    </button>
+                    {/* Sign out button */}
+                    <div className="pt-2 border-t border-white/[0.06]">
+                      <button
+                        onClick={async () => {
+                          await signOut()
+                          setMobileMenuOpen(false)
+                        }}
+                        className="w-full text-left px-4 py-4 text-white/70 hover:text-white hover:bg-red-500/[0.08] rounded-lg transition-all duration-200 flex items-center space-x-3 group min-h-[48px]"
+                      >
+                        <LogOut className="w-5 h-5 text-white/50 group-hover:text-red-400 transition-colors" />
+                        <span className="group-hover:text-red-400 transition-colors">SIGN OUT</span>
+                      </button>
+                    </div>
                   </>
                 ) : (
                   <>
                     <Link href="/auth/login">
                       <button 
-                        className="block w-full text-center px-4 py-3 text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-200"
+                        className="block w-full text-center px-6 py-4 text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-200 font-medium min-h-[48px] flex items-center justify-center"
                         onClick={() => setMobileMenuOpen(false)}
                       >
                         SIGN IN
@@ -566,10 +650,10 @@ export default function Header() {
                     </Link>
                     <Link href="/auth/register">
                       <button 
-                        className="block w-full text-center px-4 py-3 bg-white/95 hover:bg-white text-black rounded-lg transition-all duration-200"
+                        className="block w-full text-center px-6 py-4 bg-white/95 hover:bg-white text-black rounded-lg transition-all duration-200 font-medium min-h-[48px] flex items-center justify-center"
                         onClick={() => setMobileMenuOpen(false)}
                       >
-                        JOIN
+                        JOIN DRIFT
                       </button>
                     </Link>
                   </>

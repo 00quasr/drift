@@ -100,7 +100,7 @@ async function ExplorePage() {
             <span className="text-white/80 font-bold tracking-widest uppercase text-sm">FEATURED</span>
           </div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-[600px]">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 md:gap-6 h-auto lg:h-[600px]">
             {/* Large Featured Event */}
             {hasEvents && (
               <div className="lg:col-span-2 lg:row-span-2">
@@ -183,7 +183,7 @@ async function ExplorePage() {
               </a>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
               {events.slice(1, 9).map((event) => (
                 <EntityCard
                   key={event.id}
@@ -227,7 +227,7 @@ async function ExplorePage() {
               </a>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {venues.slice(1, 7).map((venue) => (
                 <EntityCard
                   key={venue.id}
@@ -268,7 +268,7 @@ async function ExplorePage() {
               </a>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
               {artists.slice(1, 9).map((artist) => (
                 <EntityCard
                   key={artist.id}

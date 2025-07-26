@@ -54,7 +54,7 @@ export const EntityCard: React.FC<EntityCardProps> = (props) => {
 
   return (
     <Link href={href}>
-      <div className="group relative overflow-hidden h-[380px] bg-black border-2 border-white/20 hover:border-white/60 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl">
+      <div className="group relative overflow-hidden h-[320px] md:h-[380px] bg-black border-2 border-white/20 hover:border-white/60 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl">
         {/* Background Image */}
         <div className="absolute inset-0">
           <Image

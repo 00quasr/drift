@@ -113,10 +113,10 @@ export function EntityViews({
     )
   }
 
-  // Grid View
+  // Grid View - Mobile uses single column, desktop uses grid
   if (viewMode === 'grid') {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
         {entities.map((entity) => {
           const entityName = getEntityName(entity)
           const imageUrl = getGridImage(entity)
@@ -194,8 +194,107 @@ export function EntityViews({
           return (
             <div key={entity.id} className="group relative overflow-hidden bg-black border-2 border-white/20 hover:border-white/60 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl">
               <Link href={getEntityHref(entity)}>
-                <div className="p-6">
-                  <div className="flex items-center gap-6">
+                <div className="p-4 md:p-6">
+                  {/* Mobile Layout - Vertical */}
+                  <div className="block md:hidden">
+                    <div className="flex items-center gap-3 mb-3">
+                      {/* Image/Icon */}
+                      <div className="relative w-12 h-12 bg-white/10 border border-white/20 flex-shrink-0">
+                        {imageUrl ? (
+                          <Image
+                            src={imageUrl}
+                            alt={entityName}
+                            fill
+                            className="object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Icon className="w-5 h-5 text-white/60" />
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Type badge and title */}
+                      <div className="flex-1 min-w-0">
+                        <div className="bg-black/80 backdrop-blur-sm border border-white/60 px-2 py-1 inline-block mb-1">
+                          <span className="text-white text-xs font-bold tracking-widest uppercase font-mono">
+                            {entityType}
+                          </span>
+                        </div>
+                        <h4 className="text-base font-bold tracking-wider uppercase text-white group-hover:text-white/80 transition-colors leading-tight">
+                          {entityName}
+                        </h4>
+                      </div>
+                      
+                      {/* Action button for mobile */}
+                      <div className="flex-shrink-0">
+                        {entityType === 'event' && (
+                          <div className="flex items-center gap-1">
+                            <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
+                            <span className="text-white text-xs font-bold tracking-wider uppercase">
+                              ENTER
+                            </span>
+                          </div>
+                        )}
+                        {showActions && onEntityAction && (
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault()
+                              e.stopPropagation()
+                              onEntityAction('remove', entity)
+                            }}
+                            className="p-2 bg-red-500/20 border border-red-500/40 hover:bg-red-500/30 text-red-400 transition-all duration-200"
+                            title="Remove"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {/* Mobile info row */}
+                    <div className="space-y-2">
+                      <div className="flex flex-wrap gap-3 text-white/60 text-xs">
+                        {location && (
+                          <div className="flex items-center gap-1">
+                            <MapPin className="w-3 h-3" />
+                            <span className="font-bold tracking-widest uppercase">{location}</span>
+                          </div>
+                        )}
+                        {entity.capacity && (
+                          <div className="flex items-center gap-1">
+                            <Users className="w-3 h-3 text-white" />
+                            <span className="text-white font-bold tracking-wider">
+                              {entity.capacity.toLocaleString()} CAP
+                            </span>
+                          </div>
+                        )}
+                        {entity.start_date && (
+                          <div className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            <span className="font-bold tracking-widest uppercase">
+                              {new Date(entity.start_date).toLocaleDateString()}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      {entity.genres && entity.genres.length > 0 && (
+                        <div className="flex flex-wrap gap-1">
+                          {entity.genres.slice(0, 2).map((genre) => (
+                            <div key={genre} className="bg-white/10 border border-white/30 px-2 py-0.5">
+                              <span className="text-white text-xs font-bold tracking-widest uppercase">
+                                {genre}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Desktop Layout - Horizontal */}
+                  <div className="hidden md:flex items-center gap-6">
                     {/* Image/Icon */}
                     <div className="relative w-20 h-20 bg-white/10 border border-white/20 flex-shrink-0">
                       {imageUrl ? (
@@ -267,12 +366,14 @@ export function EntityViews({
 
                         {/* Action Buttons */}
                         <div className="flex items-center gap-3 ml-4">
-                          <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
-                            <span className="text-white text-sm font-bold tracking-wider uppercase">
-                              ENTER
-                            </span>
-                          </div>
+                          {entityType === 'event' && (
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                              <span className="text-white text-sm font-bold tracking-wider uppercase">
+                                ENTER
+                              </span>
+                            </div>
+                          )}
                           {showActions && onEntityAction && (
                             <button
                               onClick={(e) => {

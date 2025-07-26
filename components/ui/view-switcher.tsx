@@ -7,13 +7,12 @@ export type ViewMode = 'grid' | 'list'
 interface ViewSwitcherProps {
   viewMode: ViewMode
   onViewModeChange: (mode: ViewMode) => void
-  itemCount: number
   className?: string
 }
 
-export function ViewSwitcher({ viewMode, onViewModeChange, itemCount, className = '' }: ViewSwitcherProps) {
+export function ViewSwitcher({ viewMode, onViewModeChange, className = '' }: ViewSwitcherProps) {
   return (
-    <div className={`flex items-center gap-4 ${className}`}>
+    <div className={`flex items-center ${className}`}>
       {/* View Mode Switcher */}
       <div className="flex items-center gap-1 bg-white/5 border border-white/20 p-1">
         <button
@@ -38,12 +37,6 @@ export function ViewSwitcher({ viewMode, onViewModeChange, itemCount, className 
         >
           <List className="w-4 h-4" />
         </button>
-      </div>
-      
-      <div className="flex items-center gap-2 text-white/60">
-        <span className="font-medium tracking-wider uppercase text-sm">
-          {itemCount} ITEMS
-        </span>
       </div>
     </div>
   )

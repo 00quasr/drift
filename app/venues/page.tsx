@@ -177,7 +177,6 @@ export default function VenuesPage() {
             <ViewSwitcher 
               viewMode={viewMode}
               onViewModeChange={setViewMode}
-              itemCount={filteredVenues.length}
             />
           </div>
         </div>
@@ -186,22 +185,8 @@ export default function VenuesPage() {
         <EntityViews
           entities={filteredVenues.map(venue => ({
             ...venue,
-            name: venue.name,
-            imageUrl: (() => {
-              // First check legacy image_url field
-              if (isValidImageUrl(venue.image_url)) {
-                return venue.image_url!
-              }
-              // Then check images array from venue creation
-              if (venue.images && Array.isArray(venue.images) && venue.images.length > 0) {
-                const firstImage = venue.images[0]
-                if (isValidImageUrl(firstImage)) {
-                  return firstImage
-                }
-              }
-              // Fall back to generated image
-              return getFallbackImage('venue', venue.id)
-            })()
+            name: venue.name
+            // Let EntityViews handle image fallback logic
           }))}
           viewMode={viewMode}
           entityType="venue"

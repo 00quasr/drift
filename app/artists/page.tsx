@@ -205,7 +205,6 @@ export default function ArtistsPage() {
             <ViewSwitcher 
               viewMode={viewMode}
               onViewModeChange={setViewMode}
-              itemCount={filteredArtists.length}
             />
           </div>
         </div>
@@ -214,22 +213,8 @@ export default function ArtistsPage() {
         <EntityViews
           entities={filteredArtists.map(artist => ({
             ...artist,
-            name: artist.name,
-            imageUrl: (() => {
-              // First check legacy image_url field
-              if (isValidImageUrl(artist.image_url)) {
-                return artist.image_url!
-              }
-              // Then check images array from artist creation
-              if (artist.images && Array.isArray(artist.images) && artist.images.length > 0) {
-                const firstImage = artist.images[0]
-                if (isValidImageUrl(firstImage)) {
-                  return firstImage
-                }
-              }
-              // Fall back to generated image
-              return getFallbackImage('artist', artist.id)
-            })()
+            name: artist.name
+            // Let EntityViews handle image fallback logic
           }))}
           viewMode={viewMode}
           entityType="artist"

@@ -199,7 +199,6 @@ export default function EventsPage() {
             <ViewSwitcher 
               viewMode={viewMode}
               onViewModeChange={setViewMode}
-              itemCount={filteredEvents.length}
             />
           </div>
         </div>
@@ -211,26 +210,12 @@ export default function EventsPage() {
               ...event,
               name: event.title,
               title: event.title,
-              imageUrl: (() => {
-                // First check flyer_url
-                if (isValidImageUrl(event.flyer_url)) {
-                  return event.flyer_url!
-                }
-                // Then check images array from event creation
-                if (event.images && Array.isArray(event.images) && event.images.length > 0) {
-                  const firstImage = event.images[0]
-                  if (isValidImageUrl(firstImage)) {
-                    return firstImage
-                  }
-                }
-                // Fall back to generated image
-                return getFallbackImage('event', event.id)
-              })(),
               start_date: event.start_date,
               artist: event.artists?.[0]?.name || 'Various Artists',
               venue: event.venue?.name || 'TBA',
               city: event.venue?.city,
               country: event.venue?.country
+              // Let EntityViews handle image fallback logic
             }))}
             viewMode={viewMode}
             entityType="event"

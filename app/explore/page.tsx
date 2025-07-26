@@ -108,18 +108,7 @@ async function ExplorePage() {
                   type="event"
                   id={events[0].id}
                   title={events[0].title}
-                  imageUrl={(() => {
-                    if (isValidImageUrl(events[0].flyer_url)) {
-                      return events[0].flyer_url!
-                    }
-                    if (events[0].images && Array.isArray(events[0].images) && events[0].images.length > 0) {
-                      const firstImage = events[0].images[0]
-                      if (isValidImageUrl(firstImage)) {
-                        return firstImage
-                      }
-                    }
-                    return getFallbackImage('event', events[0].id)
-                  })()}
+                  imageUrl={undefined}
                   category="FEATURED EVENT"
                   href={`/event/${events[0].id}`}
                   artist={events[0].artists?.[0]?.name || 'Various Artists'}
@@ -140,7 +129,7 @@ async function ExplorePage() {
                   type="venue"
                   id={venues[0].id}
                   title={venues[0].name}
-                  imageUrl={venues[0].images && Array.isArray(venues[0].images) && venues[0].images.length > 0 ? venues[0].images[0] : getFallbackImage('venue', venues[0].id)}
+                  imageUrl={undefined}
                   category="HOT VENUE"
                   href={`/venue/${venues[0].id}`}
                   city={venues[0].city || 'Unknown'}
@@ -158,7 +147,7 @@ async function ExplorePage() {
                   type="artist"
                   id={artists[0].id}
                   title={artists[0].name}
-                  imageUrl={artists[0].images && Array.isArray(artists[0].images) && artists[0].images.length > 0 ? artists[0].images[0] : getFallbackImage('artist', artists[0].id)}
+                  imageUrl={undefined}
                   category="TOP ARTIST"
                   href={`/artist/${artists[0].id}`}
                   bio={artists[0].bio}
@@ -201,18 +190,7 @@ async function ExplorePage() {
                   type="event"
                   id={event.id}
                   title={event.title}
-                  imageUrl={(() => {
-                    if (isValidImageUrl(event.flyer_url)) {
-                      return event.flyer_url!
-                    }
-                    if (event.images && Array.isArray(event.images) && event.images.length > 0) {
-                      const firstImage = event.images[0]
-                      if (isValidImageUrl(firstImage)) {
-                        return firstImage
-                      }
-                    }
-                    return getFallbackImage('event', event.id)
-                  })()}
+                  imageUrl={undefined}
                   category="EVENT"
                   href={`/event/${event.id}`}
                   artist={event.artists?.[0]?.name || 'Various Artists'}
@@ -256,7 +234,7 @@ async function ExplorePage() {
                   type="venue"
                   id={venue.id}
                   title={venue.name}
-                  imageUrl={venue.images && Array.isArray(venue.images) && venue.images.length > 0 ? venue.images[0] : getFallbackImage('venue', venue.id)}
+                  imageUrl={undefined}
                   category="VENUE"
                   href={`/venue/${venue.id}`}
                   city={venue.city || 'Unknown'}
@@ -297,7 +275,7 @@ async function ExplorePage() {
                   type="artist"
                   id={artist.id}
                   title={artist.name}
-                  imageUrl={artist.images && Array.isArray(artist.images) && artist.images.length > 0 ? artist.images[0] : getFallbackImage('artist', artist.id)}
+                  imageUrl={undefined}
                   category="ARTIST"
                   href={`/artist/${artist.id}`}
                   bio={artist.bio}

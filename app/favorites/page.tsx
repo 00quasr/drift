@@ -332,7 +332,6 @@ export default function FavoritesPage() {
             <ViewSwitcher 
               viewMode={viewMode}
               onViewModeChange={setViewMode}
-              itemCount={filteredFavorites.length}
             />
           </div>
 

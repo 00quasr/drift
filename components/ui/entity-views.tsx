@@ -5,6 +5,7 @@ import { EntityCard } from './entity-card'
 import { Card } from './card'
 import { Badge } from './badge'
 import { formatDistanceToNow } from 'date-fns'
+import { getFallbackImage } from '@/lib/utils/imageUtils'
 import { 
   Heart, 
   MapPin, 
@@ -56,13 +57,27 @@ export function EntityViews({
     return entity.name || entity.title || 'Unknown'
   }
 
-  const getEntityImage = (entity: BaseEntity) => {
+  const getUploadedImage = (entity: BaseEntity) => {
+    // Only return actual uploaded images, not fallbacks
     if (entity.imageUrl) return entity.imageUrl
     if (entity.image_url) return entity.image_url
+    // Check images array first (contains actual uploaded images)
     if (entity.images && Array.isArray(entity.images) && entity.images.length > 0) {
       return entity.images[0]
     }
+    // Fallback to flyer_url for events (may contain older/seed data)
+    if (entity.flyer_url) return entity.flyer_url
     return null
+  }
+
+  const getGridImage = (entity: BaseEntity) => {
+    // For grid view: ALWAYS return undefined so EntityCard uses random background assets
+    return undefined
+  }
+
+  const getListImage = (entity: BaseEntity) => {
+    // For list view: only uploaded images, no background assets
+    return getUploadedImage(entity)
   }
 
   const getEntityLocation = (entity: BaseEntity) => {
@@ -104,7 +119,7 @@ export function EntityViews({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {entities.map((entity) => {
           const entityName = getEntityName(entity)
-          const imageUrl = getEntityImage(entity)
+          const imageUrl = getGridImage(entity)
           const location = getEntityLocation(entity)
 
           if (entityType === 'artist') {
@@ -114,7 +129,7 @@ export function EntityViews({
                 type="artist"
                 id={entity.id}
                 title={entityName}
-                imageUrl={imageUrl || ''}
+                imageUrl={imageUrl}
                 category={entity.genres?.[0] || 'Electronic'}
                 href={getEntityHref(entity)}
                 bio={entity.bio}
@@ -132,7 +147,7 @@ export function EntityViews({
                 type="venue"
                 id={entity.id}
                 title={entityName}
-                imageUrl={imageUrl || ''}
+                imageUrl={imageUrl}
                 category={entity.city || 'Unknown Location'}
                 href={getEntityHref(entity)}
                 city={entity.city || 'Unknown'}
@@ -148,7 +163,7 @@ export function EntityViews({
                 type="event"
                 id={entity.id}
                 title={entityName}
-                imageUrl={imageUrl || ''}
+                imageUrl={imageUrl}
                 category="EVENT"
                 href={getEntityHref(entity)}
                 artist={entity.artists?.[0]?.name || entity.artist || 'Various Artists'}
@@ -173,100 +188,121 @@ export function EntityViews({
         {entities.map((entity) => {
           const Icon = getEntityIcon(entityType)
           const entityName = getEntityName(entity)
-          const imageUrl = getEntityImage(entity)
+          const imageUrl = getListImage(entity)
           const location = getEntityLocation(entity)
 
           return (
-            <Card key={entity.id} className="bg-white/5 border border-white/20 hover:border-white/40 transition-all duration-300 group">
-              <div className="p-6">
-                <div className="flex items-center gap-6">
-                  {/* Image/Icon */}
-                  <div className="relative w-20 h-20 bg-white/10 border border-white/20 flex-shrink-0">
-                    {imageUrl ? (
-                      <Image
-                        src={imageUrl}
-                        alt={entityName}
-                        fill
-                        className="object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <Icon className="w-8 h-8 text-white/60" />
-                      </div>
-                    )}
-                  </div>
+            <div key={entity.id} className="group relative overflow-hidden bg-black border-2 border-white/20 hover:border-white/60 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl">
+              <Link href={getEntityHref(entity)}>
+                <div className="p-6">
+                  <div className="flex items-center gap-6">
+                    {/* Image/Icon */}
+                    <div className="relative w-20 h-20 bg-white/10 border border-white/20 flex-shrink-0">
+                      {imageUrl ? (
+                        <Image
+                          src={imageUrl}
+                          alt={entityName}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Icon className="w-8 h-8 text-white/60" />
+                        </div>
+                      )}
+                    </div>
 
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-3 mb-2">
-                          <Badge className="font-bold tracking-wider uppercase text-xs bg-white/10 text-white border-white/20">
-                            {entityType}
-                          </Badge>
-                          <Link href={getEntityHref(entity)}>
-                            <h4 className="text-xl font-bold tracking-wider uppercase text-white hover:text-white/80 transition-colors">
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="bg-black/80 backdrop-blur-sm border border-white/60 px-3 py-1">
+                              <span className="text-white text-xs font-bold tracking-widest uppercase font-mono">
+                                {entityType}
+                              </span>
+                            </div>
+                            <h4 className="text-xl font-bold tracking-wider uppercase text-white group-hover:text-white/80 transition-colors">
                               {entityName}
                             </h4>
-                          </Link>
-                        </div>
-                        
-                        <div className="flex items-center gap-6 text-white/60 text-sm">
-                          {location && (
-                            <div className="flex items-center gap-2">
-                              <MapPin className="w-4 h-4" />
-                              <span>{location}</span>
-                            </div>
-                          )}
-                          {entity.capacity && (
-                            <div className="flex items-center gap-2">
-                              <Users className="w-4 h-4" />
-                              <span>{entity.capacity.toLocaleString()} capacity</span>
-                            </div>
-                          )}
-                          {entity.created_at && (
-                            <div className="flex items-center gap-2">
-                              <Clock className="w-4 h-4" />
-                              <span>{formatDistanceToNow(new Date(entity.created_at), { addSuffix: true })}</span>
-                            </div>
-                          )}
-                        </div>
-
-                        {entity.genres && entity.genres.length > 0 && (
-                          <div className="flex flex-wrap gap-2 mt-3">
-                            {entity.genres.slice(0, 3).map((genre) => (
-                              <div key={genre} className="bg-white/10 border border-white/20 px-2 py-1">
-                                <span className="text-white/80 text-xs font-bold tracking-wider uppercase">
-                                  {genre}
+                          </div>
+                          
+                          <div className="flex items-center gap-6 text-white/60 text-sm">
+                            {location && (
+                              <div className="flex items-center gap-2">
+                                <MapPin className="w-4 h-4" />
+                                <span className="font-bold tracking-widest uppercase">{location}</span>
+                              </div>
+                            )}
+                            {entity.capacity && (
+                              <div className="flex items-center gap-2">
+                                <Users className="w-4 h-4 text-white" />
+                                <span className="text-white font-bold text-sm tracking-wider">
+                                  {entity.capacity.toLocaleString()} CAP
                                 </span>
                               </div>
-                            ))}
+                            )}
+                            {entity.start_date && (
+                              <div className="flex items-center gap-2">
+                                <Calendar className="w-4 h-4" />
+                                <span className="font-bold tracking-widest uppercase text-xs">
+                                  {new Date(entity.start_date).toLocaleDateString()}
+                                </span>
+                              </div>
+                            )}
                           </div>
-                        )}
-                      </div>
 
-                      {/* Action Buttons */}
-                      <div className="flex items-center gap-3 ml-4">
-                        <Link href={getEntityHref(entity)}>
-                          <button className="p-2 bg-white/10 hover:bg-white/20 border border-white/30 hover:border-white/60 text-white transition-all duration-200">
-                            <ExternalLink className="w-4 h-4" />
-                          </button>
-                        </Link>
-                        {showActions && onEntityAction && (
-                          <button
-                            onClick={() => onEntityAction('remove', entity)}
-                            className="p-2 bg-red-500/20 border border-red-500/40 hover:bg-red-500/30 text-red-400 transition-all duration-200"
-                            title="Remove"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        )}
+                          {entity.genres && entity.genres.length > 0 && (
+                            <div className="flex flex-wrap gap-2 mt-3">
+                              {entity.genres.slice(0, 3).map((genre) => (
+                                <div key={genre} className="bg-white/10 border border-white/30 px-2 py-1">
+                                  <span className="text-white text-xs font-bold tracking-widest uppercase">
+                                    {genre}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex items-center gap-3 ml-4">
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                            <span className="text-white text-sm font-bold tracking-wider uppercase">
+                              ENTER
+                            </span>
+                          </div>
+                          {showActions && onEntityAction && (
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                onEntityAction('remove', entity)
+                              }}
+                              className="p-2 bg-red-500/20 border border-red-500/40 hover:bg-red-500/30 text-red-400 transition-all duration-200"
+                              title="Remove"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
+              </Link>
+
+              {/* Angular Corner Design */}
+              <div className="absolute top-4 right-4 w-8 h-8 z-20">
+                <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
               </div>
-            </Card>
+
+              {/* Glitch Effect Overlay */}
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-300 pointer-events-none z-30">
+                <div className="h-full w-full bg-gradient-to-r from-transparent via-white/10 to-transparent transform skew-x-12" />
+              </div>
+            </div>
           )
         })}
       </div>

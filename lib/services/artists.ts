@@ -12,6 +12,7 @@ export async function getArtists(filters?: {
   genres?: string[]
   limit?: number
   offset?: number
+  status?: string
 }) {
   const supabase = createClient()
   
@@ -23,6 +24,13 @@ export async function getArtists(filters?: {
     `)
     .eq('is_active', true)
     .order('created_at', { ascending: false })
+
+  // Handle status filter - default to published for public API, allow override
+  if (filters?.status) {
+    query = query.eq('status', filters.status)
+  } else {
+    query = query.eq('status', 'published')
+  }
 
   if (filters?.city) {
     query = query.ilike('city', `%${filters.city}%`)
@@ -219,6 +227,7 @@ export async function searchArtists(query: string, filters?: {
   city?: string
   genres?: string[]
   limit?: number
+  status?: string
 }) {
   const supabase = createClient()
   
@@ -230,6 +239,13 @@ export async function searchArtists(query: string, filters?: {
     `)
     .eq('is_active', true)
     .or(`name.ilike.%${query}%,bio.ilike.%${query}%,city.ilike.%${query}%`)
+
+  // Handle status filter - default to published for public search, allow override
+  if (filters?.status) {
+    searchQuery = searchQuery.eq('status', filters.status)
+  } else {
+    searchQuery = searchQuery.eq('status', 'published')
+  }
 
   if (filters?.city) {
     searchQuery = searchQuery.ilike('city', `%${filters.city}%`)

@@ -5,6 +5,8 @@ import { Search, MapPin, Users, Star, SlidersHorizontal, Building, Zap } from 'l
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { EntityCard } from '@/components/ui/entity-card'
+import { EntityViews } from '@/components/ui/entity-views'
+import { ViewSwitcher, ViewMode } from '@/components/ui/view-switcher'
 import { getVenues } from '@/lib/services/venues'
 import { getFallbackImage, isValidImageUrl } from '@/lib/utils/imageUtils'
 
@@ -15,6 +17,7 @@ export default function VenuesPage() {
   const [selectedCountry, setSelectedCountry] = useState<string>('all')
   const [selectedGenre, setSelectedGenre] = useState<string>('all')
   const [filtersOpen, setFiltersOpen] = useState(false)
+  const [viewMode, setViewMode] = useState<ViewMode>('grid')
 
   useEffect(() => {
     async function loadVenues() {
@@ -171,47 +174,39 @@ export default function VenuesPage() {
               <div className="w-2 h-2 bg-white" />
               VENUES
             </h2>
-            <p className="text-white/60 font-bold tracking-widest uppercase text-sm">
-              {filteredVenues.length} VENUES FOUND
-            </p>
+            <ViewSwitcher 
+              viewMode={viewMode}
+              onViewModeChange={setViewMode}
+              itemCount={filteredVenues.length}
+            />
           </div>
         </div>
 
-        {/* Venues Grid */}
-        {filteredVenues.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredVenues.map((venue) => (
-              <EntityCard
-                key={venue.id}
-                type="venue"
-                id={venue.id}
-                title={venue.name}
-                imageUrl={isValidImageUrl(venue.image_url) ? venue.image_url : getFallbackImage('venue', venue.id)}
-                category={venue.city || 'Unknown Location'}
-                href={`/venue/${venue.id}`}
-                city={venue.city || 'Unknown'}
-                country={venue.country || 'Unknown'}
-                capacity={venue.capacity}
-                genres={venue.genres || []}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-32">
-            <div className="w-16 h-16 bg-white border-2 border-white mx-auto mb-8 relative">
-              <div className="absolute inset-2 bg-black" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <MapPin className="w-6 h-6 text-white" />
-              </div>
-            </div>
-            <h3 className="text-white font-bold tracking-widest uppercase text-lg mb-4">
-              NO VENUES FOUND
-            </h3>
-            <p className="text-white/60 font-medium tracking-wider uppercase">
-              TRY ADJUSTING YOUR SEARCH OR FILTERS
-            </p>
-          </div>
-        )}
+        {/* Venues Views */}
+        <EntityViews
+          entities={filteredVenues.map(venue => ({
+            ...venue,
+            name: venue.name,
+            imageUrl: (() => {
+              // First check legacy image_url field
+              if (isValidImageUrl(venue.image_url)) {
+                return venue.image_url!
+              }
+              // Then check images array from venue creation
+              if (venue.images && Array.isArray(venue.images) && venue.images.length > 0) {
+                const firstImage = venue.images[0]
+                if (isValidImageUrl(firstImage)) {
+                  return firstImage
+                }
+              }
+              // Fall back to generated image
+              return getFallbackImage('venue', venue.id)
+            })()
+          }))}
+          viewMode={viewMode}
+          entityType="venue"
+          emptyMessage="NO VENUES FOUND - TRY ADJUSTING YOUR SEARCH OR FILTERS"
+        />
       </div>
     </div>
   )

@@ -48,7 +48,9 @@ type EntityCardProps = VenueCardProps | EventCardProps | ArtistCardProps;
 
 export const EntityCard: React.FC<EntityCardProps> = (props) => {
   const { id, title, imageUrl, category, href, type } = props;
-  const backgroundImage = getRandomBackgroundImage(id);
+  
+  // Use the actual uploaded image if available, otherwise fall back to random background
+  const displayImage = imageUrl || getRandomBackgroundImage(id);
 
   return (
     <Link href={href}>
@@ -56,8 +58,8 @@ export const EntityCard: React.FC<EntityCardProps> = (props) => {
         {/* Background Image */}
         <div className="absolute inset-0">
           <Image
-            src={backgroundImage}
-            alt=""
+            src={displayImage}
+            alt={title}
             fill
             className="object-cover opacity-50 group-hover:opacity-70 transition-opacity duration-300"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

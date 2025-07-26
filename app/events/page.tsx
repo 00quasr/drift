@@ -5,6 +5,8 @@ import { Search, Calendar, MapPin, Users, Clock, SlidersHorizontal, Zap, Radio }
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { EntityCard } from '@/components/ui/entity-card'
+import { EntityViews } from '@/components/ui/entity-views'
+import { ViewSwitcher, ViewMode } from '@/components/ui/view-switcher'
 import { getEvents } from '@/lib/services/events'
 import { getFallbackImage, isValidImageUrl } from '@/lib/utils/imageUtils'
 
@@ -13,8 +15,9 @@ export default function EventsPage() {
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedGenre, setSelectedGenre] = useState<string>('all')
-  const [showUpcoming, setShowUpcoming] = useState(true)
+  const [showUpcoming, setShowUpcoming] = useState(false)
   const [filtersOpen, setFiltersOpen] = useState(false)
+  const [viewMode, setViewMode] = useState<ViewMode>('grid')
 
   useEffect(() => {
     async function loadEvents() {
@@ -193,36 +196,45 @@ export default function EventsPage() {
                 {showUpcoming ? 'UPCOMING EVENTS' : 'PAST EVENTS'}
               </h2>
             </div>
-            <div className="text-right">
-              <p className="text-white/80 font-bold tracking-wider uppercase text-sm">
-                {filteredEvents.length} EVENT{filteredEvents.length !== 1 ? 'S' : ''} FOUND
-              </p>
-            </div>
+            <ViewSwitcher 
+              viewMode={viewMode}
+              onViewModeChange={setViewMode}
+              itemCount={filteredEvents.length}
+            />
           </div>
         </div>
 
-        {/* Events Grid */}
+        {/* Events Views */}
         {filteredEvents.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredEvents.map((event) => (
-              <EntityCard
-                key={event.id}
-                type="event"
-                id={event.id}
-                title={event.title}
-                imageUrl={isValidImageUrl(event.flyer_url) ? event.flyer_url! : getFallbackImage('event', event.id)}
-                category="EVENT"
-                href={`/event/${event.id}`}
-                artist={event.artists?.[0]?.name || 'Various Artists'}
-                date={new Date(event.start_date).toLocaleDateString()}
-                time={new Date(event.start_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                venue={event.venue?.name || 'TBA'}
-                location={event.venue?.city ? `${event.venue.city}, ${event.venue.country}` : 'Location TBA'}
-                price={event.ticket_price_min && event.ticket_price_max ? `€${event.ticket_price_min}-€${event.ticket_price_max}` : 'Free'}
-                isUpcoming={new Date(event.start_date) > new Date()}
-              />
-            ))}
-          </div>
+          <EntityViews
+            entities={filteredEvents.map(event => ({
+              ...event,
+              name: event.title,
+              title: event.title,
+              imageUrl: (() => {
+                // First check flyer_url
+                if (isValidImageUrl(event.flyer_url)) {
+                  return event.flyer_url!
+                }
+                // Then check images array from event creation
+                if (event.images && Array.isArray(event.images) && event.images.length > 0) {
+                  const firstImage = event.images[0]
+                  if (isValidImageUrl(firstImage)) {
+                    return firstImage
+                  }
+                }
+                // Fall back to generated image
+                return getFallbackImage('event', event.id)
+              })(),
+              start_date: event.start_date,
+              artist: event.artists?.[0]?.name || 'Various Artists',
+              venue: event.venue?.name || 'TBA',
+              city: event.venue?.city,
+              country: event.venue?.country
+            }))}
+            viewMode={viewMode}
+            entityType="event"
+          />
         ) : (
           <div className="text-center py-32">
             <div className="w-16 h-16 bg-white border-2 border-white mx-auto mb-8 relative">

@@ -5,6 +5,8 @@ import { Search, Music, Star, SlidersHorizontal, Mic, Zap } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { EntityCard } from '@/components/ui/entity-card'
+import { EntityViews } from '@/components/ui/entity-views'
+import { ViewSwitcher, ViewMode } from '@/components/ui/view-switcher'
 import { getArtists } from '@/lib/services/artists'
 import { getFallbackImage, isValidImageUrl } from '@/lib/utils/imageUtils'
 
@@ -16,6 +18,7 @@ export default function ArtistsPage() {
   const [selectedCountry, setSelectedCountry] = useState<string>('all')
   const [sortBy, setSortBy] = useState<string>('name')
   const [filtersOpen, setFiltersOpen] = useState(false)
+  const [viewMode, setViewMode] = useState<ViewMode>('grid')
 
   useEffect(() => {
     async function loadArtists() {
@@ -199,49 +202,39 @@ export default function ArtistsPage() {
               <div className="w-2 h-2 bg-white" />
               ARTISTS
             </h2>
-            <p className="text-white/60 font-bold tracking-widest uppercase text-sm">
-              {filteredArtists.length} ARTISTS FOUND
-            </p>
+            <ViewSwitcher 
+              viewMode={viewMode}
+              onViewModeChange={setViewMode}
+              itemCount={filteredArtists.length}
+            />
           </div>
         </div>
 
-        {/* Artists Grid */}
-        {filteredArtists.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {filteredArtists.map((artist) => (
-              <EntityCard
-                key={artist.id}
-                type="artist"
-                id={artist.id}
-                title={artist.name}
-                imageUrl={isValidImageUrl(artist.image_url) ? artist.image_url : getFallbackImage('artist', artist.id)}
-                category={artist.genres?.[0] || 'Electronic'}
-                href={`/artist/${artist.id}`}
-                bio={artist.bio}
-                city={artist.city}
-                country={artist.country}
-                genres={artist.genres || []}
-                rating={artist.average_rating}
-                reviewCount={artist.review_count}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-32">
-            <div className="w-16 h-16 bg-white border-2 border-white mx-auto mb-8 relative">
-              <div className="absolute inset-2 bg-black" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Music className="w-6 h-6 text-white" />
-              </div>
-            </div>
-            <h3 className="text-white font-bold tracking-widest uppercase text-lg mb-4">
-              NO ARTISTS FOUND
-            </h3>
-            <p className="text-white/60 font-medium tracking-wider uppercase">
-              TRY ADJUSTING YOUR SEARCH OR FILTERS
-            </p>
-          </div>
-        )}
+        {/* Artists Views */}
+        <EntityViews
+          entities={filteredArtists.map(artist => ({
+            ...artist,
+            name: artist.name,
+            imageUrl: (() => {
+              // First check legacy image_url field
+              if (isValidImageUrl(artist.image_url)) {
+                return artist.image_url!
+              }
+              // Then check images array from artist creation
+              if (artist.images && Array.isArray(artist.images) && artist.images.length > 0) {
+                const firstImage = artist.images[0]
+                if (isValidImageUrl(firstImage)) {
+                  return firstImage
+                }
+              }
+              // Fall back to generated image
+              return getFallbackImage('artist', artist.id)
+            })()
+          }))}
+          viewMode={viewMode}
+          entityType="artist"
+          emptyMessage="NO ARTISTS FOUND - TRY ADJUSTING YOUR SEARCH OR FILTERS"
+        />
       </div>
     </div>
   )

@@ -108,7 +108,18 @@ async function ExplorePage() {
                   type="event"
                   id={events[0].id}
                   title={events[0].title}
-                  imageUrl={isValidImageUrl(events[0].flyer_url) ? events[0].flyer_url! : getFallbackImage('event', events[0].id)}
+                  imageUrl={(() => {
+                    if (isValidImageUrl(events[0].flyer_url)) {
+                      return events[0].flyer_url!
+                    }
+                    if (events[0].images && Array.isArray(events[0].images) && events[0].images.length > 0) {
+                      const firstImage = events[0].images[0]
+                      if (isValidImageUrl(firstImage)) {
+                        return firstImage
+                      }
+                    }
+                    return getFallbackImage('event', events[0].id)
+                  })()}
                   category="FEATURED EVENT"
                   href={`/event/${events[0].id}`}
                   artist={events[0].artists?.[0]?.name || 'Various Artists'}
@@ -190,7 +201,18 @@ async function ExplorePage() {
                   type="event"
                   id={event.id}
                   title={event.title}
-                  imageUrl={isValidImageUrl(event.flyer_url) ? event.flyer_url! : getFallbackImage('event', event.id)}
+                  imageUrl={(() => {
+                    if (isValidImageUrl(event.flyer_url)) {
+                      return event.flyer_url!
+                    }
+                    if (event.images && Array.isArray(event.images) && event.images.length > 0) {
+                      const firstImage = event.images[0]
+                      if (isValidImageUrl(firstImage)) {
+                        return firstImage
+                      }
+                    }
+                    return getFallbackImage('event', event.id)
+                  })()}
                   category="EVENT"
                   href={`/event/${event.id}`}
                   artist={event.artists?.[0]?.name || 'Various Artists'}

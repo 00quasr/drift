@@ -49,7 +49,7 @@ export async function middleware(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser()
     
     if (!user) {
-      return NextResponse.redirect(new URL('/auth/login', request.url))
+      return NextResponse.redirect(new URL('/auth/signin', request.url))
     }
 
     // Check if user is admin
@@ -72,7 +72,7 @@ export async function middleware(request: NextRequest) {
     console.log('Middleware: User found:', !!user, user?.id)
     if (!user) {
       console.log('Middleware: No user, redirecting to login')
-      return NextResponse.redirect(new URL('/auth/login', request.url))
+      return NextResponse.redirect(new URL('/auth/signin', request.url))
     }
 
     // Check if user has creator role

@@ -16,7 +16,8 @@ import {
   Shield,
   ChevronDown,
   Menu,
-  X
+  X,
+  UserCheck
 } from 'lucide-react'
 
 interface CMSLayoutProps {
@@ -65,6 +66,12 @@ export default function CMSLayout({ children }: CMSLayoutProps) {
         href: '/dashboard/users', 
         label: 'User Management', 
         icon: Users,
+        roles: ['admin']
+      },
+      { 
+        href: '/dashboard/verification', 
+        label: 'Verification Requests', 
+        icon: UserCheck,
         roles: ['admin']
       },
       { 

@@ -8,9 +8,11 @@ export async function GET(request: NextRequest) {
     const authHeader = request.headers.get('Authorization')
     const token = authHeader?.replace('Bearer ', '')
     
+    // Initialize cookieStore outside of conditional
+    const cookieStore = cookies()
+    
     if (!token) {
       // Try to get session from cookies as fallback
-      const cookieStore = cookies()
       const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -80,21 +82,24 @@ export async function GET(request: NextRequest) {
       artists: 0,
       totalViews: 0,
       totalLikes: 0,
-      recentActivity: []
+      recentActivity: [],
+      pendingVerifications: 0
     }
 
     // Role-based stats fetching
     if (profile.role === 'admin') {
       // Admin can see all stats
-      const [venuesResult, eventsResult, artistsResult] = await Promise.all([
+      const [venuesResult, eventsResult, artistsResult, verificationsResult] = await Promise.all([
         supabase.from('venues').select('id', { count: 'exact' }),
         supabase.from('events').select('id', { count: 'exact' }),
-        supabase.from('artists').select('id', { count: 'exact' })
+        supabase.from('artists').select('id', { count: 'exact' }),
+        supabase.from('verification_requests').select('id', { count: 'exact' }).eq('status', 'pending')
       ])
 
       stats.venues = venuesResult.count || 0
       stats.events = eventsResult.count || 0
       stats.artists = artistsResult.count || 0
+      stats.pendingVerifications = verificationsResult.count || 0
 
       // Get recent activity for admin
       const { data: recentActivity } = await supabase

@@ -301,10 +301,23 @@ export default function Header() {
                               </motion.div>
                             )}
                             
+                            {/* Verification link for non-verified users */}
+                            {user.role === 'fan' && (
+                              <motion.div whileHover={{ x: 2 }} transition={{ duration: 0.2 }}>
+                                <Link 
+                                  href="/verification" 
+                                  className="block px-4 py-3 text-sm font-medium text-yellow-400/80 hover:text-yellow-400 hover:bg-yellow-400/[0.04] rounded-lg transition-all duration-300"
+                                  onClick={() => setUserMenuOpen(false)}
+                                >
+                                  REQUEST VERIFICATION
+                                </Link>
+                              </motion.div>
+                            )}
+                            
                             <motion.div whileHover={{ x: 2 }} transition={{ duration: 0.2 }}>
                               <Link 
                                 href="/settings" 
-                                className="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-2xl transition-all duration-300"
+                                className="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-300"
                                 onClick={() => setUserMenuOpen(false)}
                               >
                                 SETTINGS
@@ -334,7 +347,7 @@ export default function Header() {
                 </div>
               ) : (
                 <>
-                  <Link href="/auth/login">
+                  <Link href="/auth/signin">
                     <motion.button
                       className="px-4 py-2 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg backdrop-blur-sm transition-all duration-300 border border-white/[0.04] hover:border-white/[0.08]"
                       whileHover={{ scale: 1.02 }}
@@ -343,7 +356,7 @@ export default function Header() {
                       SIGN IN
                     </motion.button>
                   </Link>
-                  <Link href="/auth/register">
+                  <Link href="/auth/signin?mode=register">
                     <motion.button
                       className="px-4 py-2 bg-white/95 hover:bg-white text-black text-sm font-medium rounded-lg transition-all duration-300 shadow-lg"
                       whileHover={{ scale: 1.02 }}
@@ -596,6 +609,18 @@ export default function Header() {
                       </Link>
                     )}
                     
+                    {/* Verification link for non-verified users */}
+                    {user.role === 'fan' && (
+                      <Link href="/verification">
+                        <button 
+                          className="block w-full text-left px-4 py-4 text-yellow-400/80 hover:text-yellow-400 hover:bg-yellow-400/[0.04] rounded-lg transition-all duration-200 min-h-[48px] flex items-center"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          REQUEST VERIFICATION
+                        </button>
+                      </Link>
+                    )}
+                    
                     {/* Common user links */}
                     <Link href="/favorites">
                       <button 
@@ -640,7 +665,7 @@ export default function Header() {
                   </>
                 ) : (
                   <>
-                    <Link href="/auth/login">
+                    <Link href="/auth/signin">
                       <button 
                         className="block w-full text-center px-6 py-4 text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-200 font-medium min-h-[48px] flex items-center justify-center"
                         onClick={() => setMobileMenuOpen(false)}
@@ -648,7 +673,7 @@ export default function Header() {
                         SIGN IN
                       </button>
                     </Link>
-                    <Link href="/auth/register">
+                    <Link href="/auth/signin?mode=register">
                       <button 
                         className="block w-full text-center px-6 py-4 bg-white/95 hover:bg-white text-black rounded-lg transition-all duration-200 font-medium min-h-[48px] flex items-center justify-center"
                         onClick={() => setMobileMenuOpen(false)}

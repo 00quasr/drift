@@ -11,7 +11,8 @@ import {
   Eye,
   Heart,
   TrendingUp,
-  Plus
+  Plus,
+  Shield
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -22,6 +23,7 @@ interface DashboardStats {
   totalViews: number
   totalLikes: number
   recentActivity: any[]
+  pendingVerifications?: number
 }
 
 export default function DashboardOverview() {
@@ -32,7 +34,8 @@ export default function DashboardOverview() {
     artists: 0,
     totalViews: 0,
     totalLikes: 0,
-    recentActivity: []
+    recentActivity: [],
+    pendingVerifications: 0
   })
   const [loading, setLoading] = useState(true)
 
@@ -42,10 +45,24 @@ export default function DashboardOverview() {
 
   const fetchDashboardStats = async () => {
     try {
-      const response = await fetch('/api/dashboard/stats')
+      // Import auth service here to get token
+      const { authService } = await import('@/lib/auth')
+      const token = await authService.getAccessToken()
+      
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      }
+      
+      if (token) {
+        headers.Authorization = `Bearer ${token}`
+      }
+      
+      const response = await fetch('/api/dashboard/stats', { headers })
       if (response.ok) {
-        const data = await response.json()
-        setStats(data)
+        const result = await response.json()
+        if (result.success && result.data) {
+          setStats(result.data)
+        }
       }
     } catch (error) {
       console.error('Error fetching dashboard stats:', error)
@@ -81,6 +98,15 @@ export default function DashboardOverview() {
         href: '/dashboard/artists/new',
         icon: Music,
         description: 'Create artist profile'
+      })
+    }
+
+    if (user?.role === 'admin') {
+      actions.push({
+        title: 'Verification Requests',
+        href: '/admin/verification',
+        icon: Shield,
+        description: 'Review and approve user verification requests'
       })
     }
 
@@ -177,7 +203,7 @@ export default function DashboardOverview() {
         <h2 className="text-2xl font-bold tracking-wider uppercase text-white mb-6">
           Overview
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 ${user?.role === 'admin' ? 'lg:grid-cols-5' : 'lg:grid-cols-4'}`}>
           <StatCard
             icon={MapPin}
             label="Total Venues"
@@ -199,9 +225,19 @@ export default function DashboardOverview() {
           <StatCard
             icon={Eye}
             label="Total Views"
-            value={stats.totalViews.toLocaleString()}
+            value={stats.totalViews?.toLocaleString() || '0'}
             trend={23}
           />
+          {user?.role === 'admin' && (
+            <Link href="/dashboard/verification">
+              <StatCard
+                icon={Shield}
+                label="Pending Verifications"
+                value={stats.pendingVerifications || 0}
+                trend={null}
+              />
+            </Link>
+          )}
         </div>
       </div>
 

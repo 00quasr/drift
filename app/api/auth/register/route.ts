@@ -42,13 +42,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Create the profile using service role (bypasses RLS)
+    // All new users start as 'fan' and must go through verification for other roles
     const { error: profileError } = await supabase
       .from('profiles')
       .insert({
         id: authData.user.id,
         full_name,
-        role,
-        is_verified: role === 'fan' // Fans are auto-verified
+        role: 'fan', // Always start as fan
+        is_verified: false // All users start unverified
       })
 
     if (profileError) {
@@ -66,8 +67,8 @@ export async function POST(request: NextRequest) {
       user: {
         id: authData.user.id,
         email: authData.user.email,
-        role,
-        is_verified: role === 'fan'
+        role: 'fan',
+        is_verified: false
       }
     })
 

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import { Footer } from "@/components/ui/footer-section";
 import LayoutContent from "@/components/LayoutContent";
 import { AuthProvider } from "@/contexts/AuthContext";
 

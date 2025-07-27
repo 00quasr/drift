@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, ChevronLeft, ChevronRight, Download, ZoomIn, ZoomOut } from 'lucide-react'
 import Image from 'next/image'
+import ClassicLoader from '@/components/ui/loader'
 
 interface ImageViewerProps {
   images: string[]
@@ -195,7 +196,7 @@ export default function ImageViewer({
             {/* Loading spinner */}
             {!imageLoaded && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded">
-                <div className="w-8 h-8 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                <ClassicLoader />
               </div>
             )}
 

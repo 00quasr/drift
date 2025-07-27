@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import Image from 'next/image'
+import ClassicLoader from '@/components/ui/loader'
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -153,7 +154,7 @@ export default function Header() {
             {/* User Section */}
             <div className="hidden md:flex items-center space-x-3">
               {loading ? (
-                <div className="w-8 h-8 animate-spin rounded-full border-2 border-white/20 border-t-white/80" />
+                <ClassicLoader />
               ) : user ? (
                 <div className="relative">
                   <motion.button
@@ -405,7 +406,9 @@ export default function Header() {
                 />
                 {isSearching && (
                   <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                    <div className="w-4 h-4 border-2 border-white/20 border-t-white/80 rounded-full animate-spin" />
+                    <div className="scale-50">
+                      <ClassicLoader />
+                    </div>
                   </div>
                 )}
               </div>

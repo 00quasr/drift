@@ -12,6 +12,7 @@ import { ProfileFavorites } from '@/components/profile/ProfileFavorites'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card } from '@/components/ui/card'
 import { AlertCircle } from 'lucide-react'
+import ClassicLoader from '@/components/ui/loader'
 
 interface ProfileData {
   id: string
@@ -124,7 +125,7 @@ export default function ProfilePage() {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
         <div className="text-center space-y-4">
-          <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <ClassicLoader />
           <p className="text-white/80 font-bold tracking-wider uppercase">
             LOADING PROFILE...
           </p>

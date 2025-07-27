@@ -9,6 +9,7 @@ import { getEvents } from '@/lib/services/events'
 import { getVenues } from '@/lib/services/venues'
 import { getArtists } from '@/lib/services/artists'
 import { getFallbackImage, isValidImageUrl } from '@/lib/utils/imageUtils'
+import ClassicLoader from '@/components/ui/loader'
 
 const genreTags = ['ALL', 'TECHNO', 'HOUSE', 'TRANCE', 'DRUM & BASS', 'DUBSTEP', 'AMBIENT', 'MINIMAL', 'PROGRESSIVE']
 
@@ -30,11 +31,8 @@ async function ExplorePage() {
       <div className="min-h-screen bg-black pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center py-32">
-            <div className="w-16 h-16 bg-white border-2 border-white mx-auto mb-8 relative">
-              <div className="absolute inset-2 bg-black" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-4 h-4 bg-cyan-400 animate-pulse" />
-              </div>
+            <div className="mb-8 flex justify-center">
+              <ClassicLoader />
             </div>
             <h1 className="text-4xl font-bold text-white tracking-widest uppercase mb-4">
               EXPLORE
@@ -300,11 +298,8 @@ export default function ExplorePageWrapper() {
       <div className="min-h-screen bg-black pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center py-32">
-            <div className="w-16 h-16 bg-white border-2 border-white mx-auto mb-8 relative">
-              <div className="absolute inset-2 bg-black" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-4 h-4 bg-white animate-pulse" />
-              </div>
+            <div className="mb-8 flex justify-center">
+              <ClassicLoader />
             </div>
             <h1 className="text-4xl font-bold text-white tracking-widest uppercase mb-4">
               EXPLORE

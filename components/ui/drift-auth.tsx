@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { Eye, EyeOff, User, Mail, Lock, UserPlus, LogIn, AlertCircle, CheckCircle2 } from 'lucide-react'
 import { Badge } from './badge'
 import { UserRole } from '@/lib/auth'
+import ClassicLoader from '@/components/ui/loader'
 
 // Google Icon Component
 const GoogleIcon = () => (
@@ -219,7 +220,7 @@ export const DriftAuth: React.FC<DriftAuthProps> = ({
                 >
                   {isLoading ? (
                     <div className="flex items-center justify-center gap-2">
-                      <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+                      <div className="scale-50"><ClassicLoader /></div>
                       SIGNING IN...
                     </div>
                   ) : (
@@ -368,7 +369,7 @@ export const DriftAuth: React.FC<DriftAuthProps> = ({
                 >
                   {isLoading ? (
                     <div className="flex items-center justify-center gap-2">
-                      <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+                      <div className="scale-50"><ClassicLoader /></div>
                       CREATING ACCOUNT...
                     </div>
                   ) : (

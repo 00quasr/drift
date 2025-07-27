@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import ClassicLoader from '@/components/ui/loader'
 import { 
   Music, 
   Plus, 
@@ -325,7 +326,7 @@ export default function ArtistsPage() {
       {/* Artists Grid */}
       {loading ? (
         <div className="flex items-center justify-center min-h-[400px]">
-          <div className="w-8 h-8 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+          <ClassicLoader />
         </div>
       ) : filteredArtists.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

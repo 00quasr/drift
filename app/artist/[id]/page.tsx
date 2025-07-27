@@ -14,6 +14,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { ReviewModal } from '@/components/reviews/ReviewModal'
 import { favoritesService } from '@/lib/services/favorites'
+import ClassicLoader from '@/components/ui/loader'
 
 interface ArtistPageProps {
   params: { id: string }
@@ -100,7 +101,7 @@ export default function ArtistPage({ params }: ArtistPageProps) {
   if (loading) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-white/20 border-t-white/80 rounded-full animate-spin" />
+        <ClassicLoader />
       </div>
     )
   }
@@ -212,7 +213,9 @@ export default function ArtistPage({ params }: ArtistPageProps) {
                 title={isLiked ? 'Unlike Artist' : 'Like Artist'}
               >
                 {likesLoading ? (
-                  <div className="w-5 h-5 border border-white/30 border-t-white/80 rounded-full animate-spin" />
+                  <div className="scale-50">
+                    <ClassicLoader />
+                  </div>
                 ) : (
                   <Heart className={`w-5 h-5 ${isLiked ? 'fill-red-400' : ''}`} />
                 )}

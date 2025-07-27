@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import CMSLayout from '@/components/cms/CMSLayout'
+import ClassicLoader from '@/components/ui/loader'
 
 export default function DashboardLayout({
   children,
@@ -31,7 +32,7 @@ export default function DashboardLayout({
   if (loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="w-8 h-8 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+        <ClassicLoader />
       </div>
     )
   }

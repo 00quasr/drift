@@ -15,6 +15,7 @@ import {
   Shield
 } from 'lucide-react'
 import Link from 'next/link'
+import ClassicLoader from '@/components/ui/loader'
 
 interface DashboardStats {
   venues: number
@@ -140,7 +141,7 @@ export default function DashboardOverview() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="w-8 h-8 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+        <ClassicLoader />
       </div>
     )
   }

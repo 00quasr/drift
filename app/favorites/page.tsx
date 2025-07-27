@@ -21,6 +21,7 @@ import {
 import Link from 'next/link'
 import Image from 'next/image'
 import { favoritesService } from '@/lib/services/favorites'
+import ClassicLoader from '@/components/ui/loader'
 
 interface Favorite {
   id: string
@@ -395,7 +396,9 @@ export default function FavoritesPage() {
                                 title="Remove from favorites"
                               >
                                 {removingId === favorite.id ? (
-                                  <div className="w-4 h-4 border border-white/30 border-t-white/80 rounded-full animate-spin" />
+                                  <div className="scale-50">
+                                    <ClassicLoader />
+                                  </div>
                                 ) : (
                                   <Trash2 className="w-4 h-4 text-red-400" />
                                 )}
@@ -544,7 +547,9 @@ export default function FavoritesPage() {
                                     title="Remove from favorites"
                                   >
                                     {removingId === favorite.id ? (
-                                      <div className="w-4 h-4 border border-white/30 border-t-white/80 rounded-full animate-spin" />
+                                      <div className="scale-50">
+                                        <ClassicLoader />
+                                      </div>
                                     ) : (
                                       <Trash2 className="w-4 h-4" />
                                     )}
@@ -628,7 +633,9 @@ export default function FavoritesPage() {
                                     title="Remove from favorites"
                                   >
                                     {removingId === favorite.id ? (
-                                      <div className="w-4 h-4 border border-white/30 border-t-white/80 rounded-full animate-spin" />
+                                      <div className="scale-50">
+                                        <ClassicLoader />
+                                      </div>
                                     ) : (
                                       <Trash2 className="w-4 h-4" />
                                     )}

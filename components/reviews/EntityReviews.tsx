@@ -7,6 +7,7 @@ import { StarRating } from '@/components/ui/star-rating'
 import { useAuth } from '@/contexts/AuthContext'
 import { authService } from '@/lib/auth'
 import { formatDistanceToNow } from 'date-fns'
+import ClassicLoader from '@/components/ui/loader'
 
 interface Review {
   id: string
@@ -219,7 +220,9 @@ export const EntityReviews: React.FC<EntityReviewsProps> = ({
           </h2>
         </div>
         <div className="text-center py-12">
-          <div className="w-8 h-8 border-2 border-white/20 border-t-white/80 rounded-full animate-spin mx-auto mb-4" />
+          <div className="flex justify-center mb-4">
+            <ClassicLoader />
+          </div>
           <p className="text-white/60 font-bold tracking-widest uppercase text-sm">
             LOADING REVIEWS...
           </p>
@@ -430,7 +433,9 @@ export const EntityReviews: React.FC<EntityReviewsProps> = ({
                           title="Delete Review"
                         >
                           {deletingReviewId === review.id ? (
-                            <div className="w-4 h-4 border border-white/30 border-t-white/80 rounded-full animate-spin" />
+                            <div className="scale-50">
+                              <ClassicLoader />
+                            </div>
                           ) : (
                             <Trash2 className="w-4 h-4" />
                           )}

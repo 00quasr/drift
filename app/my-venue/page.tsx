@@ -24,6 +24,7 @@ import {
 } from 'lucide-react'
 import { uploadVenueImage, moderateImage, validateImageFile } from '@/lib/services/storage'
 import ImageGallery from '@/components/ui/ImageGallery'
+import ClassicLoader from '@/components/ui/loader'
 
 interface VenueFormData {
   name: string
@@ -396,7 +397,7 @@ export default function MyVenuePage() {
   if (loading || isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="w-8 h-8 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+        <ClassicLoader />
       </div>
     )
   }

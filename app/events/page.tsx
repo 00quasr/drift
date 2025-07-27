@@ -9,6 +9,7 @@ import { EntityViews } from '@/components/ui/entity-views'
 import { ViewSwitcher, ViewMode } from '@/components/ui/view-switcher'
 import { getEvents } from '@/lib/services/events'
 import { getFallbackImage, isValidImageUrl } from '@/lib/utils/imageUtils'
+import ClassicLoader from '@/components/ui/loader'
 
 export default function EventsPage() {
   const [events, setEvents] = useState<any[]>([])
@@ -59,11 +60,8 @@ export default function EventsPage() {
       <div className="min-h-screen bg-black pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center py-32">
-            <div className="w-16 h-16 bg-white border-2 border-white mx-auto mb-8 relative">
-              <div className="absolute inset-2 bg-black" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-4 h-4 bg-white animate-pulse" />
-              </div>
+            <div className="mb-8 flex justify-center">
+              <ClassicLoader />
             </div>
             <p className="text-white/80 font-bold tracking-widest uppercase text-sm">LOADING EVENTS...</p>
           </div>

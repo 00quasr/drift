@@ -8,6 +8,7 @@ import { ProfileEditForm } from '@/components/profile/ProfileEditForm'
 import { Card } from '@/components/ui/card'
 import { ArrowLeft, Settings } from 'lucide-react'
 import Link from 'next/link'
+import ClassicLoader from '@/components/ui/loader'
 
 export default function ProfileEditPage() {
   const { user, loading } = useAuth()
@@ -66,7 +67,7 @@ export default function ProfileEditPage() {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center">
         <div className="text-center space-y-4">
-          <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <ClassicLoader />
           <p className="text-white/80 font-bold tracking-wider uppercase">
             LOADING PROFILE...
           </p>

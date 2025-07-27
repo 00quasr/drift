@@ -6,6 +6,7 @@ import { Eye, EyeOff, Mail, Lock, User, ArrowRight } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { UserRole } from '@/lib/auth'
+import ClassicLoader from '@/components/ui/loader'
 
 interface SignInFormData {
   email: string
@@ -282,7 +283,7 @@ export const HeroAuth: React.FC<HeroAuthProps> = ({
                 whileTap={{ scale: isLoading ? 1 : 0.98 }}
               >
                 {isLoading ? (
-                  <div className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+                  <div className="scale-50"><ClassicLoader /></div>
                 ) : (
                   <>
                     {isSignIn ? 'Sign In' : 'Create Account'}

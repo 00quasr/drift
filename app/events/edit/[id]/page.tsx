@@ -20,6 +20,7 @@ import {
   Search
 } from 'lucide-react'
 import { uploadEventImage, moderateImage, validateImageFile } from '@/lib/services/storage'
+import ClassicLoader from '@/components/ui/loader'
 
 interface EventFormData {
   title: string
@@ -512,7 +513,7 @@ export default function EditEventPage({ params }: { params: { id: string } }) {
   if (loading || loading_event) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="w-8 h-8 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+        <ClassicLoader />
       </div>
     )
   }

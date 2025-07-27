@@ -8,12 +8,12 @@ import {
   Upload, 
   User, 
   Save, 
-  Loader2, 
   AlertCircle, 
   Camera,
   X,
   Check
 } from 'lucide-react'
+import ClassicLoader from '@/components/ui/loader'
 import Image from 'next/image'
 import { supabase } from '@/lib/auth'
 import { uploadProfileImage, moderateImage } from '@/lib/services/storage'
@@ -197,7 +197,7 @@ export const ProfileEditForm: React.FC<ProfileEditFormProps> = ({
   const getModerationIcon = () => {
     switch (moderationStatus) {
       case 'pending':
-        return <Loader2 className="w-4 h-4 animate-spin text-yellow-400" />
+        return <ClassicLoader />
       case 'approved':
         return <Check className="w-4 h-4 text-green-400" />
       case 'rejected':
@@ -269,7 +269,7 @@ export const ProfileEditForm: React.FC<ProfileEditFormProps> = ({
 
             {moderationStatus === 'pending' && (
               <div className="flex items-center gap-2 text-yellow-400 text-sm font-medium">
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <ClassicLoader />
                 CHECKING CONTENT...
               </div>
             )}
@@ -423,7 +423,7 @@ export const ProfileEditForm: React.FC<ProfileEditFormProps> = ({
         >
           {saving || uploading ? (
             <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              <ClassicLoader />
               {uploading ? 'UPLOADING...' : 'SAVING...'}
             </>
           ) : (

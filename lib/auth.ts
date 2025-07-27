@@ -1,11 +1,11 @@
-import { createClient } from '@supabase/supabase-js'
+import { createBrowserClient } from '@supabase/ssr'
 import { Database } from '@/lib/types/database'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
-// Client-side Supabase client for authentication
-const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey)
+// Client-side Supabase client for authentication with SSR support
+const supabase = createBrowserClient<Database>(supabaseUrl, supabaseAnonKey)
 
 export type UserRole = 'fan' | 'artist' | 'promoter' | 'club_owner' | 'admin'
 

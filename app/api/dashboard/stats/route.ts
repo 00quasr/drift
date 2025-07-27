@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { withSecurity, standardEndpointSecurity } from '@/lib/utils/apiSecurity'
+import { createApiResponse, createErrorResponse } from '@/lib/validations/api'
 
 export async function GET(request: NextRequest) {
+  return withSecurity(request, async (req) => {
   try {
     // Get the authorization header
     const authHeader = request.headers.get('Authorization')
@@ -28,10 +31,7 @@ export async function GET(request: NextRequest) {
       const { data: { session } } = await supabase.auth.getSession()
       
       if (!session?.access_token) {
-        return NextResponse.json({ 
-          success: false, 
-          error: 'Authentication required' 
-        }, { status: 401 })
+        return NextResponse.json(createErrorResponse('Authentication required'), { status: 401 })
       }
     }
     
@@ -56,10 +56,7 @@ export async function GET(request: NextRequest) {
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     
     if (authError || !user) {
-      return NextResponse.json({ 
-        success: false, 
-        error: 'Authentication required' 
-      }, { status: 401 })
+      return NextResponse.json(createErrorResponse('Authentication required'), { status: 401 })
     }
 
     // Get user role
@@ -70,10 +67,7 @@ export async function GET(request: NextRequest) {
       .single()
 
     if (!profile) {
-      return NextResponse.json({ 
-        success: false, 
-        error: 'Profile not found' 
-      }, { status: 404 })
+      return NextResponse.json(createErrorResponse('Profile not found'), { status: 404 })
     }
 
     const stats = {
@@ -164,16 +158,14 @@ export async function GET(request: NextRequest) {
     stats.totalViews = Math.floor(Math.random() * 10000) + 1000
     stats.totalLikes = Math.floor(Math.random() * 1000) + 100
 
-    return NextResponse.json({
-      success: true,
-      data: stats
-    })
+    return NextResponse.json(createApiResponse(stats))
 
   } catch (error: any) {
     console.error('Dashboard stats error:', error)
-    return NextResponse.json({
-      success: false,
-      error: error.message || 'Failed to fetch dashboard stats'
-    }, { status: 500 })
+    return NextResponse.json(
+      createErrorResponse(error.message || 'Failed to fetch dashboard stats'),
+      { status: 500 }
+    )
   }
+  }, standardEndpointSecurity)
 }

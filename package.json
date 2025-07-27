@@ -44,18 +44,22 @@
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.51.0",
     "@types/mapbox-gl": "^3.4.1",
+    "@upstash/ratelimit": "^2.0.6",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "dotenv": "^17.2.0",
     "framer-motion": "^12.23.6",
+    "helmet": "^8.1.0",
     "lucide-react": "^0.525.0",
     "mapbox-gl": "^3.13.0",
     "next": "14.2.30",
     "openai": "^5.10.1",
     "react": "^18",
     "react-dom": "^18",
-    "tailwind-merge": "^3.3.1"
+    "tailwind-merge": "^3.3.1",
+    "winston": "^3.17.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/node": "^20",

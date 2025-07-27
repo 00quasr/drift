@@ -4,23 +4,37 @@ import { createServerClient } from '@supabase/ssr'
 export async function middleware(request: NextRequest) {
   const response = NextResponse.next()
 
-  // Add CORS headers for API routes
+  // Add secure CORS headers for API routes
   if (request.nextUrl.pathname.startsWith('/api/')) {
+    const origin = request.headers.get('origin')
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://localhost:3001', 
+      'https://drift.vercel.app',
+      process.env.NEXT_PUBLIC_SITE_URL
+    ].filter(Boolean)
+
+    const isAllowedOrigin = origin && allowedOrigins.includes(origin)
+    
     // Handle preflight requests
     if (request.method === 'OPTIONS') {
       return new NextResponse(null, {
         status: 200,
         headers: {
-          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Origin': isAllowedOrigin ? origin : '',
           'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
           'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
           'Access-Control-Max-Age': '86400',
+          'Access-Control-Allow-Credentials': 'true',
         },
       })
     }
 
     // Add CORS headers to actual requests
-    response.headers.set('Access-Control-Allow-Origin', '*')
+    if (isAllowedOrigin) {
+      response.headers.set('Access-Control-Allow-Origin', origin)
+      response.headers.set('Access-Control-Allow-Credentials', 'true')
+    }
     response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
     response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With')
   }
@@ -31,26 +45,39 @@ export async function middleware(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        getAll() {
-          return request.cookies.getAll()
+        get(name: string) {
+          return request.cookies.get(name)?.value
         },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options))
+        set(name: string, value: string, options: any) {
+          response.cookies.set(name, value, options)
+        },
+        remove(name: string, options: any) {
+          response.cookies.set(name, '', {
+            ...options,
+            maxAge: 0,
+          })
         },
       },
     }
   )
   
-  // Refresh session if expired
-  await supabase.auth.getSession()
+  // Get session and verify with server for security
+  const { data: { session } } = await supabase.auth.getSession()
+  
+  // For dashboard routes, verify user with server for security
+  let verifiedUser = null
+  if (request.nextUrl.pathname.startsWith('/dashboard') && session) {
+    const { data: { user } } = await supabase.auth.getUser()
+    verifiedUser = user
+  }
 
   // Protect admin routes
   if (request.nextUrl.pathname.startsWith('/admin')) {
-    const { data: { user } } = await supabase.auth.getUser()
-    
-    if (!user) {
+    if (!session?.user) {
       return NextResponse.redirect(new URL('/auth/signin', request.url))
     }
+
+    const user = session.user
 
     // Check if user is admin
     const { data: profile } = await supabase
@@ -65,40 +92,39 @@ export async function middleware(request: NextRequest) {
   }
 
   // Protect dashboard routes
-  if (false && request.nextUrl.pathname.startsWith('/dashboard')) { // Temporarily disabled
-    console.log('Middleware: Checking dashboard access')
-    const { data: { user } } = await supabase.auth.getUser()
-    
-    console.log('Middleware: User found:', !!user, user?.id)
-    if (!user) {
-      console.log('Middleware: No user, redirecting to login')
+  if (request.nextUrl.pathname.startsWith('/dashboard')) {
+    try {
+      // Use server-verified user for security
+      if (!verifiedUser) {
+        return NextResponse.redirect(new URL('/auth/signin', request.url))
+      }
+
+      // Check if user has creator role
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('role, is_verified')
+        .eq('id', verifiedUser.id)
+        .single()
+
+      if (profileError || !profile) {
+        return NextResponse.redirect(new URL('/auth/signin', request.url))
+      }
+
+      const creatorRoles = ['artist', 'promoter', 'club_owner', 'admin']
+      if (!creatorRoles.includes(profile.role)) {
+        return NextResponse.redirect(new URL('/', request.url))
+      }
+
+      // Check verification for non-admin roles
+      if (profile.role !== 'admin' && !profile.is_verified) {
+        return NextResponse.redirect(new URL('/verification-pending', request.url))
+      }
+
+      // Dashboard access granted
+    } catch (error) {
+      console.error('Dashboard middleware error:', error)
       return NextResponse.redirect(new URL('/auth/signin', request.url))
     }
-
-    // Check if user has creator role
-    const { data: profile, error } = await supabase
-      .from('profiles')
-      .select('role, is_verified')
-      .eq('id', user.id)
-      .single()
-
-    console.log('Middleware: Profile lookup result:', { profile, error })
-
-    const creatorRoles = ['artist', 'promoter', 'club_owner', 'admin']
-    if (!profile || !creatorRoles.includes(profile.role)) {
-      console.log('Middleware: User role not allowed:', profile?.role)
-      return NextResponse.redirect(new URL('/', request.url))
-    }
-
-    console.log('Middleware: User has valid role:', profile.role)
-
-    // Check verification for non-admin roles
-    if (profile.role !== 'admin' && !profile.is_verified) {
-      console.log('Middleware: User not verified, redirecting')
-      return NextResponse.redirect(new URL('/verification-pending', request.url))
-    }
-
-    console.log('Middleware: Dashboard access granted')
   }
 
   // Add security headers

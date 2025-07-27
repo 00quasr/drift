@@ -2,23 +2,37 @@ import { NextRequest, NextResponse } from 'next/server'
 import { searchVenues } from '@/lib/services/venues'
 import { searchEvents } from '@/lib/services/events'
 import { searchArtists } from '@/lib/services/artists'
+import { withSecurity, searchEndpointSecurity } from '@/lib/utils/apiSecurity'
+import { searchQuerySchema, createApiResponse, createErrorResponse } from '@/lib/validations/api'
+import { log } from '@/lib/utils/logger'
 
 export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url)
-    const query = searchParams.get('q')
-    const type = searchParams.get('type') // venues, events, artists, or null for all
-    const city = searchParams.get('city')
-    const country = searchParams.get('country')
-    const genres = searchParams.get('genres')?.split(',').filter(Boolean)
-    const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 10
+  return withSecurity(request, async (req) => {
+    try {
+      const { searchParams } = new URL(req.url)
+      
+      // Validate search parameters
+      const validationResult = searchQuerySchema.safeParse({
+        q: searchParams.get('q'),
+        limit: searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : undefined
+      })
 
-    if (!query) {
-      return NextResponse.json({ 
-        success: false, 
-        error: 'Search query is required' 
-      }, { status: 400 })
-    }
+      if (!validationResult.success) {
+        log.security('Invalid search query', { 
+          errors: validationResult.error.errors,
+          ip: req.headers.get('x-forwarded-for') || 'unknown'
+        })
+        return NextResponse.json(
+          createErrorResponse('Invalid search parameters', validationResult.error.errors),
+          { status: 400 }
+        )
+      }
+
+      const { q: query, limit } = validationResult.data
+      const type = searchParams.get('type') // venues, events, artists, or null for all
+      const city = searchParams.get('city')
+      const country = searchParams.get('country')
+      const genres = searchParams.get('genres')?.split(',').filter(Boolean)
 
     const searchFilters = {
       city: city || undefined,
@@ -55,17 +69,22 @@ export async function GET(request: NextRequest) {
 
     const totalResults = results.venues.length + results.events.length + results.artists.length
 
-    return NextResponse.json({ 
-      success: true, 
-      data: results,
-      total: totalResults,
-      query
-    })
-  } catch (error) {
-    console.error('Error in GET /api/search:', error)
-    return NextResponse.json({ 
-      success: false, 
-      error: 'Search failed' 
-    }, { status: 500 })
-  }
+      log.api('GET', '/api/search', 200, undefined, undefined)
+      
+      return NextResponse.json(createApiResponse({
+        results,
+        total: totalResults,
+        query
+      }))
+    } catch (error) {
+      log.error('Search API error', { 
+        error: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined
+      })
+      return NextResponse.json(
+        createErrorResponse('Search failed'),
+        { status: 500 }
+      )
+    }
+  }, searchEndpointSecurity)
 }

@@ -17,7 +17,7 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'jwxlskzmmdrwrlljtfdi.supabase.co',
+        hostname: new URL(process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://jwxlskzmmdrwrlljtfdi.supabase.co').hostname,
         port: '',
         pathname: '/storage/v1/object/public/**',
       },

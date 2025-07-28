@@ -1,13 +1,21 @@
 'use client'
 
 import Link from 'next/link'
-import { Search, Menu, X, Bell, User, LogOut } from 'lucide-react'
+import { Search, Menu, X, Bell, User, LogOut, ArrowRight } from 'lucide-react'
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import Image from 'next/image'
 import ClassicLoader from '@/components/ui/loader'
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu"
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -73,10 +81,67 @@ export default function Header() {
   }, [])
 
   const navigationItems = [
-    { href: '/explore', label: 'EXPLORE' },
-    { href: '/events', label: 'EVENTS' },
-    { href: '/artists', label: 'ARTISTS' },
-    { href: '/venues', label: 'VENUES' }
+    {
+      title: "EXPLORE",
+      href: "/explore",
+      description: "DISCOVER WHAT'S TRENDING IN ELECTRONIC MUSIC",
+      items: [
+        {
+          title: "TRENDING",
+          href: "/explore/trending",
+          description: "Popular venues, events & artists"
+        },
+        {
+          title: "THIS WEEKEND",
+          href: "/explore/weekend",
+          description: "Curated events this weekend"
+        },
+        {
+          title: "LABELS & COLLECTIVES",
+          href: "/explore/labels",
+          description: "Music collectives and labels"
+        }
+      ],
+    },
+    {
+      title: "EVENTS",
+      href: "/events",
+      description: "FIND YOUR NEXT ELECTRONIC MUSIC EXPERIENCE",
+      items: [
+        {
+          title: "FESTIVALS",
+          href: "/events/festivals",
+          description: "Multi-day events with lineups"
+        },
+        {
+          title: "MAP VIEW",
+          href: "/events/map",
+          description: "Browse events by location"
+        }
+      ],
+    },
+    {
+      title: "ARTISTS",
+      href: "/artists",
+      description: "CONNECT WITH DJS AND PRODUCERS",
+      items: [
+        {
+          title: "NEWCOMERS",
+          href: "/artists/newcomers",
+          description: "Recently added artists"
+        },
+        {
+          title: "TRENDING ARTISTS",
+          href: "/artists/trending",
+          description: "Most followed and booked"
+        }
+      ],
+    },
+    {
+      title: "VENUES",
+      href: "/venues",
+      description: "DISCOVER UNDERGROUND SPACES",
+    },
   ]
 
   return (
@@ -110,23 +175,69 @@ export default function Header() {
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-6">
-              {navigationItems.map(({ href, label }) => (
-                <Link 
-                  key={href} 
-                  href={href}
-                  className={`
-                    text-sm font-medium transition-all duration-300
-                    ${pathname === href 
-                      ? 'text-white' 
-                      : 'text-white/70 hover:text-white'
-                    }
-                  `}
-                >
-                  {label}
-                </Link>
-              ))}
-            </nav>
+            <NavigationMenu className="hidden md:flex">
+              <NavigationMenuList className="space-x-2">
+                {navigationItems.map((item) => (
+                  <NavigationMenuItem key={item.title}>
+                    {item.items ? (
+                      <>
+                        <NavigationMenuTrigger className="bg-transparent text-white/70 hover:text-white hover:bg-white/10 font-bold tracking-wider uppercase text-sm">
+                          {item.title}
+                        </NavigationMenuTrigger>
+                        <NavigationMenuContent className="!w-[450px] p-6">
+                          <div className="flex flex-col gap-6">
+                            <div className="flex flex-col">
+                              <h3 className="text-lg font-bold tracking-wider uppercase text-white mb-2">{item.title}</h3>
+                              <p className="text-white/60 text-sm font-bold tracking-wide uppercase leading-relaxed">
+                                {item.description}
+                              </p>
+                            </div>
+                            <div className="flex flex-col gap-3">
+                              <NavigationMenuLink
+                                href={item.href}
+                                className="flex flex-row justify-between items-center hover:bg-white/10 py-3 px-4 rounded border border-white/20 hover:border-white/40 transition-all duration-200"
+                              >
+                                <div className="flex flex-col">
+                                  <span className="text-white font-bold tracking-wider uppercase text-sm">VIEW ALL {item.title}</span>
+                                  <span className="text-white/60 text-xs font-bold tracking-wide uppercase">Complete {item.title.toLowerCase()} section</span>
+                                </div>
+                                <ArrowRight className="w-4 h-4 text-white/60" />
+                              </NavigationMenuLink>
+                              {item.items?.map((subItem) => (
+                                <NavigationMenuLink
+                                  href={subItem.href}
+                                  key={subItem.title}
+                                  className="flex flex-row justify-between items-center hover:bg-white/10 py-3 px-4 rounded transition-all duration-200"
+                                >
+                                  <div className="flex flex-col">
+                                    <span className="text-white font-bold tracking-wider uppercase text-sm">{subItem.title}</span>
+                                    <span className="text-white/60 text-xs font-bold tracking-wide uppercase">{subItem.description}</span>
+                                  </div>
+                                  <ArrowRight className="w-4 h-4 text-white/60" />
+                                </NavigationMenuLink>
+                              ))}
+                            </div>
+                          </div>
+                        </NavigationMenuContent>
+                      </>
+                    ) : (
+                      <NavigationMenuLink
+                        href={item.href}
+                        className={`
+                          bg-transparent text-sm font-bold tracking-wider uppercase transition-all duration-300 px-4 py-2 rounded-md hover:bg-white/10
+                          ${pathname === item.href 
+                            ? 'text-white' 
+                            : 'text-white/70 hover:text-white'
+                          }
+                        `}
+                      >
+                        {item.title}
+                      </NavigationMenuLink>
+                    )}
+                  </NavigationMenuItem>
+                ))}
+              </NavigationMenuList>
+            </NavigationMenu>
           </div>
 
           {/* Right side: Actions */}
@@ -515,15 +626,33 @@ export default function Header() {
             <div className="px-6 py-6 space-y-4">
               {/* Main Navigation */}
               <div className="space-y-2">
-                {navigationItems.map(({ href, label }) => (
-                  <Link 
-                    key={href}
-                    href={href} 
-                    className="block px-4 py-4 text-lg font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-200 min-h-[48px] flex items-center"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    {label}
-                  </Link>
+                {navigationItems.map((item) => (
+                  <div key={item.title}>
+                    {/* Main section link */}
+                    <Link 
+                      href={item.href} 
+                      className="block px-4 py-4 text-lg font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-200 min-h-[48px] flex items-center"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {item.title}
+                    </Link>
+                    
+                    {/* Subsection links if they exist */}
+                    {item.items && (
+                      <div className="ml-4 mt-2 space-y-1">
+                        {item.items.map((subItem) => (
+                          <Link 
+                            key={subItem.href}
+                            href={subItem.href} 
+                            className="block px-4 py-3 text-sm font-medium text-white/60 hover:text-white/80 hover:bg-white/[0.03] rounded-lg transition-all duration-200 min-h-[40px] flex items-center"
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            {subItem.title}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
               

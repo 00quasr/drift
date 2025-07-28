@@ -93,14 +93,20 @@
 - [ ] **Venue/Event/Artist Pages** - Content management UI
 - [ ] **Admin Dashboard** - Moderation interface
 
-#### Subpages for EXPLORE / EVENTS / ARTITS / VENUES 
-- [ ] **Explore - Trending** - Discover what’s popular across events, artists, and venues
-- [ ] **Explore - This Weekend** - Curated list of events happening this weekend
-- [ ] **Explore - Labels & Collectives** - Curated list of events happening this weekend
-- [ ] **EVENTS - Festivals** - Multi-day events with lineups and open-air vibes
-- [ ] **EVENTS - Mapview** - Browse upcoming events visually by location
-- [ ] **Artists - Newcomers** - Recently added or debuting artists
-- [ ] **Artists - Trending Artists** - Most followed, searched, or booked artists
+#### ✅ Dropdown Navigation System (🆕 July 2025)
+- [x] **Navigation Menu Component** - Radix UI NavigationMenu with custom styling
+- [x] **Desktop Dropdown Menus** - Fully functional dropdown navigation for EXPLORE/EVENTS/ARTISTS/VENUES
+- [x] **Mobile Navigation Update** - Hierarchical mobile menu with subsections
+- [x] **Transparent Styling** - Consistent with header design using backdrop-blur and gradients
+
+#### ✅ Subpages Implementation (🆕 July 2025)
+- [x] **Explore - Trending** - `/explore/trending` - Popular venues, events & artists with trending algorithms
+- [x] **Explore - This Weekend** - `/explore/weekend` - Curated weekend events with date filtering
+- [x] **Explore - Labels & Collectives** - `/explore/labels` - Music collectives and labels showcase
+- [x] **EVENTS - Festivals** - `/events/festivals` - Multi-day events with lineup displays and filtering
+- [x] **EVENTS - Map View** - `/events/map` - Location-based event browsing with distance calculations
+- [x] **Artists - Newcomers** - `/artists/newcomers` - Recently added artists with join dates and growth tracking
+- [x] **Artists - Trending Artists** - `/artists/trending` - Most followed and booked artists with trending charts
 
 #### Advanced Features
 - [x] **Mapbox Integration** - Interactive venue location maps

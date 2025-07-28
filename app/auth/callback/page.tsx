@@ -71,9 +71,9 @@ export default function AuthCallback() {
 
   return (
     <div className="min-h-screen bg-black text-white flex items-center justify-center">
-      <div className="text-center space-y-4">
+      <div className="flex flex-col items-center justify-center space-y-6">
         <ClassicLoader />
-        <p className="text-white/80 font-bold tracking-wider uppercase">
+        <p className="text-white/80 font-bold tracking-wider uppercase text-center">
           PROCESSING AUTHENTICATION...
         </p>
       </div>

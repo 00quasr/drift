@@ -311,6 +311,90 @@ export async function deleteVenue(id: string) {
   }
 }
 
+export async function getTrendingVenues(limit = 10) {
+  const supabase = safeCreateClient()
+  if (!supabase) {
+    console.error('Supabase not configured. Cannot get trending venues.')
+    return []
+  }
+  
+  try {
+    // Get venues with their average ratings, ordered by rating desc
+    const { data, error } = await supabase
+      .from('venues')
+      .select(`
+        *,
+        owner:profiles!venues_owner_id_fkey(full_name, role)
+      `)
+      .eq('is_active', true)
+      .eq('status', 'published')
+      .order('created_at', { ascending: false })
+      .limit(limit * 3) // Get more to randomize from
+
+    if (error) {
+      console.error('Error fetching trending venues:', error)
+      throw error
+    }
+
+    // Get review data for these venues
+    const venueIds = data?.map(v => v.id) || []
+    if (venueIds.length === 0) return []
+
+    const { data: reviewData, error: reviewError } = await supabase
+      .from('reviews')
+      .select('target_id, rating_overall, created_at')
+      .eq('target_type', 'venue')
+      .eq('status', 'visible')
+      .in('target_id', venueIds)
+
+    if (reviewError) {
+      console.error('Error fetching venue reviews:', reviewError)
+      // Return venues without ratings if review fetch fails
+      return data?.slice(0, limit) || []
+    }
+
+    // Calculate trending score (recent ratings + average rating)
+    const now = new Date()
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+
+    const venuesWithTrending = data?.map(venue => {
+      const venueReviews = reviewData?.filter(r => r.target_id === venue.id) || []
+      const recentReviews = venueReviews.filter(r => new Date(r.created_at) > thirtyDaysAgo)
+      
+      const avgRating = venueReviews.length > 0 
+        ? venueReviews.reduce((sum, r) => sum + (r.rating_overall || 0), 0) / venueReviews.length
+        : 0
+      
+      // Trending score: recent activity weight + average rating
+      const trendingScore = (recentReviews.length * 0.3) + (avgRating * 0.7)
+      
+      return {
+        ...venue,
+        average_rating: avgRating,
+        review_count: venueReviews.length,
+        recent_review_count: recentReviews.length,
+        trending_score: trendingScore
+      }
+    }) || []
+
+    // Sort by trending score desc, then shuffle venues with same score
+    const sorted = venuesWithTrending
+      .sort((a, b) => {
+        if (Math.abs(b.trending_score - a.trending_score) > 0.1) {
+          return b.trending_score - a.trending_score
+        }
+        // For similar scores, random order
+        return Math.random() - 0.5
+      })
+      .slice(0, limit)
+
+    return sorted
+  } catch (error) {
+    console.error('Error in getTrendingVenues:', error)
+    throw error
+  }
+}
+
 // Utility functions
 export function generateSlug(name: string): string {
   return name

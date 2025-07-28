@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getVenues } from '@/lib/services/venues'
+import { getVenues, getTrendingVenues } from '@/lib/services/venues'
 import { getUpcomingEvents, getTrendingEvents } from '@/lib/services/events'
 import { getTopRatedArtists } from '@/lib/services/artists'
 
@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     let data = {}
 
     if (!section || section === 'trending-venues') {
-      const venues = await getVenues({ limit })
+      const venues = await getTrendingVenues(limit)
       data = { ...data, trending_venues: venues }
     }
 

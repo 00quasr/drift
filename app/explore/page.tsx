@@ -5,9 +5,9 @@ import { Search, Zap, Radar } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { EntityCard } from '@/components/ui/entity-card'
-import { getEvents } from '@/lib/services/events'
-import { getVenues } from '@/lib/services/venues'
-import { getArtists } from '@/lib/services/artists'
+import { getUpcomingEvents } from '@/lib/services/events'
+import { getTrendingVenues } from '@/lib/services/venues'
+import { getTopRatedArtists } from '@/lib/services/artists'
 import { getFallbackImage, isValidImageUrl } from '@/lib/utils/imageUtils'
 import ClassicLoader from '@/components/ui/loader'
 
@@ -15,9 +15,9 @@ const genreTags = ['ALL', 'TECHNO', 'HOUSE', 'TRANCE', 'DRUM & BASS', 'DUBSTEP',
 
 async function ExplorePage() {
   const [events, venues, artists] = await Promise.all([
-    getEvents({ limit: 12 }),
-    getVenues({ limit: 12 }),
-    getArtists({ limit: 12 })
+    getUpcomingEvents(12),
+    getTrendingVenues(12),
+    getTopRatedArtists(12)
   ])
 
   // Filter out empty results
@@ -106,7 +106,7 @@ async function ExplorePage() {
                   type="event"
                   id={events[0].id}
                   title={events[0].title}
-                  imageUrl={undefined}
+                  imageUrl={`https://jwxlskzmmdrwrlljtfdi.supabase.co/storage/v1/object/public/assets/${String(Math.floor(Math.random() * 9) + 1).padStart(3, '0')}.jpg`}
                   category="FEATURED EVENT"
                   href={`/event/${events[0].id}`}
                   artist={events[0].artists?.[0]?.name || 'Various Artists'}
@@ -127,8 +127,8 @@ async function ExplorePage() {
                   type="venue"
                   id={venues[0].id}
                   title={venues[0].name}
-                  imageUrl={undefined}
-                  category="HOT VENUE"
+                  imageUrl={`https://jwxlskzmmdrwrlljtfdi.supabase.co/storage/v1/object/public/assets/${String(Math.floor(Math.random() * 9) + 1).padStart(3, '0')}.jpg`}
+                  category="TRENDING VENUE"
                   href={`/venue/${venues[0].id}`}
                   city={venues[0].city || 'Unknown'}
                   country={venues[0].country || 'Unknown'}
@@ -145,8 +145,8 @@ async function ExplorePage() {
                   type="artist"
                   id={artists[0].id}
                   title={artists[0].name}
-                  imageUrl={undefined}
-                  category="TOP ARTIST"
+                  imageUrl={`https://jwxlskzmmdrwrlljtfdi.supabase.co/storage/v1/object/public/assets/${String(Math.floor(Math.random() * 9) + 1).padStart(3, '0')}.jpg`}
+                  category="TOP RATED ARTIST"
                   href={`/artist/${artists[0].id}`}
                   bio={artists[0].bio}
                   city={artists[0].city}
@@ -161,7 +161,7 @@ async function ExplorePage() {
         </div>
 
         {/* Events Section */}
-        {hasEvents && (
+        {hasEvents && events.length > 0 && (
           <section className="mb-24">
             <div className="flex items-center justify-between mb-12">
               <div>
@@ -182,14 +182,15 @@ async function ExplorePage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-              {events.slice(1, 9).map((event) => (
+              {events.length === 1 
+                ? events.map((event) => ( // Show the same event if only one exists
                 <EntityCard
-                  key={event.id}
+                  key={`upcoming-${event.id}`}
                   type="event"
                   id={event.id}
                   title={event.title}
-                  imageUrl={undefined}
-                  category="EVENT"
+                  imageUrl={`https://jwxlskzmmdrwrlljtfdi.supabase.co/storage/v1/object/public/assets/${String(Math.floor(Math.random() * 9) + 1).padStart(3, '0')}.jpg`}
+                  category="UPCOMING EVENT"
                   href={`/event/${event.id}`}
                   artist={event.artists?.[0]?.name || 'Various Artists'}
                   date={new Date(event.start_date).toLocaleDateString()}
@@ -197,7 +198,25 @@ async function ExplorePage() {
                   venue={event.venue?.name || 'TBA'}
                   location={event.venue?.city ? `${event.venue.city}, ${event.venue.country}` : 'Location TBA'}
                   price={event.ticket_price_min && event.ticket_price_max ? `€${event.ticket_price_min}-${event.ticket_price_max}` : undefined}
-                  isUpcoming={new Date(event.start_date) > new Date()}
+                  isUpcoming={true}
+                />
+              ))
+                : events.slice(1, 9).map((event) => ( // Show remaining events if multiple exist
+                <EntityCard
+                  key={event.id}
+                  type="event"
+                  id={event.id}
+                  title={event.title}
+                  imageUrl={`https://jwxlskzmmdrwrlljtfdi.supabase.co/storage/v1/object/public/assets/${String(Math.floor(Math.random() * 9) + 1).padStart(3, '0')}.jpg`}
+                  category="UPCOMING EVENT"
+                  href={`/event/${event.id}`}
+                  artist={event.artists?.[0]?.name || 'Various Artists'}
+                  date={new Date(event.start_date).toLocaleDateString()}
+                  time={new Date(event.start_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  venue={event.venue?.name || 'TBA'}
+                  location={event.venue?.city ? `${event.venue.city}, ${event.venue.country}` : 'Location TBA'}
+                  price={event.ticket_price_min && event.ticket_price_max ? `€${event.ticket_price_min}-${event.ticket_price_max}` : undefined}
+                  isUpcoming={true}
                 />
               ))}
             </div>
@@ -232,7 +251,7 @@ async function ExplorePage() {
                   type="venue"
                   id={venue.id}
                   title={venue.name}
-                  imageUrl={undefined}
+                  imageUrl={`https://jwxlskzmmdrwrlljtfdi.supabase.co/storage/v1/object/public/assets/${String(Math.floor(Math.random() * 9) + 1).padStart(3, '0')}.jpg`}
                   category="VENUE"
                   href={`/venue/${venue.id}`}
                   city={venue.city || 'Unknown'}
@@ -273,7 +292,7 @@ async function ExplorePage() {
                   type="artist"
                   id={artist.id}
                   title={artist.name}
-                  imageUrl={undefined}
+                  imageUrl={`https://jwxlskzmmdrwrlljtfdi.supabase.co/storage/v1/object/public/assets/${String(Math.floor(Math.random() * 9) + 1).padStart(3, '0')}.jpg`}
                   category="ARTIST"
                   href={`/artist/${artist.id}`}
                   bio={artist.bio}

@@ -178,6 +178,7 @@ export async function getUpcomingEvents(limit = 10): Promise<EventWithDetails[]>
         )
       `)
       .eq('is_active', true)
+      .eq('status', 'published')
       .gte('start_date', now)
       .order('start_date', { ascending: true })
       .limit(limit)
@@ -187,12 +188,14 @@ export async function getUpcomingEvents(limit = 10): Promise<EventWithDetails[]>
       return []
     }
     
-    // Transform the data
-    const events: EventWithDetails[] = (data || []).map(event => ({
-      ...event,
-      venue: event.venue,
-      artists: event.event_artists?.map((ea: any) => ea.artist) || []
-    }))
+    // Transform the data and ensure events are truly upcoming
+    const events: EventWithDetails[] = (data || [])
+      .filter(event => new Date(event.start_date) > new Date()) // Double-check upcoming
+      .map(event => ({
+        ...event,
+        venue: event.venue,
+        artists: event.event_artists?.map((ea: any) => ea.artist) || []
+      }))
     
     return events
   } catch (error) {

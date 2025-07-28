@@ -144,21 +144,71 @@ export async function getArtistBySlug(slug: string) {
 export async function getTopRatedArtists(limit = 10) {
   const supabase = createClient()
   
-  // Get artists ordered by creation date (for now, since reviews need special handling)
-  const { data, error } = await supabase
-    .from('artists')
-    .select('*')
-    .eq('is_active', true)
-    .order('created_at', { ascending: false })
-    .limit(limit)
+  try {
+    // Get artists with their average ratings, ordered by rating desc, then randomly
+    const { data, error } = await supabase
+      .from('artists')
+      .select(`
+        *,
+        user:profiles!artists_user_id_fkey(full_name, role)
+      `)
+      .eq('is_active', true)
+      .eq('status', 'published')
+      .order('created_at', { ascending: false })
+      .limit(limit * 3) // Get more to randomize from
 
-  if (error) {
-    console.error('Error fetching top rated artists:', error)
+    if (error) {
+      console.error('Error fetching top rated artists:', error)
+      throw error
+    }
+
+    // Get review data for these artists
+    const artistIds = data?.map(a => a.id) || []
+    if (artistIds.length === 0) return []
+
+    const { data: reviewData, error: reviewError } = await supabase
+      .from('reviews')
+      .select('target_id, rating_overall')
+      .eq('target_type', 'artist')
+      .eq('status', 'visible')
+      .in('target_id', artistIds)
+
+    if (reviewError) {
+      console.error('Error fetching artist reviews:', reviewError)
+      // Return artists without ratings if review fetch fails
+      return data?.slice(0, limit) || []
+    }
+
+    // Calculate average ratings and add to artists
+    const artistsWithRatings = data?.map(artist => {
+      const artistReviews = reviewData?.filter(r => r.target_id === artist.id) || []
+      const avgRating = artistReviews.length > 0 
+        ? artistReviews.reduce((sum, r) => sum + (r.rating_overall || 0), 0) / artistReviews.length
+        : 0
+      
+      return {
+        ...artist,
+        average_rating: avgRating,
+        review_count: artistReviews.length
+      }
+    }) || []
+
+    // Sort by rating desc, then shuffle artists with same rating
+    const sorted = artistsWithRatings
+      .sort((a, b) => {
+        if (b.average_rating !== a.average_rating) {
+          return b.average_rating - a.average_rating
+        }
+        // For same ratings, random order
+        return Math.random() - 0.5
+      })
+      .slice(0, limit)
+
+    return sorted
+  } catch (error) {
+    console.error('Error in getTopRatedArtists:', error)
     throw error
   }
-
-  // TODO: Add proper review aggregation when review system is fully implemented
-  return data
 }
 
 export async function getArtistUpcomingEvents(artistId: string, limit = 10) {

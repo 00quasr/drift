@@ -23,11 +23,15 @@ export default function TrendingPage() {
     const fetchTrendingData = async () => {
       try {
         setIsLoading(true)
-        const response = await fetch('/api/explore?type=trending')
+        const response = await fetch('/api/explore')
         const result = await response.json()
         
         if (result.success) {
-          setData(result.data)
+          setData({
+            venues: result.data.trending_venues || [],
+            events: result.data.upcoming_events || [],
+            artists: result.data.top_artists || []
+          })
         } else {
           setError('Failed to load trending content')
         }
@@ -128,17 +132,15 @@ export default function TrendingPage() {
                 >
                   <Link href={`/venue/${venue.id}`}>
                     <Card className="bg-white/5 border border-white/10 hover:border-white/20 transition-all duration-300 overflow-hidden group">
-                      {venue.images?.[0] && (
-                        <div className="relative h-48 overflow-hidden">
-                          <Image
-                            src={venue.images[0]}
-                            alt={venue.name}
-                            fill
-                            className="object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                          <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300" />
-                        </div>
-                      )}
+                      <div className="relative h-48 overflow-hidden">
+                        <Image
+                          src={`https://jwxlskzmmdrwrlljtfdi.supabase.co/storage/v1/object/public/assets/${String(Math.floor(Math.random() * 9) + 1).padStart(3, '0')}.jpg`}
+                          alt={venue.name}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300" />
+                      </div>
                       <div className="p-6">
                         <div className="flex items-start justify-between mb-3">
                           <h3 className="text-lg font-bold tracking-wider uppercase text-white group-hover:text-white/90 transition-colors">
@@ -203,17 +205,15 @@ export default function TrendingPage() {
                 >
                   <Link href={`/event/${event.id}`}>
                     <Card className="bg-white/5 border border-white/10 hover:border-white/20 transition-all duration-300 overflow-hidden group">
-                      {event.poster_url && (
-                        <div className="relative h-48 overflow-hidden">
-                          <Image
-                            src={event.poster_url}
-                            alt={event.title}
-                            fill
-                            className="object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                          <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300" />
-                        </div>
-                      )}
+                      <div className="relative h-48 overflow-hidden">
+                        <Image
+                          src={`https://jwxlskzmmdrwrlljtfdi.supabase.co/storage/v1/object/public/assets/${String(Math.floor(Math.random() * 9) + 1).padStart(3, '0')}.jpg`}
+                          alt={event.title}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300" />
+                      </div>
                       <div className="p-6">
                         <h3 className="text-lg font-bold tracking-wider uppercase text-white group-hover:text-white/90 transition-colors mb-3">
                           {event.title}
@@ -270,18 +270,12 @@ export default function TrendingPage() {
                   <Link href={`/artist/${artist.id}`}>
                     <Card className="bg-white/5 border border-white/10 hover:border-white/20 transition-all duration-300 overflow-hidden group">
                       <div className="relative aspect-square overflow-hidden">
-                        {artist.avatar_url ? (
-                          <Image
-                            src={artist.avatar_url}
-                            alt={artist.name}
-                            fill
-                            className="object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-white/10 flex items-center justify-center">
-                            <Users className="w-12 h-12 text-white/40" />
-                          </div>
-                        )}
+                        <Image
+                          src={`https://jwxlskzmmdrwrlljtfdi.supabase.co/storage/v1/object/public/assets/${String(Math.floor(Math.random() * 9) + 1).padStart(3, '0')}.jpg`}
+                          alt={artist.name}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
                         <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300" />
                       </div>
                       <div className="p-4">

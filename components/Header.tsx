@@ -141,15 +141,17 @@ export default function Header() {
               <Search className="w-5 h-5" />
             </motion.button>
             
-            {/* Notifications */}
-            <motion.button
-              className="relative p-3 md:p-2.5 text-white/70 hover:text-white hover:bg-white/[0.04] rounded-lg backdrop-blur-sm transition-all duration-300 border border-white/[0.04] hover:border-white/[0.08] min-h-[44px] min-w-[44px] flex items-center justify-center"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Bell className="w-5 h-5" />
-              <div className="absolute top-2 right-2 w-2 h-2 bg-white rounded-full opacity-90 animate-pulse" />
-            </motion.button>
+            {/* Notifications - Only show when logged in */}
+            {user && (
+              <motion.button
+                className="relative p-3 md:p-2.5 text-white/70 hover:text-white hover:bg-white/[0.04] rounded-lg backdrop-blur-sm transition-all duration-300 border border-white/[0.04] hover:border-white/[0.08] min-h-[44px] min-w-[44px] flex items-center justify-center"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Bell className="w-5 h-5" />
+                <div className="absolute top-2 right-2 w-2 h-2 bg-white rounded-full opacity-90 animate-pulse" />
+              </motion.button>
+            )}
             
             {/* User Section */}
             <div className="hidden md:flex items-center space-x-3">

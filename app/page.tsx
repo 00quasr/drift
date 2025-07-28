@@ -1,562 +1,369 @@
 'use client'
 
-import React, { useEffect, useRef, useState, useCallback, useMemo, memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect } from "react"
+import { motion } from "framer-motion"
+import { ArrowRight } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
+import Image from 'next/image'
 
-interface MatrixRainProps {
-  fontSize?: number;
-  color?: string;
-  characters?: string;
-  fadeOpacity?: number;
-  speed?: number;
+// Animation variants
+const fadeIn = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6 },
+  },
 }
 
-const MatrixRain: React.FC<MatrixRainProps> = ({
-  fontSize = 20,
-  color = '#ffffff',
-  characters = '01',
-  fadeOpacity = 0.1,
-  speed = 1
-}) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const resizeCanvas = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-
-    const chars = characters.split('');
-    const drops: number[] = [];
-    const columnCount = Math.floor(canvas.width / fontSize);
-
-    for (let i = 0; i < columnCount; i++) {
-      drops[i] = Math.random() * -100;
-    }
-
-    const draw = () => {
-      ctx.fillStyle = `rgba(0, 0, 0, ${fadeOpacity})`;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      ctx.fillStyle = color;
-      ctx.font = `${fontSize}px monospace`;
-
-      for (let i = 0; i < drops.length; i++) {
-        const char = chars[Math.floor(Math.random() * chars.length)];
-        ctx.fillText(char, i * fontSize, drops[i] * fontSize);
-
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-          drops[i] = 0;
-        }
-        drops[i] += speed;
-      }
-    };
-
-    const interval = setInterval(draw, 33 / speed);
-
-    return () => {
-      clearInterval(interval);
-      window.removeEventListener('resize', resizeCanvas);
-    };
-  }, [fontSize, color, characters, fadeOpacity, speed]);
-
-  return (
-    <canvas
-      ref={canvasRef}
-      className="fixed top-0 left-0 w-full h-full z-0"
-    />
-  );
-};
-
-interface AnimatedTextCycleProps {
-  words: string[];
-  interval?: number;
-  className?: string;
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
 }
 
-const AnimatedTextCycle: React.FC<AnimatedTextCycleProps> = ({
-  words,
-  interval = 3000,
-  className = "",
-}) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [width, setWidth] = useState("auto");
-  const measureRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (measureRef.current) {
-      const elements = measureRef.current.children;
-      if (elements.length > currentIndex) {
-        const newWidth = elements[currentIndex].getBoundingClientRect().width;
-        setWidth(`${newWidth}px`);
-      }
-    }
-  }, [currentIndex]);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % words.length);
-    }, interval);
-
-    return () => clearInterval(timer);
-  }, [interval, words.length]);
-
-  const containerVariants = {
-    hidden: { 
-      y: -20,
-      opacity: 0,
-      filter: "blur(8px)"
-    },
-    visible: {
-      y: 0,
-      opacity: 1,
-      filter: "blur(0px)"
-    },
-    exit: { 
-      y: 20,
-      opacity: 0,
-      filter: "blur(8px)"
-    },
-  };
-
-  return (
-    <>
-      <div 
-        ref={measureRef} 
-        aria-hidden="true"
-        className="absolute opacity-0 pointer-events-none"
-        style={{ visibility: "hidden" }}
-      >
-        {words.map((word, i) => (
-          <span key={i} className={`font-bold ${className}`}>
-            {word}
-          </span>
-        ))}
-      </div>
-
-      <motion.span 
-        className="relative inline-block"
-        animate={{ 
-          width,
-          transition: { 
-            type: "spring",
-            stiffness: 150,
-            damping: 15,
-            mass: 1.2,
-          }
-        }}
-      >
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.span
-            key={currentIndex}
-            className={`inline-block font-bold ${className}`}
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            style={{ whiteSpace: "nowrap" }}
-          >
-            {words[currentIndex]}
-          </motion.span>
-        </AnimatePresence>
-      </motion.span>
-    </>
-  );
-};
-
-interface Dot {
-  x: number;
-  y: number;
-  baseOpacity: number;
-  currentOpacity: number;
-  opacitySpeed: number;
-  baseRadius: number;
-  currentRadius: number;
+const itemFadeIn = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5 },
+  },
 }
 
-const GeometricGrid: React.FC = memo(() => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationFrameId = useRef<number | null>(null);
-  const dotsRef = useRef<Dot[]>([]);
-  const mousePositionRef = useRef<{ x: number | null; y: number | null }>({ x: null, y: null });
+interface FeatureProps {
+  title: string;
+  description: string;
+  image: string;
+  index: number;
+}
 
-  const DOT_SPACING = 30;
-  const BASE_OPACITY_MIN = 0.1;
-  const BASE_OPACITY_MAX = 0.3;
-  const BASE_RADIUS = 1;
-  const INTERACTION_RADIUS = 100;
-
-  const handleMouseMove = useCallback((event: globalThis.MouseEvent) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const rect = canvas.getBoundingClientRect();
-    const canvasX = event.clientX - rect.left;
-    const canvasY = event.clientY - rect.top;
-    mousePositionRef.current = { x: canvasX, y: canvasY };
-  }, []);
-
-  const createDots = useCallback(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const { width, height } = canvas;
-    const newDots: Dot[] = [];
-    const cols = Math.ceil(width / DOT_SPACING);
-    const rows = Math.ceil(height / DOT_SPACING);
-
-    for (let i = 0; i < cols; i++) {
-      for (let j = 0; j < rows; j++) {
-        const x = i * DOT_SPACING + DOT_SPACING / 2;
-        const y = j * DOT_SPACING + DOT_SPACING / 2;
-        const baseOpacity = Math.random() * (BASE_OPACITY_MAX - BASE_OPACITY_MIN) + BASE_OPACITY_MIN;
-        
-        newDots.push({
-          x,
-          y,
-          baseOpacity,
-          currentOpacity: baseOpacity,
-          opacitySpeed: (Math.random() * 0.005) + 0.002,
-          baseRadius: BASE_RADIUS,
-          currentRadius: BASE_RADIUS,
-        });
-      }
-    }
-    dotsRef.current = newDots;
-  }, []);
-
-  const animateDots = useCallback(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas?.getContext('2d');
-    const dots = dotsRef.current;
-
-    if (!ctx || !dots || !canvas) {
-      animationFrameId.current = requestAnimationFrame(animateDots);
-      return;
-    }
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    const { x: mouseX, y: mouseY } = mousePositionRef.current;
-
-    dots.forEach((dot) => {
-      dot.currentOpacity += dot.opacitySpeed;
-      if (dot.currentOpacity >= BASE_OPACITY_MAX || dot.currentOpacity <= BASE_OPACITY_MIN) {
-        dot.opacitySpeed = -dot.opacitySpeed;
-        dot.currentOpacity = Math.max(BASE_OPACITY_MIN, Math.min(dot.currentOpacity, BASE_OPACITY_MAX));
-      }
-
-      let interactionFactor = 0;
-      dot.currentRadius = dot.baseRadius;
-
-      if (mouseX !== null && mouseY !== null) {
-        const dx = dot.x - mouseX;
-        const dy = dot.y - mouseY;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-
-        if (distance < INTERACTION_RADIUS) {
-          interactionFactor = Math.max(0, 1 - distance / INTERACTION_RADIUS);
-          interactionFactor = interactionFactor * interactionFactor;
-        }
-      }
-
-      const finalOpacity = Math.min(1, dot.currentOpacity + interactionFactor * 0.7);
-      dot.currentRadius = dot.baseRadius + interactionFactor * 3;
-
-      ctx.beginPath();
-      ctx.fillStyle = `rgba(255, 255, 255, ${finalOpacity})`;
-      ctx.arc(dot.x, dot.y, dot.currentRadius, 0, Math.PI * 2);
-      ctx.fill();
-    });
-
-    animationFrameId.current = requestAnimationFrame(animateDots);
-  }, []);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const resizeCanvas = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      createDots();
-    };
-
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-    window.addEventListener('mousemove', handleMouseMove);
-
-    animationFrameId.current = requestAnimationFrame(animateDots);
-
-    return () => {
-      window.removeEventListener('resize', resizeCanvas);
-      window.removeEventListener('mousemove', handleMouseMove);
-      if (animationFrameId.current) {
-        cancelAnimationFrame(animationFrameId.current);
-      }
-    };
-  }, [createDots, handleMouseMove, animateDots]);
-
+const Feature = ({ title, description, image, index }: FeatureProps) => {
   return (
-    <canvas
-      ref={canvasRef}
-      className="absolute inset-0 z-10 pointer-events-none"
-    />
-  );
-});
-
-const PulsingElement: React.FC<{ children: React.ReactNode; className?: string; delay?: number }> = memo(({ 
-  children, 
-  className = "", 
-  delay = 0 
-}) => {
-  return (
-    <motion.div
-      className={className}
-      animate={{
-        scale: [1, 1.02, 1],
-        opacity: [0.8, 1, 0.8],
-      }}
-      transition={{
-        duration: 3,
-        repeat: Infinity,
-        delay,
-        ease: "easeInOut"
-      }}
+    <div
+      className={cn(
+        "flex flex-col relative group/feature border-white/20 overflow-hidden",
+        "border-b sm:border-r",
+        "sm:last:border-r-0 lg:last:border-r lg:border-r",
+        (index === 0 || index === 2) && "sm:border-l",
+        index === 0 && "lg:border-l",
+        index < 2 && "sm:border-b",
+        index < 4 && "lg:border-b"
+      )}
     >
-      {children}
-    </motion.div>
-  );
-});
-
-export default function HomePage() {
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  useEffect(() => {
-    setIsLoaded(true);
-  }, []);
-
-  return (
-    <div className="relative min-h-screen bg-black text-white overflow-hidden">
-
-
-      {/* Geometric Grid Overlay */}
-      <GeometricGrid />
-
-      {/* Gradient Overlays */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/80 z-20" />
-      <div className="absolute inset-0 bg-gradient-to-r from-black/30 via-transparent to-black/30 z-20" />
-
-      {/* Grid Pattern Overlay */}
-      <div 
-        className="absolute inset-0 z-20 opacity-10"
-        style={{
-          backgroundImage: `
-            linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
-          `,
-          backgroundSize: '50px 50px',
-        }}
-      />
-
-      {/* Main Content */}
-      <div className="relative z-30 flex flex-col items-center justify-center min-h-screen px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: isLoaded ? 1 : 0, y: isLoaded ? 0 : 50 }}
-          transition={{ duration: 1, delay: 0.5 }}
-          className="text-center max-w-6xl mx-auto"
-        >
-          {/* Main Headline */}
-          <motion.h1 
-            className="text-6xl md:text-8xl lg:text-9xl font-black mb-8 leading-none"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1.2, delay: 0.8 }}
-          >
-            <PulsingElement delay={0}>
-              <span className="block bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent">
-                DISCOVER
-              </span>
-            </PulsingElement>
-            <PulsingElement delay={0.5}>
-              <span className="block bg-gradient-to-r from-gray-300 via-white to-gray-300 bg-clip-text text-transparent">
-                ELECTRONIC
-              </span>
-            </PulsingElement>
-            <PulsingElement delay={1}>
-              <span className="block bg-gradient-to-r from-white via-gray-300 to-white bg-clip-text text-transparent">
-                MUSIC
-              </span>
-            </PulsingElement>
-          </motion.h1>
-
-          {/* Animated Subtitle */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 1.5 }}
-            className="text-xl md:text-2xl lg:text-3xl font-light mb-12 text-gray-300"
-          >
-            <span>Connect with venues, events, and artists in the </span>
-            <AnimatedTextCycle 
-              words={["global underground scene", "electronic music world", "music community", "digital sound space"]}
-              className="text-white font-bold"
-              interval={2500}
-            />
-          </motion.div>
-
-          {/* CTA Buttons */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 2 }}
-            className="flex flex-col sm:flex-row gap-6 justify-center items-center"
-          >
-            <Link href="/explore">
-              <motion.button
-                className="group relative px-8 py-4 bg-white text-black font-bold text-lg border-2 border-white overflow-hidden uppercase tracking-wider"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <motion.div
-                  className="absolute inset-0 bg-black"
-                  initial={{ x: "-100%" }}
-                  whileHover={{ x: "0%" }}
-                  transition={{ duration: 0.3 }}
-                />
-                <span className="relative z-10 group-hover:text-white transition-colors duration-300">
-                  START EXPLORING
-                </span>
-              </motion.button>
-            </Link>
-
-            <Link href="/auth/register">
-              <motion.button
-                className="group relative px-8 py-4 border-2 border-white text-white font-bold text-lg bg-transparent overflow-hidden uppercase tracking-wider"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <motion.div
-                  className="absolute inset-0 bg-white"
-                  initial={{ x: "-100%" }}
-                  whileHover={{ x: "0%" }}
-                  transition={{ duration: 0.3 }}
-                />
-                <span className="relative z-10 group-hover:text-black transition-colors duration-300">
-                  JOIN COMMUNITY
-                </span>
-              </motion.button>
-            </Link>
-          </motion.div>
-
-          {/* Geometric Decorations */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, delay: 2.5 }}
-            className="mt-16 flex justify-center space-x-8"
-          >
-            {[...Array(5)].map((_, i) => (
-              <motion.div
-                key={i}
-                className="w-2 h-2 bg-white"
-                animate={{
-                  scale: [1, 1.5, 1],
-                  opacity: [0.3, 1, 0.3],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  delay: i * 0.2,
-                }}
-              />
-            ))}
-          </motion.div>
-        </motion.div>
-
-        {/* Bottom Navigation */}
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 3 }}
-          className="absolute bottom-8 left-0 right-0 flex justify-center"
-        >
-          <div className="flex space-x-8 text-sm font-mono uppercase tracking-wider">
-            <Link href="/artists">
-              <motion.span 
-                className="text-gray-400 hover:text-white transition-colors border-b border-transparent hover:border-white pb-1 cursor-pointer"
-                whileHover={{ y: -2 }}
-              >
-                Artists
-              </motion.span>
-            </Link>
-            <Link href="/events">
-              <motion.span 
-                className="text-gray-400 hover:text-white transition-colors border-b border-transparent hover:border-white pb-1 cursor-pointer"
-                whileHover={{ y: -2 }}
-              >
-                Events
-              </motion.span>
-            </Link>
-            <Link href="/venues">
-              <motion.span 
-                className="text-gray-400 hover:text-white transition-colors border-b border-transparent hover:border-white pb-1 cursor-pointer"
-                whileHover={{ y: -2 }}
-              >
-                Venues
-              </motion.span>
-            </Link>
-            <Link href="/explore">
-              <motion.span 
-                className="text-gray-400 hover:text-white transition-colors border-b border-transparent hover:border-white pb-1 cursor-pointer"
-                whileHover={{ y: -2 }}
-              >
-                Explore
-              </motion.span>
-            </Link>
-          </div>
-        </motion.div>
+      {/* Background Image with Overlay */}
+      <div className="absolute inset-0 overflow-hidden">
+        <Image
+          src={image}
+          alt={title}
+          fill
+          className="object-cover"
+          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+        />
+        <div className="absolute inset-0 bg-black/30" />
       </div>
 
-      {/* Corner Decorations */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1, delay: 3.5 }}
-        className="absolute top-4 left-4 z-30 w-16 h-16 border-l-2 border-t-2 border-white"
-      />
-
-      <motion.div
-        initial={{ opacity: 0, scale: 0 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1, delay: 3.7 }}
-        className="absolute top-4 right-4 z-30 w-16 h-16 border-r-2 border-t-2 border-white"
-      />
-
-      <motion.div
-        initial={{ opacity: 0, scale: 0 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1, delay: 3.9 }}
-        className="absolute bottom-4 left-4 z-30 w-16 h-16 border-l-2 border-b-2 border-white"
-      />
-
-      <motion.div
-        initial={{ opacity: 0, scale: 0 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1, delay: 4.1 }}
-        className="absolute bottom-4 right-4 z-30 w-16 h-16 border-r-2 border-b-2 border-white"
-      />
+      {/* Content */}
+      <div className="relative z-10 p-4 sm:p-6 lg:p-10 min-h-[200px] sm:min-h-[250px] lg:min-h-[300px] flex flex-col justify-end">
+        <div className="text-base sm:text-lg font-bold mb-2">
+          <div className="absolute left-0 inset-y-0 h-6 group-hover/feature:h-8 w-1 rounded-tr-full rounded-br-full bg-neutral-700 group-hover/feature:bg-white transition-all duration-200 origin-center" />
+          <span className="group-hover/feature:translate-x-2 transition duration-200 inline-block text-white uppercase tracking-wider">
+            {title}
+          </span>
+        </div>
+        <p className="text-xs sm:text-sm text-neutral-300 uppercase tracking-wide leading-relaxed">
+          {description}
+        </p>
+      </div>
     </div>
   );
+};
+
+export default function HomePage() {
+  // Base Supabase storage URL for assets
+  const storageUrl = "https://jwxlskzmmdrwrlljtfdi.supabase.co/storage/v1/object/public/logoassets"
+  
+  const features = [
+    {
+      title: "VENUE DISCOVERY",
+      description: "FIND UNDERGROUND SPACES AND HIDDEN GEMS",
+      image: `${storageUrl}/pawel-czerwinski-V558Lx_ji6I-unsplash.jpg`
+    },
+    {
+      title: "EVENT TRACKING",
+      description: "NEVER MISS A SHOW WITH REAL-TIME UPDATES",
+      image: `${storageUrl}/pawel-czerwinski-TLzxYiyXw1o-unsplash(1).jpg`
+    },
+    {
+      title: "ARTIST PROFILES",
+      description: "DISCOVER NEW TALENT AND FOLLOW FAVORITES",
+      image: `${storageUrl}/pawel-czerwinski-uGd6aKkvHnk-unsplash.jpg`
+    },
+    {
+      title: "COMMUNITY HUB",
+      description: "CONNECT WITH LIKE-MINDED MUSIC LOVERS",
+      image: `${storageUrl}/pawel-czerwinski-YAtspJ-HV2E-unsplash.jpg`
+    },
+  ];
+
+  const userTypes = [
+    {
+      title: "ARTISTS",
+      description: "SHOWCASE YOUR SOUND AND BUILD YOUR FOLLOWING",
+    },
+    {
+      title: "PROMOTERS",
+      description: "REACH YOUR TARGET AUDIENCE EFFICIENTLY",
+    },
+    {
+      title: "VENUES",
+      description: "FILL YOUR SPACE WITH THE RIGHT CROWD",
+    },
+    {
+      title: "FANS",
+      description: "DISCOVER YOUR NEXT FAVORITE ARTIST",
+    },
+  ];
+
+  return (
+    <div className="min-h-screen bg-black text-white">
+      <main className="flex-1 pt-16">
+        {/* Hero Section */}
+        <section className="w-full py-12 sm:py-16 lg:py-24 xl:py-32">
+          <div className="container mx-auto max-w-6xl px-4 sm:px-6">
+            <div className="relative border border-white/20 bg-black/50 p-6 sm:p-8 lg:p-12 overflow-hidden">
+              {/* Background Image */}
+              <div className="absolute inset-0">
+                <Image
+                  src={`${storageUrl}/kajetan-sumila-GcHBIKRGWcM-unsplash.jpg`}
+                  alt="Underground electronic music scene"
+                  fill
+                  className="object-cover"
+                  priority
+                  sizes="100vw"
+                />
+                <div className="absolute inset-0 bg-black/20" />
+              </div>
+
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={fadeIn}
+                className="relative z-10 flex flex-col justify-center space-y-6 sm:space-y-8"
+              >
+                <div className="space-y-4 sm:space-y-6">
+                  <motion.h1
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.7, delay: 0.2 }}
+                    className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold tracking-wider uppercase leading-tight"
+                  >
+                    UNDERGROUND
+                    <br />
+                    ELECTRONIC
+                    <br />
+                    MUSIC PLATFORM
+                  </motion.h1>
+                  <motion.p
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.7, delay: 0.4 }}
+                    className="max-w-[600px] text-neutral-300 text-sm sm:text-base lg:text-lg uppercase tracking-wide leading-relaxed"
+                  >
+                    DISCOVER VENUES, EVENTS, AND ARTISTS IN THE ELECTRONIC MUSIC SCENE. CONNECT WITH THE UNDERGROUND COMMUNITY.
+                  </motion.p>
+                </div>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.7, delay: 0.6 }}
+                  className="flex flex-col gap-3 sm:gap-4 sm:flex-row"
+                >
+                  <Link href="/explore" className="w-full sm:w-auto">
+                    <Button size="lg" className="w-full sm:w-auto bg-white text-black hover:bg-neutral-200 uppercase tracking-wider group px-6 py-3 text-sm sm:text-base">
+                      GET STARTED
+                      <motion.span
+                        initial={{ x: 0 }}
+                        whileHover={{ x: 5 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                      >
+                        <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                      </motion.span>
+                    </Button>
+                  </Link>
+                  <Link href="/events" className="w-full sm:w-auto">
+                    <Button variant="outline" size="lg" className="w-full sm:w-auto bg-transparent border-white/20 text-white hover:bg-white hover:text-black uppercase tracking-wider px-6 py-3 text-sm sm:text-base">
+                      EXPLORE PLATFORM
+                    </Button>
+                  </Link>
+                </motion.div>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
+        {/* Features Section */}
+        <section id="features" className="w-full py-12 sm:py-16 lg:py-24">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeIn}
+            className="container mx-auto max-w-6xl px-4 sm:px-6"
+          >
+            <div className="border border-white/20">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 relative z-10 max-w-7xl mx-auto">
+                {features.map((feature, index) => (
+                  <Feature key={feature.title} {...feature} index={index} />
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        </section>
+
+        {/* User Types Section */}
+        <section id="users" className="w-full py-12 sm:py-16 lg:py-24">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeIn}
+            className="container mx-auto max-w-6xl px-4 sm:px-6"
+          >
+            <div className="relative border border-white/20 overflow-hidden">
+              {/* Background Image */}
+              <div className="absolute inset-0">
+                <Image
+                  src={`${storageUrl}/geronimo-giqueaux-NAMBG-gRR7U-unsplash.jpg`}
+                  alt="Electronic music community"
+                  fill
+                  className="object-cover"
+                  sizes="100vw"
+                />
+                <div className="absolute inset-0 bg-black/15" />
+              </div>
+
+              <div className="relative z-10 p-6 sm:p-8 lg:p-12">
+                <div className="text-center mb-8 sm:mb-12 lg:mb-16">
+                  <motion.h2
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                    className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-widest uppercase mb-4 sm:mb-6"
+                  >
+                    FOR EVERYONE
+                  </motion.h2>
+                  <motion.p
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.3 }}
+                    className="text-white/80 font-bold tracking-wider uppercase text-sm sm:text-base lg:text-lg leading-relaxed"
+                  >
+                    BUILT FOR ALL MEMBERS OF THE ELECTRONIC MUSIC ECOSYSTEM
+                  </motion.p>
+                </div>
+
+                <motion.div
+                  variants={staggerContainer}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
+                >
+                  {userTypes.map((userType, index) => (
+                    <motion.div
+                      key={index}
+                      variants={itemFadeIn}
+                      className="border border-white/20 p-4 sm:p-6 lg:p-8 bg-black/30"
+                    >
+                      <h3 className="text-lg sm:text-xl font-bold tracking-widest uppercase mb-3 sm:mb-4 text-white">{userType.title}</h3>
+                      <p className="text-white/70 text-xs sm:text-sm uppercase tracking-wide leading-relaxed">{userType.description}</p>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              </div>
+            </div>
+          </motion.div>
+        </section>
+
+        {/* CTA Section */}
+        <section id="contact" className="w-full py-12 sm:py-16 lg:py-24">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeIn}
+            className="container mx-auto max-w-6xl px-4 sm:px-6"
+          >
+            <div className="relative border border-white/20 overflow-hidden">
+              {/* Background Image */}
+              <div className="absolute inset-0">
+                <Image
+                  src={`${storageUrl}/philip-oroni-yiPpgTV0Sbs-unsplash.jpg`}
+                  alt="Join the movement"
+                  fill
+                  className="object-cover"
+                  sizes="100vw"
+                />
+                <div className="absolute inset-0 bg-black/20" />
+              </div>
+
+              <div className="relative z-10 flex flex-col items-center justify-center space-y-6 sm:space-y-8 text-center py-12 sm:py-16 lg:py-24 px-6 sm:px-8 lg:px-12">
+                <div className="space-y-4 sm:space-y-6">
+                  <motion.h2
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                    className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold tracking-wider uppercase leading-tight"
+                  >
+                    JOIN THE MOVEMENT
+                  </motion.h2>
+                  <motion.p
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.3 }}
+                    className="mx-auto max-w-[600px] text-neutral-300 text-sm sm:text-base lg:text-lg uppercase tracking-wide leading-relaxed"
+                  >
+                    BECOME PART OF THE UNDERGROUND ELECTRONIC MUSIC COMMUNITY
+                  </motion.p>
+                </div>
+                
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.7, delay: 0.6 }}
+                  className="flex flex-col gap-3 sm:gap-4 sm:flex-row w-full sm:w-auto"
+                >
+                  <Link href="/auth/signup" className="w-full sm:w-auto">
+                    <Button size="lg" className="w-full sm:w-auto bg-white text-black hover:bg-neutral-200 uppercase tracking-wider group px-6 py-3 text-sm sm:text-base">
+                      START NOW
+                      <motion.span
+                        initial={{ x: 0 }}
+                        whileHover={{ x: 5 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                      >
+                        <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                      </motion.span>
+                    </Button>
+                  </Link>
+                  <Link href="/explore" className="w-full sm:w-auto">
+                    <Button variant="outline" size="lg" className="w-full sm:w-auto bg-transparent border-white/20 text-white hover:bg-white hover:text-black uppercase tracking-wider px-6 py-3 text-sm sm:text-base">
+                      LEARN MORE
+                    </Button>
+                  </Link>
+                </motion.div>
+              </div>
+            </div>
+          </motion.div>
+        </section>
+      </main>
+    </div>
+  )
 }

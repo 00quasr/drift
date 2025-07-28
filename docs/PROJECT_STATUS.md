@@ -104,7 +104,7 @@
 
 #### Advanced Features
 - [x] **Mapbox Integration** - Interactive venue location maps
-- [ ] **Email Notifications** - Automated email system
+- [ ] **Email Notifications** - Automated email system (footer stay in the loop)
 - [ ] **Mobile Optimization** - Enhanced mobile experience
 - [ ] **Push Notifications** - Real-time user notifications
 - [ ] **Spotify Integration** - Spotify mini player embeds for users who connected their Spotify account

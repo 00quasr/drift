@@ -3,13 +3,18 @@
 **Last Updated**: January 2026
 **Version**: 1.0
 
+---
+
 ## Overview
 
 This guide explains how to use the custom agents and skills configured for the Drift project. These tools help maintain code quality, enforce patterns, and accelerate development with AI assistance.
 
+---
+
 ## Quick Reference
 
-### 5 Custom Agents (Specialized AI Workers)
+### Custom Agents (Specialized AI Workers)
+
 | Agent | When to Use | Invocation |
 |-------|-------------|------------|
 | **supabase-assistant** | Database queries, migrations, RLS policies | `Use supabase-assistant to...` |
@@ -18,7 +23,8 @@ This guide explains how to use the custom agents and skills configured for the D
 | **security-auditor** | Security reviews, content moderation | `Use security-auditor to check...` |
 | **maintenance-agent** | Update agents/skills (monthly) | `Use maintenance-agent to review all agents` |
 
-### 3 Custom Skills (Knowledge Guides)
+### Custom Skills (Knowledge Guides)
+
 | Skill | Auto-Triggers When | Manual Use |
 |-------|-------------------|------------|
 | **supabase-query-helper** | "How do I query...", "Show me the schema" | Ask database-related questions |
@@ -27,9 +33,9 @@ This guide explains how to use the custom agents and skills configured for the D
 
 ---
 
-## Detailed Agent Reference
+## Agent Reference
 
-### 1. supabase-assistant 🗄️
+### 1. supabase-assistant
 
 **Purpose**: Database expert for Supabase queries, schema design, and RLS policies
 
@@ -46,23 +52,20 @@ This guide explains how to use the custom agents and skills configured for the D
 **Example commands**:
 ```
 Use supabase-assistant to create a bookmarks table with RLS policies
-
 Use supabase-assistant to optimize the events query with venue joins
-
 Use supabase-assistant to review my migration before applying
-
 Use supabase-assistant to explain the current RLS policies for venues
 ```
 
 **Key features**:
-- ✅ Direct access to Supabase MCP tools
-- ✅ Can execute SQL queries and apply migrations
-- ✅ Checks security advisors automatically
-- ✅ Generates TypeScript types after schema changes
+- Direct access to Supabase MCP tools
+- Can execute SQL queries and apply migrations
+- Checks security advisors automatically
+- Generates TypeScript types after schema changes
 
 ---
 
-### 2. drift-reviewer 🔍
+### 2. drift-reviewer
 
 **Purpose**: Expert code reviewer for Next.js, React, TypeScript, and Supabase integration
 
@@ -79,31 +82,28 @@ Use supabase-assistant to explain the current RLS policies for venues
 **Example commands**:
 ```
 Use drift-reviewer to review my latest changes
-
 Use drift-reviewer to check this component for accessibility issues
-
 Use drift-reviewer to validate the security of my new API route
-
 Use drift-reviewer to ensure this matches our design system
 ```
 
 **What it checks**:
-- ✅ TypeScript type safety
-- ✅ Component structure and shadcn/ui patterns
-- ✅ Supabase integration correctness
-- ✅ API route security
-- ✅ Performance considerations
-- ✅ Accessibility compliance
-- ✅ Design system consistency
+- TypeScript type safety
+- Component structure and shadcn/ui patterns
+- Supabase integration correctness
+- API route security
+- Performance considerations
+- Accessibility compliance
+- Design system consistency
 
 **Output format**:
-- 🔴 **Critical Issues** (must fix)
-- 🟡 **Important Issues** (should fix)
-- 🟢 **Suggestions** (nice to have)
+- **Critical Issues** (must fix)
+- **Important Issues** (should fix)
+- **Suggestions** (nice to have)
 
 ---
 
-### 3. event-optimizer ⚡
+### 3. event-optimizer
 
 **Purpose**: Performance and UX specialist for event discovery features
 
@@ -119,11 +119,8 @@ Use drift-reviewer to ensure this matches our design system
 **Example commands**:
 ```
 Use event-optimizer to analyze the trending page performance
-
 Use event-optimizer to optimize this search query
-
 Use event-optimizer to improve mobile performance for the events page
-
 Use event-optimizer to implement caching for venue listings
 ```
 
@@ -142,7 +139,7 @@ Use event-optimizer to implement caching for venue listings
 
 ---
 
-### 4. security-auditor 🔐
+### 4. security-auditor
 
 **Purpose**: Security specialist for content moderation, API protection, and data safety
 
@@ -158,23 +155,20 @@ Use event-optimizer to implement caching for venue listings
 **Example commands**:
 ```
 Use security-auditor to audit my API routes
-
 Use security-auditor to review RLS policies for the new bookmarks table
-
 Use security-auditor to check if this image upload is secure
-
 Use security-auditor to validate the authentication flow
 ```
 
 **Security checklist covers**:
-- ✅ Authentication & authorization
-- ✅ Row Level Security policies
-- ✅ API input validation
-- ✅ Content moderation
-- ✅ File upload security
-- ✅ Role-based access control
-- ✅ Data privacy & GDPR
-- ✅ OWASP Top 10 vulnerabilities
+- Authentication & authorization
+- Row Level Security policies
+- API input validation
+- Content moderation
+- File upload security
+- Role-based access control
+- Data privacy & GDPR
+- OWASP Top 10 vulnerabilities
 
 **Output includes**:
 - Vulnerability severity (Critical/High/Medium/Low)
@@ -185,7 +179,7 @@ Use security-auditor to validate the authentication flow
 
 ---
 
-### 5. maintenance-agent 🔄
+### 5. maintenance-agent
 
 **Purpose**: Keeps all agents and skills up-to-date with the evolving codebase
 
@@ -200,11 +194,8 @@ Use security-auditor to validate the authentication flow
 **Example commands**:
 ```
 Use maintenance-agent to review all agents and skills
-
 Use maintenance-agent to validate agents (report only)
-
 Use maintenance-agent to update supabase-assistant after migration
-
 Use maintenance-agent to check if component-generator is current
 ```
 
@@ -223,11 +214,11 @@ Use maintenance-agent to check if component-generator is current
 
 ---
 
-## Detailed Skill Reference
+## Skill Reference
 
 Skills automatically load when you ask relevant questions. You don't need to explicitly invoke them.
 
-### 1. supabase-query-helper 🗄️
+### 1. supabase-query-helper
 
 **Auto-triggers when you ask**:
 - "How do I query the venues table?"
@@ -262,7 +253,7 @@ How do I create a migration for a new bookmarks table?
 
 ---
 
-### 2. drift-component-generator ⚛️
+### 2. drift-component-generator
 
 **Auto-triggers when you ask**:
 - "Create a new component"
@@ -305,7 +296,7 @@ What's the color for primary buttons?
 
 ---
 
-### 3. drift-api-patterns 🚀
+### 3. drift-api-patterns
 
 **Auto-triggers when you ask**:
 - "Create an API route for..."
@@ -356,27 +347,21 @@ Implement image moderation in upload endpoint
 ```bash
 # Step 1: Database setup
 > Use supabase-assistant to create a bookmarks table with RLS policies
-# Agent creates migration, applies it, generates types
 
 # Step 2: API route
 > Create an API route for managing bookmarks
-# drift-api-patterns skill guides you through structure
 
 # Step 3: Component
 > Create a bookmark button component
-# drift-component-generator skill guides design
 
 # Step 4: Code review
 > Use drift-reviewer to review my bookmark feature
-# Agent checks all code for quality, security, consistency
 
 # Step 5: Performance check
 > Use event-optimizer to ensure bookmarks load efficiently
-# Agent suggests caching, query optimizations
 
 # Step 6: Security audit
 > Use security-auditor to audit the bookmarks API
-# Agent validates auth, RLS, input validation
 ```
 
 ### Workflow 2: Performance Optimization
@@ -386,15 +371,12 @@ Implement image moderation in upload endpoint
 ```bash
 # Step 1: Analyze
 > Use event-optimizer to analyze search page performance
-# Agent profiles queries, components, bundle size
 
 # Step 2: Database optimization
 > Use supabase-assistant to optimize the search query
-# Agent adds indexes, improves joins
 
 # Step 3: Verify
 > Use event-optimizer to benchmark the improvements
-# Agent measures before/after performance
 ```
 
 ### Workflow 3: Security Review
@@ -404,22 +386,18 @@ Implement image moderation in upload endpoint
 ```bash
 # Step 1: API audit
 > Use security-auditor to audit all API routes
-# Agent checks auth, validation, error handling
 
 # Step 2: Database audit
 > Use supabase-assistant to review all RLS policies
-# Agent validates policies for all tables
 
 # Step 3: Content moderation
 > Use security-auditor to verify content moderation implementation
-# Agent checks image and text moderation
 
 # Step 4: Fix issues
 # Apply recommended fixes
 
 # Step 5: Re-audit
 > Use security-auditor to verify fixes
-# Agent confirms vulnerabilities are resolved
 ```
 
 ### Workflow 4: Monthly Maintenance
@@ -429,7 +407,6 @@ Implement image moderation in upload endpoint
 ```bash
 # Step 1: Run maintenance
 > Use maintenance-agent to review all agents and skills
-# Agent scans code, compares with documentation
 
 # Step 2: Review report
 # Agent shows outdated patterns, missing coverage
@@ -439,7 +416,6 @@ Implement image moderation in upload endpoint
 
 # Step 4: Verify
 > Use maintenance-agent to validate all agents
-# Agent confirms everything is current
 ```
 
 ---
@@ -451,7 +427,7 @@ Implement image moderation in upload endpoint
 **First time setup**:
 1. Clone the repo (agents/skills come with it in `.claude/`)
 2. Install Claude Code CLI
-3. Start coding - agents/skills work automatically!
+3. Start coding - agents/skills work automatically
 
 **Try these commands to get familiar**:
 ```bash
@@ -493,13 +469,13 @@ Implement image moderation in upload endpoint
 
 ### 1. Use Agents Proactively
 
-**Good** ✅:
+**Good**:
 ```
 [After writing code]
 > Use drift-reviewer to review my changes
 ```
 
-**Bad** ❌:
+**Bad**:
 ```
 [Writing code with bugs]
 [Committing without review]
@@ -700,7 +676,7 @@ Add to `.github/workflows/`:
 Track these metrics:
 
 ### Code Quality
-- % of PRs reviewed by drift-reviewer before submission
+- Percentage of PRs reviewed by drift-reviewer before submission
 - Number of issues caught by agents before deployment
 - Reduction in bugs related to common patterns
 
@@ -711,7 +687,7 @@ Track these metrics:
 
 ### Security
 - Vulnerabilities caught by security-auditor
-- % of API routes audited before deployment
+- Percentage of API routes audited before deployment
 - RLS policy coverage
 
 ### Documentation
@@ -727,7 +703,7 @@ Track these metrics:
 **A**: No. Use agents when you need expertise (database, security, performance) or quality checks (code review). Skills trigger automatically.
 
 ### Q: Can I modify agents and skills?
-**A**: Yes! Agents/skills are in `.claude/agents/` and `.claude/skills/`. Edit them to match your needs. Run maintenance-agent to validate changes.
+**A**: Yes. Agents/skills are in `.claude/agents/` and `.claude/skills/`. Edit them to match your needs. Run maintenance-agent to validate changes.
 
 ### Q: What if an agent gives wrong advice?
 **A**: Run maintenance-agent to update it with current patterns. Report the issue so documentation can be improved.

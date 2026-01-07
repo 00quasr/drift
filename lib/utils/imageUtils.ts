@@ -1,4 +1,13 @@
-// Curated professional images for different entity types
+// Supabase storage configuration
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
+const SUPABASE_STORAGE_URL = `${SUPABASE_URL}/storage/v1/object/public`
+
+// Available background images (001.jpg - 029.jpg) from Supabase storage
+const BACKGROUND_IMAGES = Array.from({ length: 29 }, (_, i) => 
+  String(i + 1).padStart(3, '0') + '.jpg'
+)
+
+// Curated professional images for different entity types (fallback to Unsplash if needed)
 const VENUE_IMAGES = [
   'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&h=600&fit=crop&crop=center', // Dark nightclub with crowd
   'https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?w=800&h=600&fit=crop&crop=center', // Underground club with purple lighting
@@ -27,58 +36,106 @@ const ARTIST_IMAGES = [
 ];
 
 /**
+ * Get a random background image from Supabase storage
+ * @param seed - Optional seed for consistent randomization (e.g., using an ID)
+ * @returns Full URL to the background image
+ */
+export function getRandomBackgroundImage(seed?: string): string {
+  let index: number
+  
+  if (seed) {
+    // Use seed to generate consistent "random" index
+    let hash = 0
+    for (let i = 0; i < seed.length; i++) {
+      const char = seed.charCodeAt(i)
+      hash = ((hash << 5) - hash) + char
+      hash = hash & hash // Convert to 32bit integer
+    }
+    index = Math.abs(hash) % BACKGROUND_IMAGES.length
+  } else {
+    // Truly random index
+    index = Math.floor(Math.random() * BACKGROUND_IMAGES.length)
+  }
+  
+  const imageName = BACKGROUND_IMAGES[index]
+  return `${SUPABASE_STORAGE_URL}/assets/${imageName}`
+}
+
+/**
+ * Get a specific background image by number
+ * @param number - Image number (1-29)
+ * @returns Full URL to the background image
+ */
+export function getBackgroundImage(number: number): string {
+  if (number < 1 || number > 29) {
+    throw new Error('Background image number must be between 1 and 29')
+  }
+  
+  const imageName = String(number).padStart(3, '0') + '.jpg'
+  return `${SUPABASE_STORAGE_URL}/assets/${imageName}`
+}
+
+/**
  * Returns a curated fallback image for an entity when no image is provided
- * Uses entity ID for consistent image selection
+ * Now uses Supabase storage images as primary fallback
  */
 export function getFallbackImage(
   entityType: 'venue' | 'event' | 'artist',
   entityId: string
 ): string {
-  // Convert string ID to numeric hash for consistent selection
-  const hash = entityId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  
-  let imageArray: string[];
-  switch (entityType) {
-    case 'venue':
-      imageArray = VENUE_IMAGES;
-      break;
-    case 'event':
-      imageArray = EVENT_IMAGES;
-      break;
-    case 'artist':
-      imageArray = ARTIST_IMAGES;
-      break;
-    default:
-      imageArray = VENUE_IMAGES;
-  }
-  
-  const index = hash % imageArray.length;
-  return imageArray[index];
+  // Primary: Use Supabase storage background images
+  return getRandomBackgroundImage(entityId)
 }
 
 /**
  * Get a fallback image for a list view (when user hasn't uploaded an image)
+ * Now uses Supabase storage images
  */
 export function getListFallbackImage(
   entityType: 'venue' | 'event' | 'artist',
   index: number
 ): string {
-  let imageArray: string[];
-  switch (entityType) {
-    case 'venue':
-      imageArray = VENUE_IMAGES;
-      break;
-    case 'event':
-      imageArray = EVENT_IMAGES;
-      break;
-    case 'artist':
-      imageArray = ARTIST_IMAGES;
-      break;
-    default:
-      imageArray = VENUE_IMAGES;
+  // Use index to get consistent background image
+  const imageIndex = (index % BACKGROUND_IMAGES.length) + 1
+  return getBackgroundImage(imageIndex)
+}
+
+/**
+ * Get multiple random background images
+ * @param count - Number of images to get
+ * @param seed - Optional seed for consistent randomization
+ * @returns Array of image URLs
+ */
+export function getRandomBackgroundImages(count: number, seed?: string): string[] {
+  const images: string[] = []
+  const usedIndices = new Set<number>()
+  
+  for (let i = 0; i < Math.min(count, BACKGROUND_IMAGES.length); i++) {
+    let index: number
+    
+    if (seed) {
+      // Use seed + index to generate different but consistent images
+      const seedWithIndex = seed + i
+      let hash = 0
+      for (let j = 0; j < seedWithIndex.length; j++) {
+        const char = seedWithIndex.charCodeAt(j)
+        hash = ((hash << 5) - hash) + char
+        hash = hash & hash
+      }
+      index = Math.abs(hash) % BACKGROUND_IMAGES.length
+    } else {
+      // Ensure no duplicates for random selection
+      do {
+        index = Math.floor(Math.random() * BACKGROUND_IMAGES.length)
+      } while (usedIndices.has(index))
+    }
+    
+    usedIndices.add(index)
+    const imageName = BACKGROUND_IMAGES[index]
+    images.push(`${SUPABASE_STORAGE_URL}/assets/${imageName}`)
   }
   
-  return imageArray[index % imageArray.length];
+  return images
 }
 
 /**
@@ -92,20 +149,4 @@ export function isValidImageUrl(url: string | null | undefined): boolean {
   } catch {
     return false;
   }
-}
-
-/**
- * Get a random background image from the Supabase assets bucket
- * Uses entity ID for consistent selection across renders
- */
-export function getRandomBackgroundImage(entityId: string): string {
-  // Convert string ID to numeric hash for consistent selection
-  const hash = entityId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  
-  // We have 29 background images (001.jpg through 029.jpg)
-  const imageNumber = (hash % 29) + 1;
-  const paddedNumber = imageNumber.toString().padStart(3, '0');
-  
-  // Return Supabase storage URL for the assets bucket
-  return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/assets/${paddedNumber}.jpg`;
 } 

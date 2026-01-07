@@ -30,6 +30,7 @@
 
 ## Development
 * [Development Guide](06-development/development/DEVELOPMENT_GUIDE.md)
+* [Claude Code Agent & Skill Guide](06-development/development/CLAUDE_CODE_GUIDE.md)
 * [Contributing Guidelines](06-development/development/CONTRIBUTING.md)
 * [Implementation Plan](06-development/development/implementation_plan.mdc)
 * [Security Guidelines](06-development/development/security_guideline_document.mdc)

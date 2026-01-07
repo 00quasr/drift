@@ -14,7 +14,7 @@ High-level project information and current status:
 
 ### 🎯 [02-features/](./02-features/) - Feature Documentation
 Specific feature implementations and guides:
-
+V
 - **[REALTIME_CHAT_IMPLEMENTATION.md](./02-features/REALTIME_CHAT_IMPLEMENTATION.md)** - 🆕 **NEW** - Complete chat system implementation guide
 - **[USER_MANAGEMENT_SYSTEM.md](./02-features/USER_MANAGEMENT_SYSTEM.md)** - Authentication and user management
 - **[MAPBOX_SETUP.md](./02-features/MAPBOX_SETUP.md)** - Map integration setup guide
@@ -50,6 +50,7 @@ Guides for developers working on the platform:
 
 - **[development/](./06-development/development/)** - Development workflow and guidelines
   - **[DEVELOPMENT_GUIDE.md](./06-development/development/DEVELOPMENT_GUIDE.md)** - Complete development setup and workflow
+  - **[CLAUDE_CODE_GUIDE.md](./06-development/development/CLAUDE_CODE_GUIDE.md)** - 🆕 **NEW** - AI agents and skills for development
   - **[CONTRIBUTING.md](./06-development/development/CONTRIBUTING.md)** - How to contribute to the project
   - **[security_guideline_document.mdc](./06-development/development/security_guideline_document.mdc)** - Security best practices
   - **[implementation_plan.mdc](./06-development/development/implementation_plan.mdc)** - Original development roadmap
@@ -79,7 +80,8 @@ Marketing strategy and design documentation:
 1. Start with **[Project Status](./01-overview/PROJECT_STATUS.md)** to understand current state
 2. Review **[Tech Stack](./03-technical/architecture/tech_stack_document.mdc)** to understand technology choices
 3. Follow **[Development Guide](./06-development/development/DEVELOPMENT_GUIDE.md)** for setup
-4. Read **[Contributing Guidelines](./06-development/development/CONTRIBUTING.md)** for workflow
+4. Learn **[Claude Code Agents & Skills](./06-development/development/CLAUDE_CODE_GUIDE.md)** for AI-assisted development
+5. Read **[Contributing Guidelines](./06-development/development/CONTRIBUTING.md)** for workflow
 
 #### **For API Integration**
 1. Review **[API Documentation](./03-technical/api/API_DOCUMENTATION.md)** for complete endpoint reference
@@ -142,7 +144,10 @@ Marketing strategy and design documentation:
 - **Row Level Security** - Database-level authorization
 
 ### Development Tools
-- **Claude Code** - AI-powered development assistant
+- **Claude Code** - AI-powered development assistant with custom agents and skills
+  - 5 specialized agents (supabase-assistant, drift-reviewer, event-optimizer, security-auditor, maintenance-agent)
+  - 3 knowledge skills (supabase-query-helper, drift-component-generator, drift-api-patterns)
+  - See [Claude Code Guide](./06-development/development/CLAUDE_CODE_GUIDE.md) for usage
 - **ESLint & Prettier** - Code quality and formatting
 - **TypeScript** - Static type checking
 

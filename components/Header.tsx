@@ -146,15 +146,7 @@ export default function Header() {
 
   return (
     <motion.header
-      className={`
-        fixed top-4 left-4 right-4 z-50 transition-all duration-500 ease-out rounded-xl
-        ${scrolled
-          ? 'bg-black/90 bg-gradient-to-b from-white/[0.08] to-white/[0.02] backdrop-blur-xl border border-white/20 shadow-lg'
-          : isLandingPage
-            ? 'bg-black/70 backdrop-blur-md border border-white/10'
-            : 'bg-black/90 bg-gradient-to-b from-white/[0.08] to-white/[0.02] backdrop-blur-xl border border-white/20'
-        }
-      `}
+      className="fixed top-4 left-4 right-4 z-50 transition-all duration-500 ease-out rounded-xl bg-black/95 backdrop-blur-xl border border-white/20 shadow-lg"
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}

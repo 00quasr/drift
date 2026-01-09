@@ -145,14 +145,14 @@ export default function Header() {
   ]
 
   return (
-    <motion.header 
+    <motion.header
       className={`
         fixed top-4 left-4 right-4 z-50 transition-all duration-500 ease-out rounded-xl
-        ${scrolled 
-          ? 'bg-black/[0.2] bg-gradient-to-b from-white/[0.08] to-white/[0.02] backdrop-blur-3xl border border-white/[0.12] shadow-lg' 
-          : isLandingPage 
-            ? 'bg-transparent border border-transparent' 
-            : 'bg-black/[0.2] bg-gradient-to-b from-white/[0.08] to-white/[0.02] backdrop-blur-xl border border-white/[0.1]'
+        ${scrolled
+          ? 'bg-black/90 bg-gradient-to-b from-white/[0.08] to-white/[0.02] backdrop-blur-xl border border-white/20 shadow-lg'
+          : isLandingPage
+            ? 'bg-black/70 backdrop-blur-md border border-white/10'
+            : 'bg-black/90 bg-gradient-to-b from-white/[0.08] to-white/[0.02] backdrop-blur-xl border border-white/20'
         }
       `}
       initial={{ y: -100 }}

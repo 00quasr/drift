@@ -69,3 +69,4 @@ Desktop.ini
 .claude/.env.mcp.local
 
 .mcp.json
+.playwright-mcp/

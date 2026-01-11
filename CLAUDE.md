@@ -27,6 +27,32 @@ NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=your_mapbox_token
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
+### MCP Servers (Model Context Protocol)
+Claude Code uses MCP servers to enhance development capabilities. The following servers are configured for this project:
+
+- **Supabase MCP**: Database operations, migrations, SQL queries, RLS policies, and type generation
+  - Use for all database-related tasks
+  - Manages schema changes and table operations
+  - Generates TypeScript types automatically
+
+- **Playwright MCP**: Browser automation and testing
+  - Use for automated UI testing
+  - Take screenshots for visual validation
+  - Test user flows and interactions
+  - Validate responsive behavior across breakpoints
+
+- **shadcn MCP**: UI component integration
+  - Use for adding pre-built UI components
+  - Search and install shadcn/ui components
+  - Ensures consistent design system usage
+  - Access to component examples and documentation
+
+- **Linear MCP**: Project management and issue tracking
+  - Use for creating and managing tickets
+  - Track bugs, features, and tasks
+  - Integrate development workflow with project management
+  - Access issue status and project information
+
 ## 🏗️ Architecture Decisions
 
 ### Frontend Framework
@@ -45,6 +71,82 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 - **User roles** system (Fan, Artist, Promoter, Venue Owner, Admin)
 - **Multi-dimensional rating** system for venues and events
 - **Content moderation** tables for flagged content management
+
+## 🎨 Design Principles & Frontend Standards
+
+### Core Design Philosophy
+We aim for **minimalistic, calm, and clean interfaces**. Every design decision should prioritize clarity and simplicity over decoration.
+
+#### Visual Design Principles
+- **Few colors.** Prefer a very limited color palette:
+  - Neutral base (white / off-white / dark)
+  - One primary accent color
+  - Optional muted secondary for states
+- **Minimalism over decoration.** Every visual element must earn its place.
+- **Form over function (visually).**
+  - If something looks cluttered or heavy, it is wrong.
+  - Functional density must not compromise visual clarity.
+- **Clean, boring, professional.** No flashy gradients, excessive shadows, or visual noise.
+- **Whitespace is intentional.** Spacing is a feature, not wasted space.
+- **Consistency beats creativity.** Reuse patterns relentlessly.
+
+#### Practical Rules
+**Avoid:**
+- Rainbow color schemes
+- Unnecessary icons
+- Excessive borders, outlines, dividers
+- "UI tricks" that don't improve clarity
+
+**Prefer:**
+- Typography hierarchy over boxes
+- Alignment over decoration
+- Spacing over separators
+
+**If in doubt: remove, then reassess.**
+
+#### Validation Guidelines
+- Screenshots are mandatory for UI work.
+- If a screen feels "busy," simplify until it feels calm.
+- If two elements compete for attention, one must go.
+
+### Frontend Standards (TypeScript + shadcn/ui)
+
+#### UI Library
+- Prefer **shadcn/ui** for primitives.
+- Follow Radix UI patterns.
+- Avoid one-off styling when a reusable component exists.
+
+#### TypeScript Standards
+- Use strict TypeScript configuration
+- Define interfaces for all data structures
+- Avoid `any` types unless absolutely necessary
+- Use proper type inference from Supabase database types
+
+#### Component Development Requirements
+
+Before declaring any UI work complete, you must:
+
+1. **Take screenshots:**
+   - Before changes (baseline)
+   - After each meaningful change
+   - Before declaring done
+
+2. **Validate:**
+   - Spacing & alignment
+   - Typography consistency
+   - Color restraint
+   - Responsiveness (≥2 breakpoints)
+   - Empty/loading/error states
+   - Basic accessibility (labels, focus)
+
+#### Development Loop
+
+1. Implement smallest change
+2. Screenshot
+3. Simplify visually
+4. Repeat
+
+Prefer automated screenshots (Playwright) where feasible.
 
 ## 🔧 Key Implementation Details
 
@@ -180,11 +282,28 @@ supabase gen types typescript --project-id=YOUR_PROJECT_ID > lib/types/database.
 - **Reusable components** following shadcn/ui patterns
 - **Service layer** for business logic separation
 
+### UI/UX Development Workflow
+- **Always use Playwright MCP** for automated screenshot validation
+- **Follow the design principles** outlined in the Design Principles section
+- **Simplify before adding complexity** - remove elements that don't serve a clear purpose
+- **Test at multiple breakpoints** - mobile and desktop minimum
+- **Validate all interactive states** - empty, loading, error, and success states
+- **Use shadcn MCP** to find and install appropriate components before building custom solutions
+
 ### Database Best Practices
+- **Use Supabase MCP** for all database operations and schema changes
 - **RLS policies** for all tables requiring user access control
 - **Proper indexing** for search and filtering operations
 - **Data validation** at both frontend and backend levels
 - **Consistent naming conventions** across all entities
+- **Generate TypeScript types** after any schema changes using Supabase MCP
+
+### Project Management
+- **Use Linear MCP** for creating and tracking issues
+- **Create tickets** for bugs, features, and technical debt
+- **Link commits to issues** when possible
+- **Update issue status** as work progresses
+- **Document decisions** in issue comments
 
 ### Security Best Practices
 - **Never expose sensitive keys** in frontend code
@@ -251,5 +370,5 @@ supabase gen types typescript --project-id=YOUR_PROJECT_ID > lib/types/database.
 
 ---
 
-**Last Updated**: July 2025  
-**Development Status**: Role-specific UX redesign complete, core features implemented, ready for testing and deployment
+**Last Updated**: January 2026
+**Development Status**: Design system and MCP integration documented, role-specific UX complete, core features implemented

@@ -5,6 +5,7 @@ import { Search, Zap, Radar } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { EntityCard } from '@/components/ui/entity-card'
+import { H1, H2 } from '@/components/ui/typography'
 import { getUpcomingEvents } from '@/lib/services/events'
 import { getTrendingVenues } from '@/lib/services/venues'
 import { getTopRatedArtists } from '@/lib/services/artists'
@@ -34,9 +35,9 @@ async function ExplorePage() {
             <div className="mb-8 flex justify-center">
               <ClassicLoader />
             </div>
-            <h1 className="text-4xl font-bold text-white tracking-widest uppercase mb-4">
+            <H1 variant="display" className="mb-4 text-white">
               EXPLORE
-            </h1>
+            </H1>
             <p className="text-white/80 text-lg mb-8 font-medium tracking-wider uppercase">
               DISCOVER THE BEST ELECTRONIC MUSIC EXPERIENCES AROUND THE WORLD
             </p>
@@ -53,9 +54,9 @@ async function ExplorePage() {
         {/* Search Header */}
         <div className="mb-16">
           <div className="max-w-4xl mx-auto text-center mb-12">
-            <h1 className="text-5xl md:text-7xl font-bold text-white tracking-widest uppercase mb-6">
+            <H1 variant="display" className="text-5xl md:text-7xl mb-6 text-white">
               EXPLORE
-            </h1>
+            </H1>
             <p className="text-white/80 text-lg font-medium tracking-wider uppercase">
               DISCOVER THE BEST ELECTRONIC MUSIC EXPERIENCES AROUND THE WORLD
             </p>
@@ -169,9 +170,9 @@ async function ExplorePage() {
                   <div className="w-3 h-3 bg-yellow-400 animate-pulse" />
                   <span className="text-yellow-400 font-bold tracking-widest uppercase text-sm">LIVE</span>
                 </div>
-                <h2 className="text-3xl font-bold text-white tracking-widest uppercase">
+                <H2 variant="display" className="text-3xl text-white">
                   UPCOMING EVENTS
-                </h2>
+                </H2>
               </div>
               <a 
                 href="/events" 
@@ -232,9 +233,9 @@ async function ExplorePage() {
                   <div className="w-3 h-3 bg-white animate-pulse" />
                   <span className="text-white/80 font-bold tracking-widest uppercase text-sm">TRENDING</span>
                 </div>
-                <h2 className="text-3xl font-bold text-white tracking-widest uppercase">
+                <H2 variant="display" className="text-3xl text-white">
                   HOT VENUES
-                </h2>
+                </H2>
               </div>
               <a 
                 href="/venues" 
@@ -273,9 +274,9 @@ async function ExplorePage() {
                   <div className="w-3 h-3 bg-white animate-pulse" />
                   <span className="text-white/80 font-bold tracking-widest uppercase text-sm">TOP RATED</span>
                 </div>
-                <h2 className="text-3xl font-bold text-white tracking-widest uppercase">
+                <H2 variant="display" className="text-3xl text-white">
                   FEATURED ARTISTS
-                </h2>
+                </H2>
               </div>
               <a 
                 href="/artists" 
@@ -320,9 +321,9 @@ export default function ExplorePageWrapper() {
             <div className="mb-8 flex justify-center">
               <ClassicLoader />
             </div>
-            <h1 className="text-4xl font-bold text-white tracking-widest uppercase mb-4">
+            <H1 variant="display" className="mb-4 text-white">
               EXPLORE
-            </h1>
+            </H1>
             <p className="text-white/80 text-lg mb-8 font-medium tracking-wider uppercase">
               DISCOVER THE BEST ELECTRONIC MUSIC EXPERIENCES AROUND THE WORLD
             </p>

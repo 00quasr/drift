@@ -7,11 +7,11 @@ import { Badge } from '@/components/ui/badge'
 import { ViewSwitcher, ViewMode } from '@/components/ui/view-switcher'
 import { supabase } from '@/lib/auth'
 import { formatDistanceToNow } from 'date-fns'
-import { 
-  Heart, 
-  MapPin, 
-  Calendar, 
-  Music, 
+import {
+  Heart,
+  MapPin,
+  Calendar,
+  Music,
   Clock,
   Users,
   Star,
@@ -22,6 +22,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { favoritesService } from '@/lib/services/favorites'
 import ClassicLoader from '@/components/ui/loader'
+import { H1, H3 } from "@/components/ui/typography"
 
 interface Favorite {
   id: string
@@ -200,9 +201,9 @@ export default function FavoritesPage() {
         <Card className="bg-white/5 border border-white/20 p-8 max-w-md w-full mx-6">
           <div className="text-center space-y-4">
             <Heart className="w-12 h-12 text-white/60 mx-auto" />
-            <h1 className="text-2xl font-bold tracking-wider uppercase">
+            <H1 variant="display">
               SIGN IN REQUIRED
-            </h1>
+            </H1>
             <p className="text-white/80 font-medium">
               Please sign in to view your favorites collection.
             </p>
@@ -259,7 +260,7 @@ export default function FavoritesPage() {
     <div className="min-h-screen bg-black text-white pt-24 pb-12">
       <div className="max-w-7xl mx-auto px-6">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold tracking-widest uppercase mb-4">MY FAVORITES</h1>
+          <H1 variant="display" className="mb-4">MY FAVORITES</H1>
           <p className="text-white/60 font-medium tracking-wider uppercase">
             Your personal collection of favorite artists, venues, and events
           </p>
@@ -327,10 +328,10 @@ export default function FavoritesPage() {
         {/* Favorites Grid */}
         <div>
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold tracking-wider uppercase text-white">
+            <H3>
               {filter === 'all' ? 'ALL FAVORITES' : `${filter.toUpperCase()} FAVORITES`}
-            </h3>
-            <ViewSwitcher 
+            </H3>
+            <ViewSwitcher
               viewMode={viewMode}
               onViewModeChange={setViewMode}
             />
@@ -340,9 +341,9 @@ export default function FavoritesPage() {
             <Card className="bg-white/5 border border-white/20 p-12">
               <div className="text-center space-y-4">
                 <Heart className="w-16 h-16 text-white/40 mx-auto" />
-                <h3 className="text-xl font-bold tracking-wider uppercase text-white">
+                <H3>
                   NO FAVORITES YET
-                </h3>
+                </H3>
                 <p className="text-white/60 font-medium max-w-md mx-auto">
                   Start building your collection by favoriting venues, events, and artists you love!
                 </p>
@@ -406,12 +407,12 @@ export default function FavoritesPage() {
                             </div>
                           </div>
                         </Link>
-                        
+
                         <div className="p-4">
                           <Link href={`/${favorite.target_type}/${favorite.target_id}`}>
-                            <h4 className="text-lg font-bold tracking-wider uppercase text-white mb-2 group-hover:text-white/80 transition-colors">
+                            <H3 className="mb-2 group-hover:text-white/80 transition-colors">
                               {favorite.target_name || 'Unknown'}
-                            </h4>
+                            </H3>
                             
                             {favorite.target_location && (
                               <div className="flex items-center gap-2 mb-2">
@@ -495,9 +496,9 @@ export default function FavoritesPage() {
                                       {favorite.target_type}
                                     </Badge>
                                     <Link href={`/${favorite.target_type}/${favorite.target_id}`}>
-                                      <h4 className="text-xl font-bold tracking-wider uppercase text-white hover:text-white/80 transition-colors">
+                                      <H3 className="hover:text-white/80 transition-colors">
                                         {favorite.target_name || 'Unknown'}
-                                      </h4>
+                                      </H3>
                                     </Link>
                                   </div>
                                   

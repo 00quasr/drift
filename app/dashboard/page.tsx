@@ -3,10 +3,10 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { motion } from 'framer-motion'
-import { 
-  MapPin, 
-  Calendar, 
-  Music, 
+import {
+  MapPin,
+  Calendar,
+  Music,
   Users,
   Eye,
   Heart,
@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import ClassicLoader from '@/components/ui/loader'
+import { H1, H2, H3 } from "@/components/ui/typography"
 
 interface DashboardStats {
   venues: number
@@ -150,9 +151,9 @@ export default function DashboardOverview() {
     <div className="space-y-8">
       {/* Welcome Header */}
       <div className="border-b border-white/20 pb-6">
-        <h1 className="text-4xl font-bold tracking-wider uppercase text-white mb-2">
+        <H1 variant="display" className="mb-2">
           Welcome back, {user?.display_name || user?.email}
-        </h1>
+        </H1>
         <p className="text-white/60 font-bold tracking-wider uppercase">
           {user?.role} Dashboard • {user?.is_verified ? 'VERIFIED' : 'PENDING VERIFICATION'}
         </p>
@@ -161,9 +162,9 @@ export default function DashboardOverview() {
       {/* Quick Actions */}
       {quickActions.length > 0 && (
         <div>
-          <h2 className="text-2xl font-bold tracking-wider uppercase text-white mb-6">
+          <H2 variant="display" className="mb-6">
             Quick Actions
-          </h2>
+          </H2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {quickActions.map((action) => {
               const Icon = action.icon
@@ -179,9 +180,9 @@ export default function DashboardOverview() {
                         <Icon className="w-6 h-6 text-white" />
                       </div>
                       <div>
-                        <h3 className="font-bold tracking-wider uppercase text-white text-lg">
+                        <H3>
                           {action.title}
-                        </h3>
+                        </H3>
                         <p className="text-white/60 text-sm">
                           {action.description}
                         </p>
@@ -201,9 +202,9 @@ export default function DashboardOverview() {
 
       {/* Stats Overview */}
       <div>
-        <h2 className="text-2xl font-bold tracking-wider uppercase text-white mb-6">
+        <H2 variant="display" className="mb-6">
           Overview
-        </h2>
+        </H2>
         <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 ${user?.role === 'admin' ? 'lg:grid-cols-5' : 'lg:grid-cols-4'}`}>
           <StatCard
             icon={MapPin}
@@ -244,9 +245,9 @@ export default function DashboardOverview() {
 
       {/* Recent Activity */}
       <div>
-        <h2 className="text-2xl font-bold tracking-wider uppercase text-white mb-6">
+        <H2 variant="display" className="mb-6">
           Recent Activity
-        </h2>
+        </H2>
         <div className="bg-black/50 border border-white/20 backdrop-blur-sm">
           {stats.recentActivity.length > 0 ? (
             <div className="divide-y divide-white/10">

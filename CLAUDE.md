@@ -122,6 +122,85 @@ We aim for **minimalistic, calm, and clean interfaces**. Every design decision s
 - Avoid `any` types unless absolutely necessary
 - Use proper type inference from Supabase database types
 
+### Typography Standards
+
+#### Font Family: Geist Sans
+**PROJECT-WIDE STANDARD** - All typography must use Geist Sans.
+
+- **Primary typeface**: [Geist Sans](https://vercel.com/font) by Vercel
+- **Modern, clean, optimized** for digital interfaces
+- **Installation**: `npm install geist`
+
+**Next.js Configuration** (in `app/layout.tsx`):
+```tsx
+import { GeistSans } from 'geist/font/sans';
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en" className={GeistSans.variable}>
+      <body className="font-sans">{children}</body>
+    </html>
+  );
+}
+```
+
+#### Typography Scale
+shadcn/ui does NOT ship typography styles by default - we define them using Tailwind utilities.
+
+**Headings:**
+```tsx
+// H1 - Large page titles
+<h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
+
+// H2 - Section headings
+<h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0">
+
+// H3 - Subsection headings
+<h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
+
+// H4 - Card/component titles
+<h4 className="scroll-m-20 text-xl font-semibold tracking-tight">
+```
+
+**Body Text:**
+```tsx
+// Paragraph - Standard body text
+<p className="leading-7 [&:not(:first-child)]:mt-6">
+
+// Lead - Introduction/highlight text
+<p className="text-xl text-muted-foreground">
+
+// Large - Emphasized text
+<div className="text-lg font-semibold">
+
+// Small - Secondary/supporting text
+<small className="text-sm font-medium leading-none">
+
+// Muted - De-emphasized text
+<p className="text-sm text-muted-foreground">
+```
+
+**Special Elements:**
+```tsx
+// Blockquote - Quotes and callouts
+<blockquote className="mt-6 border-l-2 pl-6 italic">
+
+// Inline code - Code snippets
+<code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
+
+// Lists - Ordered and unordered
+<ul className="my-6 ml-6 list-disc [&>li]:mt-2">
+```
+
+#### Typography Rules
+1. **Use Geist Sans** - All text must use the Geist Sans font family
+2. **Use Tailwind utilities** - No custom CSS for typography unless absolutely necessary
+3. **Semantic HTML** - Use proper heading hierarchy (h1, h2, h3, etc.)
+4. **Consistent spacing** - Follow the patterns above for margins and line heights
+5. **Color variants** - Use `text-muted-foreground`, `text-primary`, etc. from theme
+
+**Reference**: See [shadcn/ui Typography Guide](https://ui.shadcn.com/docs/components/typography) and Linear issue DES-4.
+
 #### Component Development Requirements
 
 Before declaring any UI work complete, you must:
@@ -239,8 +318,8 @@ Prefer automated screenshots (Playwright) where feasible.
 
 ### Essential Commands
 ```bash
-# Development server
-npm run dev
+# Development server 
+npm run dev 
 
 # Type checking
 npm run type-check
@@ -258,6 +337,8 @@ npm run db:reset     # Reset database
 npm run build
 npm run start
 ```
+
+All npm cmd are executed by user just tell him what to do.
 
 ### Supabase Operations
 ```bash

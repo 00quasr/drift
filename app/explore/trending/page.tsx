@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowRight, MapPin, Calendar, Users, Star, Music } from 'lucide-react'
+import { H1, H2 } from '@/components/ui/typography'
 import {
   Table,
   TableBody,
@@ -187,9 +188,9 @@ export default function TrendingPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <h1 className="text-4xl md:text-5xl font-bold tracking-wider uppercase mb-4">
+          <H1 variant="display" className="text-4xl md:text-5xl mb-4">
             TRENDING NOW
-          </h1>
+          </H1>
           <p className="text-white/70 text-lg font-medium max-w-2xl">
             DISCOVER WHAT'S HOT IN THE UNDERGROUND ELECTRONIC MUSIC SCENE
           </p>
@@ -206,7 +207,7 @@ export default function TrendingPage() {
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-3">
                 <MapPin className="w-6 h-6 text-white/80" />
-                <h2 className="text-2xl font-bold tracking-wider uppercase">TRENDING VENUES</h2>
+                <H2 variant="display">TRENDING VENUES</H2>
               </div>
               <Link 
                 href="/venues" 
@@ -345,7 +346,7 @@ export default function TrendingPage() {
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-3">
                 <Calendar className="w-6 h-6 text-white/80" />
-                <h2 className="text-2xl font-bold tracking-wider uppercase">UPCOMING EVENTS</h2>
+                <H2 variant="display">UPCOMING EVENTS</H2>
               </div>
               <Link 
                 href="/events" 
@@ -505,7 +506,7 @@ export default function TrendingPage() {
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-3">
                 <Music className="w-6 h-6 text-white/80" />
-                <h2 className="text-2xl font-bold tracking-wider uppercase">TOP RATED ARTISTS</h2>
+                <H2 variant="display">TOP RATED ARTISTS</H2>
               </div>
               <Link 
                 href="/artists" 
@@ -641,9 +642,9 @@ export default function TrendingPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-2xl font-bold tracking-wider uppercase text-white/60 mb-4">
+            <H2 variant="display" className="mb-4 text-white/60">
               NO TRENDING CONTENT YET
-            </h2>
+            </H2>
             <p className="text-white/40 max-w-md mx-auto">
               Check back soon as the community grows and trending content emerges
             </p>

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import Link from 'next/link'
 import Image from 'next/image'
+import { H1, H2, H3 } from "@/components/ui/typography"
 
 // Animation variants
 const fadeIn = {
@@ -159,18 +160,19 @@ export default function HomePage() {
                 className="relative z-10 flex flex-col justify-center space-y-6 sm:space-y-8"
               >
                 <div className="space-y-4 sm:space-y-6">
-                  <motion.h1
+                  <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.7, delay: 0.2 }}
-                    className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold tracking-wider uppercase leading-tight"
                   >
-                    UNDERGROUND
-                    <br />
-                    ELECTRONIC
-                    <br />
-                    MUSIC PLATFORM
-                  </motion.h1>
+                    <H1 variant="display" className="leading-tight">
+                      UNDERGROUND
+                      <br />
+                      ELECTRONIC
+                      <br />
+                      MUSIC PLATFORM
+                    </H1>
+                  </motion.div>
                   <motion.p
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -252,14 +254,15 @@ export default function HomePage() {
 
               <div className="relative z-10 p-6 sm:p-8 lg:p-12">
                 <div className="text-center mb-8 sm:mb-12 lg:mb-16">
-                  <motion.h2
+                  <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.2 }}
-                    className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-widest uppercase mb-4 sm:mb-6"
                   >
-                    FOR EVERYONE
-                  </motion.h2>
+                    <H2 variant="display" className="mb-4 sm:mb-6">
+                      FOR EVERYONE
+                    </H2>
+                  </motion.div>
                   <motion.p
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -283,7 +286,7 @@ export default function HomePage() {
                       variants={itemFadeIn}
                       className="border border-white/20 p-4 sm:p-6 lg:p-8 bg-black/30"
                     >
-                      <h3 className="text-lg sm:text-xl font-bold tracking-widest uppercase mb-3 sm:mb-4 text-white">{userType.title}</h3>
+                      <H3 variant="display" className="mb-3 sm:mb-4 text-white">{userType.title}</H3>
                       <p className="text-white/70 text-xs sm:text-sm uppercase tracking-wide leading-relaxed">{userType.description}</p>
                     </motion.div>
                   ))}
@@ -317,14 +320,15 @@ export default function HomePage() {
 
               <div className="relative z-10 flex flex-col items-center justify-center space-y-6 sm:space-y-8 text-center py-12 sm:py-16 lg:py-24 px-6 sm:px-8 lg:px-12">
                 <div className="space-y-4 sm:space-y-6">
-                  <motion.h2
+                  <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.2 }}
-                    className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold tracking-wider uppercase leading-tight"
                   >
-                    JOIN THE MOVEMENT
-                  </motion.h2>
+                    <H2 variant="display" className="leading-tight">
+                      JOIN THE MOVEMENT
+                    </H2>
+                  </motion.div>
                   <motion.p
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}

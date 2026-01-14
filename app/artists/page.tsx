@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { EntityCard } from '@/components/ui/entity-card'
 import { EntityViews } from '@/components/ui/entity-views'
 import { ViewSwitcher, ViewMode } from '@/components/ui/view-switcher'
+import { H1 } from '@/components/ui/typography'
 import { getArtists } from '@/lib/services/artists'
 import { getFallbackImage, isValidImageUrl } from '@/lib/utils/imageUtils'
 import ClassicLoader from '@/components/ui/loader'
@@ -84,9 +85,9 @@ export default function ArtistsPage() {
       <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-16">
-          <h1 className="text-5xl md:text-7xl font-bold text-white tracking-widest uppercase mb-6">
+          <H1 variant="display" className="text-5xl md:text-7xl mb-6 text-white">
             DISCOVER ARTISTS
-          </h1>
+          </H1>
           <p className="text-white/80 text-lg max-w-3xl mx-auto font-medium tracking-wider uppercase">
             FROM RISING STARS TO LEGENDARY DJS, EXPLORE THE ARTISTS SHAPING ELECTRONIC MUSIC CULTURE ACROSS THE GLOBE
           </p>

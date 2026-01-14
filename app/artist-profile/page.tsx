@@ -4,11 +4,12 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { motion } from 'framer-motion'
-import { 
-  Music, 
-  Upload, 
-  Image as ImageIcon, 
-  Globe, 
+import { H1, H2, H3 } from '@/components/ui/typography'
+import {
+  Music,
+  Upload,
+  Image as ImageIcon,
+  Globe,
   Mail,
   X,
   AlertCircle,
@@ -365,7 +366,7 @@ export default function ArtistProfilePage() {
     return (
       <div className="text-center py-12">
         <Music className="w-16 h-16 mx-auto text-white/30 mb-4" />
-        <h3 className="text-xl font-bold text-white mb-2">Access Denied</h3>
+        <H3 className="mb-2">Access Denied</H3>
         <p className="text-white/60 mb-6">Only artist accounts can access this page.</p>
         <button
           onClick={() => router.push('/')}
@@ -381,7 +382,7 @@ export default function ArtistProfilePage() {
     return (
       <div className="text-center py-12">
         <AlertCircle className="w-16 h-16 mx-auto text-white/30 mb-4" />
-        <h3 className="text-xl font-bold text-white mb-2">Error</h3>
+        <H3 className="mb-2">Error</H3>
         <p className="text-white/60 mb-6">Failed to load artist profile.</p>
         <button
           onClick={() => fetchExistingArtist()}
@@ -406,9 +407,9 @@ export default function ArtistProfilePage() {
           </button>
           
           <div>
-            <h1 className="text-4xl font-bold tracking-wider uppercase text-white mb-2">
+            <H1 variant="display" className="mb-2">
               {isEditing ? 'Edit Artist Profile' : 'Create Artist Profile'}
-            </h1>
+            </H1>
             <p className="text-white/60 font-bold tracking-wider uppercase">
               {isEditing ? 'Update your artist information' : 'Set up your artist profile on Drift'}
             </p>
@@ -514,9 +515,9 @@ export default function ArtistProfilePage() {
       <div className="space-y-8">
         {/* Basic Information */}
         <div className="bg-black/50 border border-white/20 p-6 backdrop-blur-sm">
-          <h2 className="text-2xl font-bold tracking-wider uppercase text-white mb-6">
+          <H2 variant="display" className="mb-6">
             Basic Information
-          </h2>
+          </H2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -604,10 +605,10 @@ export default function ArtistProfilePage() {
 
         {/* Music Genres */}
         <div className="bg-black/50 border border-white/20 p-6 backdrop-blur-sm">
-          <h2 className="text-2xl font-bold tracking-wider uppercase text-white mb-6 flex items-center">
+          <H2 variant="display" className="mb-6 flex items-center">
             <Music className="w-6 h-6 mr-3" />
             Music Genres
-          </h2>
+          </H2>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {MUSIC_GENRES.map((genre) => (
@@ -637,9 +638,9 @@ export default function ArtistProfilePage() {
 
         {/* Social Links */}
         <div className="bg-black/50 border border-white/20 p-6 backdrop-blur-sm">
-          <h2 className="text-2xl font-bold tracking-wider uppercase text-white mb-6">
+          <H2 variant="display" className="mb-6">
             Social Links
-          </h2>
+          </H2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -702,10 +703,10 @@ export default function ArtistProfilePage() {
 
         {/* Images */}
         <div className="bg-black/50 border border-white/20 p-6 backdrop-blur-sm">
-          <h2 className="text-2xl font-bold tracking-wider uppercase text-white mb-6 flex items-center">
+          <H2 variant="display" className="mb-6 flex items-center">
             <ImageIcon className="w-6 h-6 mr-3" />
             Artist Photos
-          </h2>
+          </H2>
 
           <div className="space-y-4">
             <div>

@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { EntityCard } from '@/components/ui/entity-card'
 import { EntityViews } from '@/components/ui/entity-views'
 import { ViewSwitcher, ViewMode } from '@/components/ui/view-switcher'
+import { H1 } from '@/components/ui/typography'
 import { getVenues } from '@/lib/services/venues'
 import { getFallbackImage, isValidImageUrl } from '@/lib/utils/imageUtils'
 import ClassicLoader from '@/components/ui/loader'
@@ -73,9 +74,9 @@ export default function VenuesPage() {
       <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-16">
-          <h1 className="text-5xl md:text-7xl font-bold text-white tracking-widest uppercase mb-6">
+          <H1 variant="display" className="text-5xl md:text-7xl mb-6 text-white">
             DISCOVER VENUES
-          </h1>
+          </H1>
           <p className="text-white/80 text-lg max-w-3xl mx-auto font-medium tracking-wider uppercase">
             FROM UNDERGROUND WAREHOUSES TO ICONIC CLUBS, EXPLORE THE VENUES THAT DEFINE ELECTRONIC MUSIC CULTURE WORLDWIDE
           </p>

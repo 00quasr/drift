@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Calendar, Clock, MapPin, ArrowRight, Star, Users } from 'lucide-react'
 import { Card } from '@/components/ui/card'
+import { H1, H2, H3 } from '@/components/ui/typography'
 import Link from 'next/link'
 import Image from 'next/image'
 import ClassicLoader from '@/components/ui/loader'
@@ -133,9 +134,9 @@ export default function WeekendPage() {
         >
           <div className="flex items-center gap-3 mb-4">
             <Calendar className="w-8 h-8 text-blue-500" />
-            <h1 className="text-4xl md:text-5xl font-bold tracking-wider uppercase">
+            <H1 variant="display" className="text-4xl md:text-5xl">
               THIS WEEKEND
-            </h1>
+            </H1>
           </div>
           <p className="text-white/70 text-lg font-medium max-w-2xl">
             CURATED ELECTRONIC MUSIC EVENTS • {friday} - {sunday}
@@ -276,9 +277,9 @@ export default function WeekendPage() {
             transition={{ duration: 0.6 }}
           >
             <Calendar className="w-16 h-16 text-white/20 mx-auto mb-6" />
-            <h2 className="text-2xl font-bold tracking-wider uppercase text-white/60 mb-4">
+            <H2 variant="display" className="mb-4 text-white/60">
               NO WEEKEND EVENTS SCHEDULED
-            </h2>
+            </H2>
             <p className="text-white/40 max-w-md mx-auto mb-8">
               Check back later for upcoming weekend events or explore all events
             </p>
@@ -298,9 +299,9 @@ export default function WeekendPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.5 }}
           >
-            <h3 className="text-2xl font-bold tracking-wider uppercase text-white mb-4">
+            <H3 variant="display" className="mb-4 text-white">
               PLANNING AHEAD?
-            </h3>
+            </H3>
             <p className="text-white/60 mb-6 max-w-md mx-auto">
               Browse all upcoming events and discover new venues and artists
             </p>

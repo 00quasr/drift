@@ -18,6 +18,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { ReviewModal } from '@/components/reviews/ReviewModal'
 import { favoritesService } from '@/lib/services/favorites'
+import { H1, H2, H3 } from "@/components/ui/typography"
 import ClassicLoader from '@/components/ui/loader'
 
 interface VenuePageProps {
@@ -151,9 +152,9 @@ export default function VenuePage({ params }: VenuePageProps) {
             </div>
 
             {/* Venue Title */}
-            <h1 className="text-4xl md:text-6xl font-bold tracking-widest uppercase mb-6 text-white">
+            <H1 variant="display" className="mb-6 text-white">
               {venue.name}
-            </h1>
+            </H1>
 
             {/* Venue Details Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -253,9 +254,9 @@ export default function VenuePage({ params }: VenuePageProps) {
                 <div className="absolute top-4 right-4 w-6 h-6 z-10">
                   <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
                 </div>
-                <h2 className="text-2xl font-bold tracking-widest uppercase mb-4 text-white">
+                <H2 variant="display" className="mb-4 text-white">
                   ABOUT {venue.name}
-                </h2>
+                </H2>
                 <p className="text-white/80 leading-relaxed font-medium tracking-wide">
                   {venue.description}
                 </p>
@@ -268,9 +269,9 @@ export default function VenuePage({ params }: VenuePageProps) {
                 <div className="absolute top-4 right-4 w-6 h-6 z-10">
                   <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
                 </div>
-                <h2 className="text-2xl font-bold tracking-widest uppercase mb-6 text-white">
+                <H2 variant="display" className="mb-6 text-white">
                   VENUE PHOTOS
-                </h2>
+                </H2>
                 <ImageGallery
                   images={venue.images}
                   title={`${venue.name} Photos`}
@@ -287,9 +288,9 @@ export default function VenuePage({ params }: VenuePageProps) {
                   <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
                 </div>
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold tracking-widest uppercase text-white">
+                  <H2 variant="display" className="text-white">
                     UPCOMING EVENTS
-                  </h2>
+                  </H2>
                   <Link href={`/events?venue=${venue.id}`} className="text-white/80 hover:text-white transition-colors font-bold tracking-wider uppercase text-sm">
                     VIEW ALL →
                   </Link>
@@ -314,9 +315,9 @@ export default function VenuePage({ params }: VenuePageProps) {
                             })}
                           </span>
                         </div>
-                        <h3 className="font-bold text-white mb-1 tracking-wider uppercase">
+                        <H3 className="font-bold text-white mb-1 tracking-wider uppercase">
                           {event.title}
-                        </h3>
+                        </H3>
                         {event.artists && event.artists.length > 0 && (
                           <p className="text-sm text-white/60 font-bold tracking-widest uppercase">
                             {event.artists[0].name}
@@ -340,9 +341,9 @@ export default function VenuePage({ params }: VenuePageProps) {
               <div className="absolute top-4 right-4 w-6 h-6 z-10">
                 <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
               </div>
-              <h3 className="text-xl font-bold tracking-widest uppercase mb-6 text-white">
+              <H3 variant="display" className="mb-6 text-white">
                 VENUE INFORMATION
-              </h3>
+              </H3>
               
               <div className="space-y-4">
                 <div>
@@ -392,9 +393,9 @@ export default function VenuePage({ params }: VenuePageProps) {
               <div className="absolute top-4 right-4 w-6 h-6 z-10">
                 <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
               </div>
-              <h3 className="text-xl font-bold tracking-widest uppercase mb-4 text-white">
+              <H3 variant="display" className="mb-4 text-white">
                 LOCATION
-              </h3>
+              </H3>
               <div className="mt-4">
                 <MapboxMap
                   latitude={venue.latitude}
@@ -410,9 +411,9 @@ export default function VenuePage({ params }: VenuePageProps) {
               <div className="absolute top-4 right-4 w-6 h-6 z-10">
                 <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
               </div>
-              <h3 className="text-xl font-bold tracking-widest uppercase mb-4 text-white">
+              <H3 variant="display" className="mb-4 text-white">
                 FOLLOW {venue.name}
-              </h3>
+              </H3>
               <div className="space-y-3">
                 <button className="w-full p-3 bg-white/5 border border-white/20 hover:bg-white/10 transition-all duration-200 text-white font-bold tracking-wider uppercase text-sm">
                   GET NOTIFICATIONS

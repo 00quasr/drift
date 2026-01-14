@@ -3,6 +3,7 @@ import React from 'react';
 import type { ComponentProps, ReactNode } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import Image from 'next/image';
+import { H4 } from "@/components/ui/typography";
 
 interface FooterLink {
     title: string;
@@ -76,7 +77,7 @@ export function Footer() {
                     {footerLinks.map((section, index) => (
                         <AnimatedContainer key={section.label} delay={0.1 + index * 0.1}>
                             <div className="mb-10 md:mb-0">
-                                <h3 className="text-white font-bold tracking-widest uppercase text-xs mb-4">{section.label}</h3>
+                                <H4 variant="display" className="text-xs mb-4 text-white">{section.label}</H4>
                                 <ul className="text-white/60 mt-4 space-y-3 text-sm">
                                     {section.links.map((link) => (
                                         <li key={link.title}>

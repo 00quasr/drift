@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { EntityCard } from '@/components/ui/entity-card'
 import { EntityViews } from '@/components/ui/entity-views'
 import { ViewSwitcher, ViewMode } from '@/components/ui/view-switcher'
+import { H1, H2, H3 } from '@/components/ui/typography'
 import { getEvents } from '@/lib/services/events'
 import { getFallbackImage, isValidImageUrl } from '@/lib/utils/imageUtils'
 import ClassicLoader from '@/components/ui/loader'
@@ -75,9 +76,9 @@ export default function EventsPage() {
       <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-16">
-          <h1 className="text-5xl md:text-7xl font-bold text-white tracking-widest uppercase mb-6">
+          <H1 variant="display" className="text-5xl md:text-7xl mb-6 text-white">
             ELECTRONIC MUSIC EVENTS
-          </h1>
+          </H1>
           <p className="text-white/80 text-lg max-w-3xl mx-auto font-medium tracking-wider uppercase">
             DISCOVER THE HOTTEST ELECTRONIC MUSIC EVENTS HAPPENING AROUND THE WORLD
           </p>
@@ -190,9 +191,9 @@ export default function EventsPage() {
                   {showUpcoming ? 'LIVE NOW' : 'ARCHIVE'}
                 </span>
               </div>
-              <h2 className="text-2xl font-bold text-white tracking-widest uppercase">
+              <H2 variant="display" className="text-white">
                 {showUpcoming ? 'UPCOMING EVENTS' : 'PAST EVENTS'}
-              </h2>
+              </H2>
             </div>
             <ViewSwitcher 
               viewMode={viewMode}
@@ -226,9 +227,9 @@ export default function EventsPage() {
                 <Calendar className="w-8 h-8 text-white" />
               </div>
             </div>
-            <h3 className="text-2xl font-bold text-white tracking-widest uppercase mb-4">
+            <H3 variant="display" className="mb-4 text-white">
               NO EVENTS FOUND
-            </h3>
+            </H3>
             <p className="text-white/80 max-w-md mx-auto font-medium tracking-wider uppercase text-sm">
               {searchTerm || selectedGenre !== 'all'
                 ? 'TRY ADJUSTING YOUR SEARCH CRITERIA OR FILTERS'

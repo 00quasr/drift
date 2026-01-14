@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { motion } from 'framer-motion'
 import ClassicLoader from '@/components/ui/loader'
-import { 
+import {
   Settings,
   User,
   Bell,
@@ -20,6 +20,7 @@ import {
   AlertCircle,
   ArrowLeft
 } from 'lucide-react'
+import { H1, H2, H3 } from "@/components/ui/typography"
 
 interface UserSettings {
   email_notifications: boolean
@@ -142,11 +143,12 @@ export default function SettingsPage() {
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          
+
+
           <div>
-            <h1 className="text-4xl font-bold tracking-wider uppercase text-white mb-2">
+            <H1 variant="display" className="mb-2">
               Settings
-            </h1>
+            </H1>
             <p className="text-white/60 font-bold tracking-wider uppercase">
               Manage your account preferences
             </p>
@@ -203,15 +205,15 @@ export default function SettingsPage() {
           <div className="bg-black/50 border border-white/20 p-6 backdrop-blur-sm">
             {activeTab === 'notifications' && (
               <div className="space-y-6">
-                <h2 className="text-2xl font-bold tracking-wider uppercase text-white mb-6 flex items-center">
+                <H2 variant="display" className="mb-6 flex items-center">
                   <Bell className="w-6 h-6 mr-3" />
                   Notification Preferences
-                </h2>
+                </H2>
 
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="font-bold text-white">Email Notifications</h3>
+                      <H3>Email Notifications</H3>
                       <p className="text-white/60 text-sm">Receive updates via email</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
@@ -227,7 +229,7 @@ export default function SettingsPage() {
 
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="font-bold text-white">Push Notifications</h3>
+                      <H3>Push Notifications</H3>
                       <p className="text-white/60 text-sm">Receive push notifications on your devices</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
@@ -243,7 +245,7 @@ export default function SettingsPage() {
 
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="font-bold text-white">Review Notifications</h3>
+                      <H3>Review Notifications</H3>
                       <p className="text-white/60 text-sm">Get notified when someone reviews your content</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
@@ -259,7 +261,7 @@ export default function SettingsPage() {
 
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="font-bold text-white">Event Recommendations</h3>
+                      <H3>Event Recommendations</H3>
                       <p className="text-white/60 text-sm">Receive personalized event recommendations</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
@@ -275,7 +277,7 @@ export default function SettingsPage() {
 
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="font-bold text-white">Marketing Emails</h3>
+                      <H3>Marketing Emails</H3>
                       <p className="text-white/60 text-sm">Receive marketing and promotional emails</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
@@ -294,14 +296,14 @@ export default function SettingsPage() {
 
             {activeTab === 'privacy' && (
               <div className="space-y-6">
-                <h2 className="text-2xl font-bold tracking-wider uppercase text-white mb-6 flex items-center">
+                <H2 variant="display" className="mb-6 flex items-center">
                   <Shield className="w-6 h-6 mr-3" />
                   Privacy Settings
-                </h2>
+                </H2>
 
                 <div className="space-y-4">
                   <div>
-                    <h3 className="font-bold text-white mb-2">Profile Visibility</h3>
+                    <H3 className="mb-2">Profile Visibility</H3>
                     <p className="text-white/60 text-sm mb-4">Choose who can see your profile</p>
                     <div className="space-y-2">
                       {['public', 'friends', 'private'].map((visibility) => (
@@ -322,7 +324,7 @@ export default function SettingsPage() {
 
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="font-bold text-white">Location Sharing</h3>
+                      <H3>Location Sharing</H3>
                       <p className="text-white/60 text-sm">Share your location in posts and reviews</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
@@ -338,7 +340,7 @@ export default function SettingsPage() {
 
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="font-bold text-white">Activity Visibility</h3>
+                      <H3>Activity Visibility</H3>
                       <p className="text-white/60 text-sm">Show your activity to other users</p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
@@ -357,10 +359,10 @@ export default function SettingsPage() {
 
             {activeTab === 'account' && (
               <div className="space-y-6">
-                <h2 className="text-2xl font-bold tracking-wider uppercase text-white mb-6 flex items-center">
+                <H2 variant="display" className="mb-6 flex items-center">
                   <User className="w-6 h-6 mr-3" />
                   Account Information
-                </h2>
+                </H2>
 
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -403,7 +405,7 @@ export default function SettingsPage() {
                   </div>
 
                   <div className="pt-4 border-t border-white/20">
-                    <h3 className="font-bold text-white mb-4">Quick Actions</h3>
+                    <H3 className="mb-4">Quick Actions</H3>
                     <div className="space-y-3">
                       <button
                         onClick={() => router.push('/profile/edit')}
@@ -451,10 +453,10 @@ export default function SettingsPage() {
 
             {activeTab === 'security' && (
               <div className="space-y-6">
-                <h2 className="text-2xl font-bold tracking-wider uppercase text-white mb-6 flex items-center">
+                <H2 variant="display" className="mb-6 flex items-center">
                   <Lock className="w-6 h-6 mr-3" />
                   Security Settings
-                </h2>
+                </H2>
 
                 <div className="space-y-6">
                   <div className="bg-yellow-500/10 border border-yellow-500/30 p-4">
@@ -464,7 +466,7 @@ export default function SettingsPage() {
                   </div>
 
                   <div>
-                    <h3 className="font-bold text-white mb-4">Account Actions</h3>
+                    <H3 className="mb-4">Account Actions</H3>
                     <div className="space-y-3">
                       <button className="flex items-center space-x-2 px-4 py-2 border border-white/30 text-white hover:border-white/60 transition-colors font-bold tracking-wider uppercase">
                         <Lock className="w-4 h-4" />

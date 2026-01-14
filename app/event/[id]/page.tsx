@@ -17,6 +17,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { ReviewModal } from '@/components/reviews/ReviewModal'
 import { favoritesService } from '@/lib/services/favorites'
 import ClassicLoader from '@/components/ui/loader'
+import { H1, H2, H3 } from "@/components/ui/typography"
 
 interface EventPageProps {
   params: { id: string }
@@ -153,9 +154,9 @@ export default function EventPage({ params }: EventPageProps) {
             </div>
 
             {/* Event Title */}
-            <h1 className="text-4xl md:text-6xl font-bold tracking-widest uppercase mb-6 text-white">
+            <H1 variant="display" className="mb-6 text-white">
               {event.title}
-            </h1>
+            </H1>
 
             {/* Event Details Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -280,9 +281,9 @@ export default function EventPage({ params }: EventPageProps) {
                 <div className="absolute top-4 right-4 w-6 h-6 z-10">
                   <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
                 </div>
-                <h2 className="text-2xl font-bold tracking-widest uppercase mb-4 text-white">
+                <H2 variant="display" className="mb-4 text-white">
                   ABOUT THIS EVENT
-                </h2>
+                </H2>
                 <p className="text-white/80 leading-relaxed font-medium tracking-wide">
                   {event.description}
                 </p>
@@ -295,9 +296,9 @@ export default function EventPage({ params }: EventPageProps) {
                 <div className="absolute top-4 right-4 w-6 h-6 z-10">
                   <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
                 </div>
-                <h2 className="text-2xl font-bold tracking-widest uppercase mb-6 text-white">
+                <H2 variant="display" className="mb-6 text-white">
                   EVENT PHOTOS
-                </h2>
+                </H2>
                 <ImageGallery
                   images={event.images}
                   title={`${event.title} Photos`}
@@ -328,9 +329,9 @@ export default function EventPage({ params }: EventPageProps) {
               <div className="absolute top-4 right-4 w-6 h-6 z-10">
                 <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
               </div>
-              <h3 className="text-xl font-bold tracking-widest uppercase mb-6 text-white">
+              <H3 variant="display" className="mb-6 text-white">
                 EVENT DETAILS
-              </h3>
+              </H3>
               
               <div className="space-y-4">
                 <div>
@@ -380,9 +381,9 @@ export default function EventPage({ params }: EventPageProps) {
                 <div className="absolute top-4 right-4 w-6 h-6 z-10">
                   <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
                 </div>
-                <h3 className="text-xl font-bold tracking-widest uppercase mb-4 text-white">
+                <H3 variant="display" className="mb-4 text-white">
                   ARTISTS
-                </h3>
+                </H3>
                 <div className="flex items-center gap-3">
                   <Music className="w-5 h-5 text-white" />
                   <div>
@@ -404,9 +405,9 @@ export default function EventPage({ params }: EventPageProps) {
                 <div className="absolute top-4 right-4 w-6 h-6 z-10">
                   <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
                 </div>
-                <h3 className="text-xl font-bold tracking-widest uppercase mb-4 text-white">
+                <H3 variant="display" className="mb-4 text-white">
                   MORE AT {event.venue.name}
-                </h3>
+                </H3>
                 <Link 
                   href={`/venue/${event.venue.id}`}
                   className="text-white/80 hover:text-white text-sm transition-colors font-bold tracking-wider uppercase"

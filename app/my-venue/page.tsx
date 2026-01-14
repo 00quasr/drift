@@ -4,11 +4,11 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { motion } from 'framer-motion'
-import { 
-  MapPin, 
-  Upload, 
-  Image as ImageIcon, 
-  Globe, 
+import {
+  MapPin,
+  Upload,
+  Image as ImageIcon,
+  Globe,
   Mail,
   X,
   AlertCircle,
@@ -25,6 +25,7 @@ import {
 import { uploadVenueImage, moderateImage, validateImageFile } from '@/lib/services/storage'
 import ImageGallery from '@/components/ui/ImageGallery'
 import ClassicLoader from '@/components/ui/loader'
+import { H1, H2, H3 } from "@/components/ui/typography"
 
 interface VenueFormData {
   name: string
@@ -406,7 +407,7 @@ export default function MyVenuePage() {
     return (
       <div className="text-center py-12">
         <MapPin className="w-16 h-16 mx-auto text-white/30 mb-4" />
-        <h3 className="text-xl font-bold text-white mb-2">Access Denied</h3>
+        <H3 className="mb-2">Access Denied</H3>
         <p className="text-white/60 mb-6">Only club owner accounts can access this page.</p>
         <button
           onClick={() => router.push('/')}
@@ -422,7 +423,7 @@ export default function MyVenuePage() {
     return (
       <div className="text-center py-12">
         <AlertCircle className="w-16 h-16 mx-auto text-white/30 mb-4" />
-        <h3 className="text-xl font-bold text-white mb-2">Error</h3>
+        <H3 className="mb-2">Error</H3>
         <p className="text-white/60 mb-6">Failed to load venue information.</p>
         <button
           onClick={() => fetchExistingVenue()}
@@ -447,9 +448,9 @@ export default function MyVenuePage() {
           </button>
           
           <div>
-            <h1 className="text-4xl font-bold tracking-wider uppercase text-white mb-2">
+            <H1 variant="display" className="mb-2">
               {isEditing ? 'Edit My Venue' : 'Create My Venue'}
-            </h1>
+            </H1>
             <p className="text-white/60 font-bold tracking-wider uppercase">
               {isEditing ? 'Update your venue information' : 'Set up your venue profile on Drift'}
             </p>
@@ -555,9 +556,9 @@ export default function MyVenuePage() {
       <div className="space-y-8">
         {/* Basic Information */}
         <div className="bg-black/50 border border-white/20 p-6 backdrop-blur-sm">
-          <h2 className="text-2xl font-bold tracking-wider uppercase text-white mb-6">
+          <H2 variant="display" className="mb-6">
             Basic Information
-          </h2>
+          </H2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="md:col-span-2">
@@ -625,10 +626,10 @@ export default function MyVenuePage() {
 
         {/* Location Information */}
         <div className="bg-black/50 border border-white/20 p-6 backdrop-blur-sm">
-          <h2 className="text-2xl font-bold tracking-wider uppercase text-white mb-6 flex items-center">
+          <H2 variant="display" className="mb-6 flex items-center">
             <MapPin className="w-6 h-6 mr-3" />
             Location
-          </h2>
+          </H2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="md:col-span-2">
@@ -690,9 +691,9 @@ export default function MyVenuePage() {
 
         {/* Contact Information */}
         <div className="bg-black/50 border border-white/20 p-6 backdrop-blur-sm">
-          <h2 className="text-2xl font-bold tracking-wider uppercase text-white mb-6">
+          <H2 variant="display" className="mb-6">
             Contact Information
-          </h2>
+          </H2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -740,10 +741,10 @@ export default function MyVenuePage() {
 
         {/* Technical Details */}
         <div className="bg-black/50 border border-white/20 p-6 backdrop-blur-sm">
-          <h2 className="text-2xl font-bold tracking-wider uppercase text-white mb-6 flex items-center">
+          <H2 variant="display" className="mb-6 flex items-center">
             <Music className="w-6 h-6 mr-3" />
             Technical Specifications
-          </h2>
+          </H2>
           
           <div className="space-y-6">
             <div>
@@ -811,9 +812,9 @@ export default function MyVenuePage() {
 
         {/* Social Media */}
         <div className="bg-black/50 border border-white/20 p-6 backdrop-blur-sm">
-          <h2 className="text-2xl font-bold tracking-wider uppercase text-white mb-6">
+          <H2 variant="display" className="mb-6">
             Social Media
-          </h2>
+          </H2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -848,10 +849,10 @@ export default function MyVenuePage() {
 
         {/* Images */}
         <div className="bg-black/50 border border-white/20 p-6 backdrop-blur-sm">
-          <h2 className="text-2xl font-bold tracking-wider uppercase text-white mb-6 flex items-center">
+          <H2 variant="display" className="mb-6 flex items-center">
             <Camera className="w-6 h-6 mr-3" />
             Venue Photos
-          </h2>
+          </H2>
 
           <div className="space-y-4">
             <div>

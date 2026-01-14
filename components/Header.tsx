@@ -16,6 +16,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu"
+import { H3 } from "@/components/ui/typography"
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -179,7 +180,7 @@ export default function Header() {
                         <NavigationMenuContent className="!w-[450px] p-6">
                           <div className="flex flex-col gap-6">
                             <div className="flex flex-col">
-                              <h3 className="text-lg font-bold tracking-wider uppercase text-white mb-2">{item.title}</h3>
+                              <H3 variant="display" className="mb-2 text-white">{item.title}</H3>
                               <p className="text-white/60 text-sm font-bold tracking-wide uppercase leading-relaxed">
                                 {item.description}
                               </p>
@@ -524,7 +525,7 @@ export default function Header() {
                   {/* Venues */}
                   {searchResults.venues.length > 0 && (
                     <div>
-                      <h3 className="text-white/60 text-sm font-medium mb-3">VENUES</h3>
+                      <H3 className="text-white/60 text-sm mb-3">VENUES</H3>
                       <div className="space-y-2">
                         {searchResults.venues.map((venue: any) => (
                           <motion.button
@@ -545,7 +546,7 @@ export default function Header() {
                   {/* Events */}
                   {searchResults.events.length > 0 && (
                     <div>
-                      <h3 className="text-white/60 text-sm font-medium mb-3">EVENTS</h3>
+                      <H3 className="text-white/60 text-sm mb-3">EVENTS</H3>
                       <div className="space-y-2">
                         {searchResults.events.map((event: any) => (
                           <motion.button
@@ -568,7 +569,7 @@ export default function Header() {
                   {/* Artists */}
                   {searchResults.artists.length > 0 && (
                     <div>
-                      <h3 className="text-white/60 text-sm font-medium mb-3">ARTISTS</h3>
+                      <H3 className="text-white/60 text-sm mb-3">ARTISTS</H3>
                       <div className="space-y-2">
                         {searchResults.artists.map((artist: any) => (
                           <motion.button

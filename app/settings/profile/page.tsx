@@ -9,6 +9,7 @@ import { Card } from '@/components/ui/card'
 import { ArrowLeft, Settings } from 'lucide-react'
 import Link from 'next/link'
 import ClassicLoader from '@/components/ui/loader'
+import { H1 } from "@/components/ui/typography"
 
 export default function ProfileEditPage() {
   const { user, loading } = useAuth()
@@ -128,12 +129,13 @@ export default function ProfileEditPage() {
             <ArrowLeft className="w-4 h-4" />
             <span className="font-bold tracking-wider uppercase text-sm">BACK TO PROFILE</span>
           </Link>
-          
+
+
           <div className="flex items-center gap-3 mb-2">
             <Settings className="w-6 h-6 text-white" />
-            <h1 className="text-3xl font-bold tracking-wider uppercase">
+            <H1 variant="display">
               EDIT PROFILE
-            </h1>
+            </H1>
           </div>
           <p className="text-white/60 font-medium">
             Update your profile information and preferences

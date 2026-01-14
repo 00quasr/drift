@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { motion } from 'framer-motion'
 import ClassicLoader from '@/components/ui/loader'
-import { 
+import {
   Calendar,
   MapPin,
   Clock,
@@ -21,6 +21,7 @@ import {
   Search
 } from 'lucide-react'
 import { uploadEventImage, moderateImage, validateImageFile } from '@/lib/services/storage'
+import { H1, H2, H3 } from "@/components/ui/typography"
 
 interface EventFormData {
   title: string
@@ -438,7 +439,7 @@ export default function CreateEventPage() {
     return (
       <div className="text-center py-12">
         <Calendar className="w-16 h-16 mx-auto text-white/30 mb-4" />
-        <h3 className="text-xl font-bold text-white mb-2">Access Denied</h3>
+        <H3 className="mb-2">Access Denied</H3>
         <p className="text-white/60 mb-6">Only promoter accounts can create events.</p>
         <button
           onClick={() => router.push('/')}
@@ -463,9 +464,9 @@ export default function CreateEventPage() {
           </button>
           
           <div>
-            <h1 className="text-4xl font-bold tracking-wider uppercase text-white mb-2">
+            <H1 variant="display" className="mb-2">
               Create Event
-            </h1>
+            </H1>
             <p className="text-white/60 font-bold tracking-wider uppercase">
               Promote your next electronic music event
             </p>
@@ -523,9 +524,9 @@ export default function CreateEventPage() {
       <div className="space-y-8">
         {/* Basic Information */}
         <div className="bg-black/50 border border-white/20 p-6 backdrop-blur-sm relative z-20">
-          <h2 className="text-2xl font-bold tracking-wider uppercase text-white mb-6">
+          <H2 variant="display" className="mb-6">
             Event Information
-          </h2>
+          </H2>
           
           <div className="space-y-6">
             <div>
@@ -603,10 +604,10 @@ export default function CreateEventPage() {
 
         {/* Date & Time */}
         <div className="bg-black/50 border border-white/20 p-6 backdrop-blur-sm">
-          <h2 className="text-2xl font-bold tracking-wider uppercase text-white mb-6 flex items-center">
+          <H2 variant="display" className="mb-6 flex items-center">
             <Clock className="w-6 h-6 mr-3" />
             Date & Time
-          </h2>
+          </H2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -663,10 +664,10 @@ export default function CreateEventPage() {
 
         {/* Music Genres */}
         <div className="bg-black/50 border border-white/20 p-6 backdrop-blur-sm">
-          <h2 className="text-2xl font-bold tracking-wider uppercase text-white mb-6 flex items-center">
+          <H2 variant="display" className="mb-6 flex items-center">
             <Music className="w-6 h-6 mr-3" />
             Music Genres
-          </h2>
+          </H2>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {MUSIC_GENRES.map((genre) => (
@@ -696,10 +697,10 @@ export default function CreateEventPage() {
 
         {/* Artist Lineup */}
         <div className="bg-black/50 border border-white/20 p-6 backdrop-blur-sm">
-          <h2 className="text-2xl font-bold tracking-wider uppercase text-white mb-6 flex items-center">
+          <H2 variant="display" className="mb-6 flex items-center">
             <Users className="w-6 h-6 mr-3" />
             Artist Lineup
-          </h2>
+          </H2>
           
           <div className="space-y-6">
             {/* Artist Search */}
@@ -750,9 +751,9 @@ export default function CreateEventPage() {
             {/* Selected Artists */}
             {event.artists.length > 0 && (
               <div>
-                <h3 className="text-white font-bold tracking-wider uppercase text-sm mb-4">
+                <H3 className="mb-4">
                   Lineup ({event.artists.length} artists)
-                </h3>
+                </H3>
                 <div className="space-y-3">
                   {event.artists
                     .sort((a, b) => (a.performance_order || 0) - (b.performance_order || 0))
@@ -831,10 +832,10 @@ export default function CreateEventPage() {
 
         {/* Ticketing */}
         <div className="bg-black/50 border border-white/20 p-6 backdrop-blur-sm">
-          <h2 className="text-2xl font-bold tracking-wider uppercase text-white mb-6 flex items-center">
+          <H2 variant="display" className="mb-6 flex items-center">
             <Euro className="w-6 h-6 mr-3" />
             Ticketing
-          </h2>
+          </H2>
           
           <div className="space-y-6">
             <div className="flex items-center space-x-3">
@@ -918,9 +919,9 @@ export default function CreateEventPage() {
 
         {/* Images */}
         <div className="bg-black/50 border border-white/20 p-6 backdrop-blur-sm">
-          <h2 className="text-2xl font-bold tracking-wider uppercase text-white mb-6">
+          <H2 variant="display" className="mb-6">
             Event Images
-          </h2>
+          </H2>
 
           <div className="space-y-4">
             <div>

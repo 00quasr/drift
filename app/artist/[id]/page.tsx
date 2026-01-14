@@ -15,6 +15,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { ReviewModal } from '@/components/reviews/ReviewModal'
 import { favoritesService } from '@/lib/services/favorites'
 import ClassicLoader from '@/components/ui/loader'
+import { H1, H2, H3, H4 } from "@/components/ui/typography"
 
 interface ArtistPageProps {
   params: { id: string }
@@ -151,9 +152,9 @@ export default function ArtistPage({ params }: ArtistPageProps) {
             </div>
 
             {/* Artist Title */}
-            <h1 className="text-4xl md:text-6xl font-bold tracking-widest uppercase mb-6 text-white">
+            <H1 variant="display" className="mb-6 text-white">
               {artist.name}
-            </h1>
+            </H1>
 
             {/* Artist Details Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
@@ -253,9 +254,9 @@ export default function ArtistPage({ params }: ArtistPageProps) {
                 <div className="absolute top-4 right-4 w-6 h-6 z-10">
                   <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
                 </div>
-                <h2 className="text-2xl font-bold tracking-widest uppercase mb-4 text-white">
+                <H2 variant="display" className="mb-4 text-white">
                   BIOGRAPHY
-                </h2>
+                </H2>
                 <p className="text-white/80 leading-relaxed font-medium tracking-wide">
                   {artist.bio}
                 </p>
@@ -268,9 +269,9 @@ export default function ArtistPage({ params }: ArtistPageProps) {
                 <div className="absolute top-4 right-4 w-6 h-6 z-10">
                   <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
                 </div>
-                <h2 className="text-2xl font-bold tracking-widest uppercase mb-6 text-white">
+                <H2 variant="display" className="mb-6 text-white">
                   ARTIST PHOTOS
-                </h2>
+                </H2>
                 <ImageGallery
                   images={artist.images}
                   title={`${artist.name} Photos`}
@@ -287,9 +288,9 @@ export default function ArtistPage({ params }: ArtistPageProps) {
                   <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
                 </div>
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold tracking-widest uppercase text-white">
+                  <H2 variant="display" className="text-white">
                     UPCOMING PERFORMANCES
-                  </h2>
+                  </H2>
                   <Link href={`/events?artist=${artist.id}`} className="text-white/80 hover:text-white transition-colors font-bold tracking-wider uppercase text-sm">
                     VIEW ALL →
                   </Link>
@@ -328,9 +329,9 @@ export default function ArtistPage({ params }: ArtistPageProps) {
                 <div className="absolute top-4 right-4 w-6 h-6 z-10">
                   <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
                 </div>
-                <h2 className="text-2xl font-bold tracking-widest uppercase mb-6 text-white">
+                <H2 variant="display" className="mb-6 text-white">
                   PAST PERFORMANCES
-                </h2>
+                </H2>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {pastEvents.slice(0, 4).map((event: any) => (
@@ -371,9 +372,9 @@ export default function ArtistPage({ params }: ArtistPageProps) {
               <div className="absolute top-4 right-4 w-6 h-6 z-10">
                 <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
               </div>
-              <h3 className="text-xl font-bold tracking-widest uppercase mb-6 text-white">
+              <H3 variant="display" className="mb-6 text-white">
                 ARTIST INFORMATION
-              </h3>
+              </H3>
               
               <div className="space-y-4">
                 {artist.city && artist.country && (
@@ -406,9 +407,9 @@ export default function ArtistPage({ params }: ArtistPageProps) {
               <div className="absolute top-4 right-4 w-6 h-6 z-10">
                 <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
               </div>
-              <h3 className="text-xl font-bold tracking-widest uppercase mb-4 text-white">
+              <H3 variant="display" className="mb-4 text-white">
                 PERFORMANCE STATS
-              </h3>
+              </H3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-white/80 font-bold tracking-wider uppercase text-sm">UPCOMING</span>
@@ -436,9 +437,9 @@ export default function ArtistPage({ params }: ArtistPageProps) {
               <div className="absolute top-4 right-4 w-6 h-6 z-10">
                 <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
               </div>
-              <h3 className="text-xl font-bold tracking-widest uppercase mb-4 text-white">
+              <H3 variant="display" className="mb-4 text-white">
                 FOLLOW {artist.name}
-              </h3>
+              </H3>
               <div className="space-y-3">
                 <button className="w-full p-3 bg-white/5 border border-white/20 hover:bg-white/10 transition-all duration-200 text-white font-bold tracking-wider uppercase text-sm">
                   GET NOTIFICATIONS

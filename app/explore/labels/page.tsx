@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Music, Users, Calendar, ExternalLink, Star, ArrowRight } from 'lucide-react'
 import { Card } from '@/components/ui/card'
+import { H1, H2, H3, H4 } from '@/components/ui/typography'
 import Link from 'next/link'
 import Image from 'next/image'
 import ClassicLoader from '@/components/ui/loader'
@@ -180,9 +181,9 @@ export default function LabelsPage() {
         >
           <div className="flex items-center gap-3 mb-4">
             <Music className="w-8 h-8 text-purple-500" />
-            <h1 className="text-4xl md:text-5xl font-bold tracking-wider uppercase">
+            <H1 variant="display" className="text-4xl md:text-5xl">
               LABELS & COLLECTIVES
-            </h1>
+            </H1>
           </div>
           <p className="text-white/70 text-lg font-medium max-w-2xl">
             DISCOVER ELECTRONIC MUSIC LABELS PUSHING THE BOUNDARIES OF SOUND
@@ -232,9 +233,9 @@ export default function LabelsPage() {
                     {/* Header */}
                     <div className="flex items-start justify-between mb-6">
                       <div className="flex-1">
-                        <h3 className="text-2xl font-bold tracking-wider uppercase text-white group-hover:text-white/90 transition-colors mb-2">
+                        <H3 variant="display" className="mb-2 text-white group-hover:text-white/90 transition-colors">
                           {label.name}
-                        </h3>
+                        </H3>
                         {label.location && (
                           <p className="text-white/60 text-sm font-bold tracking-wider uppercase">
                             {label.location} • EST. {label.founded_year}
@@ -303,9 +304,9 @@ export default function LabelsPage() {
                     {/* Recent Artists */}
                     {label.recent_artists.length > 0 && (
                       <div className="mb-6">
-                        <h4 className="text-white/60 text-xs font-bold tracking-wider uppercase mb-3">
+                        <H4 variant="display" className="text-white/60 text-xs mb-3">
                           RECENT ARTISTS
-                        </h4>
+                        </H4>
                         <div className="flex flex-wrap gap-2">
                           {label.recent_artists.map((artist) => (
                             <Link 
@@ -323,9 +324,9 @@ export default function LabelsPage() {
                     {/* Upcoming Events */}
                     {label.upcoming_events.length > 0 && (
                       <div className="mb-6">
-                        <h4 className="text-white/60 text-xs font-bold tracking-wider uppercase mb-3">
+                        <H4 variant="display" className="text-white/60 text-xs mb-3">
                           UPCOMING EVENTS
-                        </h4>
+                        </H4>
                         <div className="space-y-2">
                           {label.upcoming_events.map((event) => (
                             <Link 
@@ -383,9 +384,9 @@ export default function LabelsPage() {
             transition={{ duration: 0.6 }}
           >
             <Music className="w-16 h-16 text-white/20 mx-auto mb-6" />
-            <h2 className="text-2xl font-bold tracking-wider uppercase text-white/60 mb-4">
+            <H2 variant="display" className="mb-4 text-white/60">
               NO LABELS FOUND
-            </h2>
+            </H2>
             <p className="text-white/40 max-w-md mx-auto mb-8">
               Try adjusting your filter or check back as we add more labels to our platform
             </p>
@@ -406,9 +407,9 @@ export default function LabelsPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.5 }}
           >
-            <h3 className="text-2xl font-bold tracking-wider uppercase text-white mb-4">
+            <H3 variant="display" className="mb-4 text-white">
               ARE YOU A LABEL?
-            </h3>
+            </H3>
             <p className="text-white/60 mb-6 max-w-md mx-auto">
               Join our platform and showcase your artists and events to the underground community
             </p>

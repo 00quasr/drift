@@ -6,7 +6,8 @@ import { useAuth } from '@/contexts/AuthContext'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import ClassicLoader from '@/components/ui/loader'
-import { 
+import { H1, H3 } from '@/components/ui/typography'
+import {
   Calendar,
   Plus,
   Edit3,
@@ -183,7 +184,7 @@ export default function ManageEventsPage() {
     return (
       <div className="text-center py-12">
         <Calendar className="w-16 h-16 mx-auto text-white/30 mb-4" />
-        <h3 className="text-xl font-bold text-white mb-2">Access Denied</h3>
+        <H3 className="mb-2">Access Denied</H3>
         <p className="text-white/60 mb-6">Only promoter accounts can access this page.</p>
         <button
           onClick={() => router.push('/')}
@@ -201,9 +202,9 @@ export default function ManageEventsPage() {
       <div className="border-b border-white/20 pb-6 mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-4xl font-bold tracking-wider uppercase text-white mb-2">
+            <H1 variant="display" className="mb-2">
               My Events
-            </h1>
+            </H1>
             <p className="text-white/60 font-bold tracking-wider uppercase">
               Manage your promoted events
             </p>
@@ -262,9 +263,9 @@ export default function ManageEventsPage() {
       {filteredEvents.length === 0 ? (
         <div className="text-center py-12">
           <Calendar className="w-16 h-16 mx-auto text-white/30 mb-4" />
-          <h3 className="text-xl font-bold text-white mb-2">
+          <H3 className="mb-2">
             {events.length === 0 ? 'No Events Created' : 'No Events Found'}
-          </h3>
+          </H3>
           <p className="text-white/60 mb-6">
             {events.length === 0 
               ? 'Create your first event to get started'
@@ -296,9 +297,9 @@ export default function ManageEventsPage() {
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center space-x-3 mb-2">
-                    <h3 className="text-xl font-bold tracking-wider uppercase text-white">
+                    <H3 variant="display">
                       {event.title}
-                    </h3>
+                    </H3>
                     <div className={`px-2 py-1 text-xs font-bold tracking-wider uppercase border bg-black/50 ${
                       STATUS_COLORS[event.status as keyof typeof STATUS_COLORS]
                     }`}>
@@ -410,9 +411,9 @@ export default function ManageEventsPage() {
       {/* Stats */}
       {events.length > 0 && (
         <div className="mt-8 bg-black/50 border border-white/20 p-6 backdrop-blur-sm">
-          <h3 className="text-lg font-bold tracking-wider uppercase text-white mb-4">
+          <H3 variant="display" className="mb-4">
             Event Statistics
-          </h3>
+          </H3>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div className="text-center">

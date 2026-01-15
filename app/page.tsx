@@ -96,22 +96,22 @@ export default function HomePage() {
     {
       title: "VENUE DISCOVERY",
       description: "FIND UNDERGROUND SPACES AND HIDDEN GEMS",
-      image: `${storageUrl}/pawel-czerwinski-V558Lx_ji6I-unsplash.jpg`
+      image: `${storageUrl}/__krk_nightclub_atmosphere_--seed_3916890346_--sref_791149260_cb8a7863-e34f-4278-9c4a-1d4158010788_2.png`
     },
     {
       title: "EVENT TRACKING",
       description: "NEVER MISS A SHOW WITH REAL-TIME UPDATES",
-      image: `${storageUrl}/pawel-czerwinski-TLzxYiyXw1o-unsplash(1).jpg`
+      image: `${storageUrl}/__krk_nightclub_atmosphere_--seed_3916890346_--sref_791149260_cb8a7863-e34f-4278-9c4a-1d4158010788_1.png`
     },
     {
       title: "ARTIST PROFILES",
       description: "DISCOVER NEW TALENT AND FOLLOW FAVORITES",
-      image: `${storageUrl}/pawel-czerwinski-uGd6aKkvHnk-unsplash.jpg`
+      image: `${storageUrl}/__krk_nightclub_atmosphere_--seed_3916890346_--sref_791149260_cb8a7863-e34f-4278-9c4a-1d4158010788_0.png`
     },
     {
       title: "COMMUNITY HUB",
       description: "CONNECT WITH LIKE-MINDED MUSIC LOVERS",
-      image: `${storageUrl}/pawel-czerwinski-YAtspJ-HV2E-unsplash.jpg`
+      image: `${storageUrl}/__krk_nightclub_atmosphere_--seed_3916890346_--sref_754301869_77bf5d76-2688-44fe-b44a-8f858cd0fc59_3.png`
     },
   ];
 
@@ -210,7 +210,7 @@ export default function HomePage() {
               {/* Background Image */}
               <div className="absolute inset-0">
                 <Image
-                  src={`${storageUrl}/kajetan-sumila-GcHBIKRGWcM-unsplash.jpg`}
+                  src={`${storageUrl}/__krk_Late_night_underground_afterparty_dark_moody_void_atmos_6997a096-236d-4a2a-b441-60ffa9c5f813_0.png`}
                   alt="Underground electronic music scene"
                   fill
                   className="object-cover"
@@ -459,7 +459,7 @@ export default function HomePage() {
               {/* Background Image */}
               <div className="absolute inset-0">
                 <Image
-                  src={`${storageUrl}/geronimo-giqueaux-NAMBG-gRR7U-unsplash.jpg`}
+                  src={`${storageUrl}/__krk_Grainy_black_and_white_photo_taken_inside_a_small_rave_ve_5315cf53-a741-4e87-9649-b7f334bcade6.png`}
                   alt="Electronic music community"
                   fill
                   className="object-cover"
@@ -607,7 +607,7 @@ export default function HomePage() {
               {/* Background Image */}
               <div className="absolute inset-0">
                 <Image
-                  src={`${storageUrl}/philip-oroni-yiPpgTV0Sbs-unsplash.jpg`}
+                  src={`${storageUrl}/__krk_Light_leak_effect_cyber_atmosphere_underground_rave_vib_6725855e-4b73-47cd-95d4-0ea900cf9469_3.png`}
                   alt="Join the movement"
                   fill
                   className="object-cover"

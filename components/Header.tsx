@@ -17,11 +17,11 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu"
 import { H3 } from "@/components/ui/typography"
+import { cn } from "@/lib/utils"
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState({ venues: [], events: [], artists: [] })
@@ -29,8 +29,6 @@ export default function Header() {
   const pathname = usePathname()
   const router = useRouter()
   const { user, signOut, loading } = useAuth()
-  
-  const isLandingPage = pathname === '/' || pathname.startsWith('/auth/')
 
   // Debounced search function
   const searchContent = useCallback(async (query: string) => {
@@ -68,18 +66,6 @@ export default function Header() {
     setSearchQuery('')
     router.push(`/${type}/${slug}`)
   }
-
-  // Scroll handler
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY
-      setScrolled(scrollPosition > 20)
-    }
-    
-    handleScroll()
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
 
   const navigationItems = [
     {
@@ -147,7 +133,7 @@ export default function Header() {
 
   return (
     <motion.header
-      className="fixed top-4 left-4 right-4 z-50 transition-all duration-500 ease-out rounded-xl bg-black/95 backdrop-blur-xl border border-white/20 shadow-lg"
+      className="fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out bg-black border-b border-white/10"
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
@@ -168,13 +154,13 @@ export default function Header() {
             </Link>
 
             {/* Desktop Navigation */}
-            <NavigationMenu className="hidden md:flex">
+            <NavigationMenu className="hidden md:flex h-full">
               <NavigationMenuList className="space-x-2">
                 {navigationItems.map((item) => (
                   <NavigationMenuItem key={item.title}>
                     {item.items ? (
                       <>
-                        <NavigationMenuTrigger className="bg-transparent text-white/70 hover:text-white hover:bg-white/10 font-bold tracking-wider uppercase text-sm">
+                        <NavigationMenuTrigger className="bg-transparent text-white/70 hover:text-white data-[state=open]:text-white font-bold tracking-wider uppercase text-sm">
                           {item.title}
                         </NavigationMenuTrigger>
                         <NavigationMenuContent className="!w-[450px] p-6">
@@ -216,13 +202,12 @@ export default function Header() {
                     ) : (
                       <NavigationMenuLink
                         href={item.href}
-                        className={`
-                          bg-transparent text-sm font-bold tracking-wider uppercase transition-all duration-300 px-4 py-2 rounded-md hover:bg-white/10
-                          ${pathname === item.href 
-                            ? 'text-white' 
+                        className={cn(
+                          "bg-transparent text-sm font-bold tracking-wider uppercase transition-all duration-300 px-4 py-2 rounded-md hover:bg-white/[0.04] inline-flex items-center justify-center",
+                          pathname === item.href
+                            ? 'text-white'
                             : 'text-white/70 hover:text-white'
-                          }
-                        `}
+                        )}
                       >
                         {item.title}
                       </NavigationMenuLink>
@@ -291,7 +276,7 @@ export default function Header() {
                   <AnimatePresence>
                     {userMenuOpen && (
                       <motion.div
-                        className="absolute -right-12 top-14 w-64 bg-black/[0.3] bg-gradient-to-b from-white/[0.08] to-white/[0.02] backdrop-blur-3xl border border-white/[0.12] rounded-xl shadow-2xl overflow-hidden"
+                        className="absolute right-0 top-full mt-4 w-64 bg-black border border-white/10 rounded-lg shadow-2xl overflow-hidden"
                         initial={{ opacity: 0, y: -15, scale: 0.92 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -15, scale: 0.92 }}
@@ -493,7 +478,7 @@ export default function Header() {
       <AnimatePresence>
         {searchOpen && (
           <motion.div
-            className="absolute top-full left-0 right-0 mt-2 bg-black/[0.3] bg-gradient-to-b from-white/[0.08] to-white/[0.02] backdrop-blur-3xl border border-white/[0.12] rounded-xl"
+            className="absolute top-full left-0 right-0 bg-black border-b border-white/10 shadow-2xl"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
@@ -610,7 +595,7 @@ export default function Header() {
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
-            className="md:hidden absolute top-full left-0 right-0 mt-2 bg-black/[0.3] bg-gradient-to-b from-white/[0.08] to-white/[0.02] backdrop-blur-3xl border border-white/[0.12] rounded-xl mx-4"
+            className="md:hidden absolute top-full left-0 right-0 bg-black border-b border-white/10 shadow-2xl"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}

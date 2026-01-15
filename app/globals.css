@@ -215,14 +215,13 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-/* Enhanced focus states with neon effects */
-button:focus,
+/* Minimal focus states */
+button:focus-visible,
 input:focus,
 textarea:focus,
 select:focus {
-  outline: 2px solid var(--neon-cyan);
+  outline: 1px solid rgba(255, 255, 255, 0.2);
   outline-offset: 2px;
-  box-shadow: 0 0 10px var(--neon-cyan);
 }
 
 /* CRT Monitor effect for cards */

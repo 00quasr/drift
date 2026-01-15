@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
-import { ArrowRight, Users, Calendar, MapPin, TrendingUp, Shield, Zap, Music, Radio, Star } from "lucide-react"
+import { ArrowRight, Users, Calendar, MapPin, TrendingUp, Music, Radio } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import Link from 'next/link'
@@ -400,7 +400,7 @@ export default function HomePage() {
         </section>
 
         {/* Use Cases with Display Cards - Black Background */}
-        <section className="w-full py-12 sm:py-16 lg:py-24 bg-black">
+        <section className="w-full pt-12 sm:pt-16 lg:pt-24 pb-32 sm:pb-40 lg:pb-48 bg-black">
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -478,53 +478,38 @@ export default function HomePage() {
                   </p>
                 </div>
 
-                <motion.div
-                  variants={staggerContainer}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true }}
-                  className="grid grid-cols-1 sm:grid-cols-2 gap-6"
-                >
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   {[
                     {
                       title: "ARTISTS",
                       description: "Showcase your sound, build your following, connect with venues and promoters, and track your performance history.",
-                      icon: Music,
                     },
                     {
                       title: "PROMOTERS",
                       description: "Reach your target audience efficiently, promote events to engaged fans, and grow your brand in the scene.",
-                      icon: Radio,
                     },
                     {
                       title: "VENUES",
                       description: "Fill your space with the right crowd, list venue details, and connect with quality promoters.",
-                      icon: MapPin,
                     },
                     {
                       title: "FANS",
                       description: "Discover your next favorite artist, find the best underground venues, and never miss a show.",
-                      icon: Star,
                     },
                   ].map((userType, index) => {
-                    const Icon = userType.icon;
                     return (
-                      <motion.div
+                      <div
                         key={index}
-                        variants={itemFadeIn}
                         className="border border-white/20 p-8 bg-black/60 backdrop-blur-sm hover:bg-black/70 transition-all group"
                       >
-                        <div className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center mb-6 group-hover:border-white/40 transition-colors">
-                          <Icon className="w-6 h-6 text-white/60 group-hover:text-white transition-colors" />
-                        </div>
                         <H3 variant="display" className="mb-4 text-white text-xl">{userType.title}</H3>
                         <p className="text-white/50 text-xs uppercase tracking-wide leading-relaxed font-medium">
                           {userType.description}
                         </p>
-                      </motion.div>
+                      </div>
                     );
                   })}
-                </motion.div>
+                </div>
               </div>
             </div>
           </motion.div>
@@ -547,50 +532,36 @@ export default function HomePage() {
                 The premier platform for underground electronic music
               </p>
             </div>
-            <motion.div
-              variants={staggerContainer}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              className="grid grid-cols-1 md:grid-cols-3 gap-6"
-            >
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {[
                 {
-                  icon: Shield,
                   title: "TRUSTED COMMUNITY",
                   description: "Verified venues, authentic artists, and real events. Our moderation ensures quality across the platform.",
                 },
                 {
-                  icon: Zap,
                   title: "REAL-TIME UPDATES",
                   description: "Never miss a beat. Get instant notifications for new events, venue openings, and artist announcements.",
                 },
                 {
-                  icon: TrendingUp,
                   title: "GROWING NETWORK",
                   description: "Join thousands of electronic music enthusiasts building the future of the underground scene.",
                 },
               ].map((item, index) => {
-                const Icon = item.icon;
                 return (
-                  <motion.div
+                  <div
                     key={index}
-                    variants={itemFadeIn}
                     className="border border-white/10 p-8 text-center group hover:border-white/20 transition-colors bg-neutral-900/30"
                   >
-                    <div className="w-16 h-16 rounded-full border border-white/20 flex items-center justify-center mx-auto mb-6 group-hover:border-white/40 transition-colors">
-                      <Icon className="w-8 h-8 text-white/50 group-hover:text-white transition-colors" />
-                    </div>
                     <H3 variant="display" className="mb-4 text-white text-xl">
                       {item.title}
                     </H3>
                     <p className="text-white/50 uppercase tracking-wide text-xs leading-relaxed font-medium">
                       {item.description}
                     </p>
-                  </motion.div>
+                  </div>
                 );
               })}
-            </motion.div>
+            </div>
           </motion.div>
         </section>
 

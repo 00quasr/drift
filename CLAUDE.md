@@ -37,7 +37,7 @@ Claude Code uses MCP servers to enhance development capabilities. The following 
 
 - **Playwright MCP**: Browser automation and testing
   - Use for automated UI testing
-  - Take screenshots for visual validation
+  - Take screenshots for visual validation but wait a few seconds that the website can load
   - Test user flows and interactions
   - Validate responsive behavior across breakpoints
 

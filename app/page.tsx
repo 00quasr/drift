@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, Users, Calendar, MapPin, TrendingUp, Shield, Zap, Music, Radio, Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import Link from 'next/link'
 import Image from 'next/image'
 import { H1, H2, H3 } from "@/components/ui/typography"
+import { BentoCard, BentoGrid } from "@/components/ui/bento-grid"
+import DisplayCards from "@/components/ui/display-cards"
 
 // Animation variants
 const fadeIn = {
@@ -89,7 +91,7 @@ const Feature = ({ title, description, image, index }: FeatureProps) => {
 export default function HomePage() {
   // Base Supabase storage URL for assets
   const storageUrl = "https://jwxlskzmmdrwrlljtfdi.supabase.co/storage/v1/object/public/logoassets"
-  
+
   const features = [
     {
       title: "VENUE DISCOVERY",
@@ -113,32 +115,98 @@ export default function HomePage() {
     },
   ];
 
-  const userTypes = [
+  const platformFeatures = [
     {
-      title: "ARTISTS",
-      description: "SHOWCASE YOUR SOUND AND BUILD YOUR FOLLOWING",
+      Icon: MapPin,
+      name: "Venue Discovery",
+      description: "Find underground clubs, warehouses, and hidden electronic music venues in your city and around the world.",
+      href: "/venues",
+      cta: "Explore Venues",
+      background: <div className="absolute inset-0 bg-neutral-900/50" />,
+      className: "lg:row-start-1 lg:row-end-4 lg:col-start-2 lg:col-end-3",
     },
     {
-      title: "PROMOTERS",
-      description: "REACH YOUR TARGET AUDIENCE EFFICIENTLY",
+      Icon: Calendar,
+      name: "Event Tracking",
+      description: "Never miss a show. Get real-time updates on upcoming events, lineup changes, and ticket releases.",
+      href: "/events",
+      cta: "View Events",
+      background: <div className="absolute inset-0 bg-neutral-900/50" />,
+      className: "lg:col-start-1 lg:col-end-2 lg:row-start-1 lg:row-end-3",
     },
     {
-      title: "VENUES",
-      description: "FILL YOUR SPACE WITH THE RIGHT CROWD",
+      Icon: Music,
+      name: "Artist Profiles",
+      description: "Discover emerging talent, follow your favorite DJs, and explore their complete discography.",
+      href: "/artists",
+      cta: "Browse Artists",
+      background: <div className="absolute inset-0 bg-neutral-900/50" />,
+      className: "lg:col-start-1 lg:col-end-2 lg:row-start-3 lg:row-end-4",
     },
     {
-      title: "FANS",
-      description: "DISCOVER YOUR NEXT FAVORITE ARTIST",
+      Icon: Users,
+      name: "Community Network",
+      description: "Connect with fellow music enthusiasts, share experiences, and build your underground network.",
+      href: "/explore",
+      cta: "Join Community",
+      background: <div className="absolute inset-0 bg-neutral-900/50" />,
+      className: "lg:col-start-3 lg:col-end-3 lg:row-start-1 lg:row-end-2",
     },
+    {
+      Icon: TrendingUp,
+      name: "Real-Time Updates",
+      description: "Stay ahead with live venue updates, trending events, and breaking news from the electronic music scene.",
+      href: "/explore",
+      cta: "See What's Trending",
+      background: <div className="absolute inset-0 bg-neutral-900/50" />,
+      className: "lg:col-start-3 lg:col-end-3 lg:row-start-2 lg:row-end-4",
+    },
+  ];
+
+  const useCaseCards = [
+    {
+      icon: <Music className="size-4 text-white" />,
+      title: "For Artists",
+      description: "Build your following and showcase your sound",
+      date: "Create Profile",
+      iconClassName: "text-white",
+      titleClassName: "text-white",
+      className: "[grid-area:stack] hover:-translate-y-10 before:absolute before:w-[100%] before:outline-1 before:rounded-xl before:outline-border before:h-[100%] before:content-[''] before:bg-blend-overlay before:bg-background/50 grayscale-[100%] hover:before:opacity-0 before:transition-opacity before:duration-700 hover:grayscale-0 before:left-0 before:top-0",
+    },
+    {
+      icon: <Radio className="size-4 text-white" />,
+      title: "For Promoters",
+      description: "Reach the right audience for your events",
+      date: "Post Event",
+      iconClassName: "text-white",
+      titleClassName: "text-white",
+      className: "[grid-area:stack] translate-x-16 translate-y-10 hover:-translate-y-1 before:absolute before:w-[100%] before:outline-1 before:rounded-xl before:outline-border before:h-[100%] before:content-[''] before:bg-blend-overlay before:bg-background/50 grayscale-[100%] hover:before:opacity-0 before:transition-opacity before:duration-700 hover:grayscale-0 before:left-0 before:top-0",
+    },
+    {
+      icon: <MapPin className="size-4 text-white" />,
+      title: "For Venues",
+      description: "Fill your space with passionate fans",
+      date: "List Venue",
+      iconClassName: "text-white",
+      titleClassName: "text-white",
+      className: "[grid-area:stack] translate-x-32 translate-y-20 hover:translate-y-10",
+    },
+  ];
+
+  const stats = [
+    { label: "ACTIVE VENUES", value: "500+", icon: MapPin },
+    { label: "MONTHLY EVENTS", value: "1,000+", icon: Calendar },
+    { label: "ARTISTS", value: "2,500+", icon: Music },
+    { label: "COMMUNITY MEMBERS", value: "10K+", icon: Users },
   ];
 
   return (
     <div className="min-h-screen bg-black text-white">
       <main className="flex-1 pt-16">
         {/* Hero Section */}
-        <section className="w-full py-12 sm:py-16 lg:py-24 xl:py-32">
+        <section className="w-full py-12 sm:py-16 lg:py-32 bg-black">
           <div className="container mx-auto max-w-6xl px-4 sm:px-6">
-            <div className="relative border border-white/20 bg-black/50 p-6 sm:p-8 lg:p-12 overflow-hidden">
+            <div className="relative border border-white/20 bg-black/50 p-6 sm:p-8 lg:p-16 overflow-hidden">
               {/* Background Image */}
               <div className="absolute inset-0">
                 <Image
@@ -149,7 +217,7 @@ export default function HomePage() {
                   priority
                   sizes="100vw"
                 />
-                <div className="absolute inset-0 bg-black/20" />
+                <div className="absolute inset-0 bg-black/40" />
               </div>
 
               <motion.div
@@ -157,9 +225,9 @@ export default function HomePage() {
                 whileInView="visible"
                 viewport={{ once: true }}
                 variants={fadeIn}
-                className="relative z-10 flex flex-col justify-center space-y-6 sm:space-y-8"
+                className="relative z-10 flex flex-col justify-center space-y-8"
               >
-                <div className="space-y-4 sm:space-y-6">
+                <div className="space-y-6">
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -186,22 +254,16 @@ export default function HomePage() {
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.7, delay: 0.6 }}
-                  className="flex flex-col gap-3 sm:gap-4 sm:flex-row"
+                  className="flex flex-col gap-4 sm:flex-row"
                 >
-                  <Link href="/explore" className="w-full sm:w-auto">
-                    <Button size="lg" className="w-full sm:w-auto bg-white text-black hover:bg-neutral-200 uppercase tracking-wider group px-6 py-3 text-sm sm:text-base">
+                  <Link href="/explore">
+                    <Button size="lg" className="w-full sm:w-auto bg-white text-black hover:bg-neutral-200 uppercase tracking-wider group px-8 py-6 text-base">
                       GET STARTED
-                      <motion.span
-                        initial={{ x: 0 }}
-                        whileHover={{ x: 5 }}
-                        transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                      >
-                        <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                      </motion.span>
+                      <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                     </Button>
                   </Link>
-                  <Link href="/events" className="w-full sm:w-auto">
-                    <Button variant="outline" size="lg" className="w-full sm:w-auto bg-transparent border-white/20 text-white hover:bg-white hover:text-black uppercase tracking-wider px-6 py-3 text-sm sm:text-base">
+                  <Link href="/events">
+                    <Button variant="outline" size="lg" className="w-full sm:w-auto bg-transparent border-white/20 text-white hover:bg-white hover:text-black uppercase tracking-wider px-8 py-6 text-base">
                       EXPLORE PLATFORM
                     </Button>
                   </Link>
@@ -211,8 +273,8 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Features Section */}
-        <section id="features" className="w-full py-12 sm:py-16 lg:py-24">
+        {/* Stats Section - Neutral Background */}
+        <section className="w-full py-12 sm:py-16 lg:py-24 bg-neutral-950">
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -220,7 +282,161 @@ export default function HomePage() {
             variants={fadeIn}
             className="container mx-auto max-w-6xl px-4 sm:px-6"
           >
-            <div className="border border-white/20">
+            <div className="border border-white/10 p-8 lg:p-16 bg-neutral-900/30">
+              <motion.div
+                variants={staggerContainer}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                className="grid grid-cols-2 lg:grid-cols-4 gap-12"
+              >
+                {stats.map((stat, index) => {
+                  const Icon = stat.icon;
+                  return (
+                    <motion.div
+                      key={index}
+                      variants={itemFadeIn}
+                      className="text-center space-y-3"
+                    >
+                      <div className="text-4xl lg:text-6xl font-bold text-white mb-2">{stat.value}</div>
+                      <div className="text-xs lg:text-sm text-white/50 uppercase tracking-wider font-medium">{stat.label}</div>
+                    </motion.div>
+                  );
+                })}
+              </motion.div>
+            </div>
+          </motion.div>
+        </section>
+
+        {/* Platform Features with Bento Grid - Black Background */}
+        <section className="w-full py-12 sm:py-16 lg:py-24 bg-black">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeIn}
+            className="container mx-auto max-w-6xl px-4 sm:px-6"
+          >
+            <div className="text-center mb-12 lg:mb-20">
+              <H2 variant="display" className="mb-6">
+                PLATFORM FEATURES
+              </H2>
+              <p className="text-white/50 uppercase tracking-wider text-xs lg:text-sm max-w-2xl mx-auto font-medium">
+                Everything you need to navigate the underground electronic music scene
+              </p>
+            </div>
+            <BentoGrid className="lg:grid-rows-3">
+              {platformFeatures.map((feature) => (
+                <BentoCard key={feature.name} {...feature} />
+              ))}
+            </BentoGrid>
+          </motion.div>
+        </section>
+
+        {/* How It Works Section - Neutral Background */}
+        <section className="w-full py-12 sm:py-16 lg:py-24 bg-neutral-950">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeIn}
+            className="container mx-auto max-w-6xl px-4 sm:px-6"
+          >
+            <div className="text-center mb-12 lg:mb-20">
+              <H2 variant="display" className="mb-6">
+                HOW IT WORKS
+              </H2>
+              <p className="text-white/50 uppercase tracking-wider text-xs lg:text-sm max-w-2xl mx-auto font-medium">
+                Get started in three simple steps
+              </p>
+            </div>
+            <motion.div
+              variants={staggerContainer}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="grid grid-cols-1 md:grid-cols-3 gap-6"
+            >
+              {[
+                {
+                  step: "01",
+                  title: "CREATE YOUR PROFILE",
+                  description: "Sign up and tell us about your role in the electronic music scene - artist, promoter, venue owner, or fan.",
+                },
+                {
+                  step: "02",
+                  title: "EXPLORE & CONNECT",
+                  description: "Browse venues, discover events, follow artists, and connect with the underground community.",
+                },
+                {
+                  step: "03",
+                  title: "ENGAGE & GROW",
+                  description: "Attend events, share experiences, build your network, and help grow the scene.",
+                },
+              ].map((item, index) => (
+                <motion.div
+                  key={index}
+                  variants={itemFadeIn}
+                  className="border border-white/10 p-8 relative overflow-hidden group hover:border-white/20 transition-colors bg-neutral-900/30"
+                >
+                  <div className="absolute top-6 right-6 text-7xl font-bold text-white/5 group-hover:text-white/10 transition-colors">
+                    {item.step}
+                  </div>
+                  <div className="relative z-10 space-y-4">
+                    <div className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center text-white/50 text-sm font-bold">
+                      {item.step}
+                    </div>
+                    <H3 variant="display" className="text-white text-xl">
+                      {item.title}
+                    </H3>
+                    <p className="text-white/50 uppercase tracking-wide text-xs leading-relaxed font-medium">
+                      {item.description}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+          </motion.div>
+        </section>
+
+        {/* Use Cases with Display Cards - Black Background */}
+        <section className="w-full py-12 sm:py-16 lg:py-24 bg-black">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeIn}
+            className="container mx-auto max-w-6xl px-4 sm:px-6"
+          >
+            <div className="text-center mb-12 lg:mb-20">
+              <H2 variant="display" className="mb-6">
+                WHO IS IT FOR?
+              </H2>
+              <p className="text-white/50 uppercase tracking-wider text-xs lg:text-sm max-w-2xl mx-auto font-medium">
+                Built for every role in the electronic music ecosystem
+              </p>
+            </div>
+            <div className="flex justify-center">
+              <DisplayCards cards={useCaseCards} />
+            </div>
+          </motion.div>
+        </section>
+
+        {/* Features Section - Neutral Background */}
+        <section id="features" className="w-full py-12 sm:py-16 lg:py-24 bg-neutral-950">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeIn}
+            className="container mx-auto max-w-6xl px-4 sm:px-6"
+          >
+            <div className="text-center mb-12 lg:mb-20">
+              <H2 variant="display" className="mb-6">
+                CORE FEATURES
+              </H2>
+            </div>
+            <div className="border border-white/10">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 relative z-10 max-w-7xl mx-auto">
                 {features.map((feature, index) => (
                   <Feature key={feature.title} {...feature} index={index} />
@@ -230,8 +446,8 @@ export default function HomePage() {
           </motion.div>
         </section>
 
-        {/* User Types Section */}
-        <section id="users" className="w-full py-12 sm:py-16 lg:py-24">
+        {/* Detailed User Roles Section - Black Background */}
+        <section id="users" className="w-full py-12 sm:py-16 lg:py-24 bg-black">
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -239,7 +455,7 @@ export default function HomePage() {
             variants={fadeIn}
             className="container mx-auto max-w-6xl px-4 sm:px-6"
           >
-            <div className="relative border border-white/20 overflow-hidden">
+            <div className="relative border border-white/10 overflow-hidden">
               {/* Background Image */}
               <div className="absolute inset-0">
                 <Image
@@ -249,28 +465,17 @@ export default function HomePage() {
                   className="object-cover"
                   sizes="100vw"
                 />
-                <div className="absolute inset-0 bg-black/15" />
+                <div className="absolute inset-0 bg-black/60" />
               </div>
 
-              <div className="relative z-10 p-6 sm:p-8 lg:p-12">
-                <div className="text-center mb-8 sm:mb-12 lg:mb-16">
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.2 }}
-                  >
-                    <H2 variant="display" className="mb-4 sm:mb-6">
-                      FOR EVERYONE
-                    </H2>
-                  </motion.div>
-                  <motion.p
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.3 }}
-                    className="text-white/80 font-bold tracking-wider uppercase text-sm sm:text-base lg:text-lg leading-relaxed"
-                  >
-                    BUILT FOR ALL MEMBERS OF THE ELECTRONIC MUSIC ECOSYSTEM
-                  </motion.p>
+              <div className="relative z-10 p-6 sm:p-8 lg:p-16">
+                <div className="text-center mb-12 lg:mb-20">
+                  <H2 variant="display" className="mb-6">
+                    FOR EVERYONE
+                  </H2>
+                  <p className="text-white/70 font-medium tracking-wider uppercase text-xs sm:text-sm lg:text-base leading-relaxed max-w-3xl mx-auto">
+                    Built for all members of the electronic music ecosystem
+                  </p>
                 </div>
 
                 <motion.div
@@ -278,26 +483,55 @@ export default function HomePage() {
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true }}
-                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
+                  className="grid grid-cols-1 sm:grid-cols-2 gap-6"
                 >
-                  {userTypes.map((userType, index) => (
-                    <motion.div
-                      key={index}
-                      variants={itemFadeIn}
-                      className="border border-white/20 p-4 sm:p-6 lg:p-8 bg-black/30"
-                    >
-                      <H3 variant="display" className="mb-3 sm:mb-4 text-white">{userType.title}</H3>
-                      <p className="text-white/70 text-xs sm:text-sm uppercase tracking-wide leading-relaxed">{userType.description}</p>
-                    </motion.div>
-                  ))}
+                  {[
+                    {
+                      title: "ARTISTS",
+                      description: "Showcase your sound, build your following, connect with venues and promoters, and track your performance history.",
+                      icon: Music,
+                    },
+                    {
+                      title: "PROMOTERS",
+                      description: "Reach your target audience efficiently, promote events to engaged fans, and grow your brand in the scene.",
+                      icon: Radio,
+                    },
+                    {
+                      title: "VENUES",
+                      description: "Fill your space with the right crowd, list venue details, and connect with quality promoters.",
+                      icon: MapPin,
+                    },
+                    {
+                      title: "FANS",
+                      description: "Discover your next favorite artist, find the best underground venues, and never miss a show.",
+                      icon: Star,
+                    },
+                  ].map((userType, index) => {
+                    const Icon = userType.icon;
+                    return (
+                      <motion.div
+                        key={index}
+                        variants={itemFadeIn}
+                        className="border border-white/20 p-8 bg-black/60 backdrop-blur-sm hover:bg-black/70 transition-all group"
+                      >
+                        <div className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center mb-6 group-hover:border-white/40 transition-colors">
+                          <Icon className="w-6 h-6 text-white/60 group-hover:text-white transition-colors" />
+                        </div>
+                        <H3 variant="display" className="mb-4 text-white text-xl">{userType.title}</H3>
+                        <p className="text-white/50 text-xs uppercase tracking-wide leading-relaxed font-medium">
+                          {userType.description}
+                        </p>
+                      </motion.div>
+                    );
+                  })}
                 </motion.div>
               </div>
             </div>
           </motion.div>
         </section>
 
-        {/* CTA Section */}
-        <section id="contact" className="w-full py-12 sm:py-16 lg:py-24">
+        {/* Why Choose Drift Section - Neutral Background */}
+        <section className="w-full py-12 sm:py-16 lg:py-24 bg-neutral-950">
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -305,7 +539,71 @@ export default function HomePage() {
             variants={fadeIn}
             className="container mx-auto max-w-6xl px-4 sm:px-6"
           >
-            <div className="relative border border-white/20 overflow-hidden">
+            <div className="text-center mb-12 lg:mb-20">
+              <H2 variant="display" className="mb-6">
+                WHY CHOOSE DRIFT
+              </H2>
+              <p className="text-white/50 uppercase tracking-wider text-xs lg:text-sm max-w-2xl mx-auto font-medium">
+                The premier platform for underground electronic music
+              </p>
+            </div>
+            <motion.div
+              variants={staggerContainer}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="grid grid-cols-1 md:grid-cols-3 gap-6"
+            >
+              {[
+                {
+                  icon: Shield,
+                  title: "TRUSTED COMMUNITY",
+                  description: "Verified venues, authentic artists, and real events. Our moderation ensures quality across the platform.",
+                },
+                {
+                  icon: Zap,
+                  title: "REAL-TIME UPDATES",
+                  description: "Never miss a beat. Get instant notifications for new events, venue openings, and artist announcements.",
+                },
+                {
+                  icon: TrendingUp,
+                  title: "GROWING NETWORK",
+                  description: "Join thousands of electronic music enthusiasts building the future of the underground scene.",
+                },
+              ].map((item, index) => {
+                const Icon = item.icon;
+                return (
+                  <motion.div
+                    key={index}
+                    variants={itemFadeIn}
+                    className="border border-white/10 p-8 text-center group hover:border-white/20 transition-colors bg-neutral-900/30"
+                  >
+                    <div className="w-16 h-16 rounded-full border border-white/20 flex items-center justify-center mx-auto mb-6 group-hover:border-white/40 transition-colors">
+                      <Icon className="w-8 h-8 text-white/50 group-hover:text-white transition-colors" />
+                    </div>
+                    <H3 variant="display" className="mb-4 text-white text-xl">
+                      {item.title}
+                    </H3>
+                    <p className="text-white/50 uppercase tracking-wide text-xs leading-relaxed font-medium">
+                      {item.description}
+                    </p>
+                  </motion.div>
+                );
+              })}
+            </motion.div>
+          </motion.div>
+        </section>
+
+        {/* CTA Section - Black Background */}
+        <section id="contact" className="w-full py-12 sm:py-16 lg:py-32 bg-black">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeIn}
+            className="container mx-auto max-w-6xl px-4 sm:px-6"
+          >
+            <div className="relative border border-white/10 overflow-hidden">
               {/* Background Image */}
               <div className="absolute inset-0">
                 <Image
@@ -315,54 +613,32 @@ export default function HomePage() {
                   className="object-cover"
                   sizes="100vw"
                 />
-                <div className="absolute inset-0 bg-black/20" />
+                <div className="absolute inset-0 bg-black/60" />
               </div>
 
-              <div className="relative z-10 flex flex-col items-center justify-center space-y-6 sm:space-y-8 text-center py-12 sm:py-16 lg:py-24 px-6 sm:px-8 lg:px-12">
-                <div className="space-y-4 sm:space-y-6">
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.2 }}
-                  >
-                    <H2 variant="display" className="leading-tight">
-                      JOIN THE MOVEMENT
-                    </H2>
-                  </motion.div>
-                  <motion.p
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.3 }}
-                    className="mx-auto max-w-[600px] text-neutral-300 text-sm sm:text-base lg:text-lg uppercase tracking-wide leading-relaxed"
-                  >
-                    BECOME PART OF THE UNDERGROUND ELECTRONIC MUSIC COMMUNITY
-                  </motion.p>
+              <div className="relative z-10 flex flex-col items-center justify-center space-y-10 text-center py-16 sm:py-24 lg:py-40 px-6 sm:px-8 lg:px-12">
+                <div className="space-y-6">
+                  <H2 variant="display" className="leading-tight">
+                    JOIN THE MOVEMENT
+                  </H2>
+                  <p className="mx-auto max-w-[700px] text-neutral-300 text-sm lg:text-lg uppercase tracking-wide leading-relaxed">
+                    Become part of the underground electronic music community
+                  </p>
                 </div>
-                
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.7, delay: 0.6 }}
-                  className="flex flex-col gap-3 sm:gap-4 sm:flex-row w-full sm:w-auto"
-                >
-                  <Link href="/auth/signup" className="w-full sm:w-auto">
-                    <Button size="lg" className="w-full sm:w-auto bg-white text-black hover:bg-neutral-200 uppercase tracking-wider group px-6 py-3 text-sm sm:text-base">
+
+                <div className="flex flex-col gap-4 sm:flex-row">
+                  <Link href="/auth/signup">
+                    <Button size="lg" className="w-full sm:w-auto bg-white text-black hover:bg-neutral-200 uppercase tracking-wider group px-8 py-6 text-base">
                       START NOW
-                      <motion.span
-                        initial={{ x: 0 }}
-                        whileHover={{ x: 5 }}
-                        transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                      >
-                        <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                      </motion.span>
+                      <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                     </Button>
                   </Link>
-                  <Link href="/explore" className="w-full sm:w-auto">
-                    <Button variant="outline" size="lg" className="w-full sm:w-auto bg-transparent border-white/20 text-white hover:bg-white hover:text-black uppercase tracking-wider px-6 py-3 text-sm sm:text-base">
-                      LEARN MORE
+                  <Link href="/explore">
+                    <Button variant="outline" size="lg" className="w-full sm:w-auto bg-transparent border-white/20 text-white hover:bg-white hover:text-black uppercase tracking-wider px-8 py-6 text-base">
+                      EXPLORE PLATFORM
                     </Button>
                   </Link>
-                </motion.div>
+                </div>
               </div>
             </div>
           </motion.div>

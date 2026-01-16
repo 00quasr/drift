@@ -447,6 +447,8 @@ git commit -m "DRI-123: Add user profile editing
 - Adds validation
 - Updates API endpoint"
 
+never use CLAUDE as co-author 
+
 # Push regularly
 git push origin feature/DRI-123-issue-title
 ```

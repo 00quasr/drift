@@ -3,8 +3,8 @@ const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
 const SUPABASE_STORAGE_URL = `${SUPABASE_URL}/storage/v1/object/public`
 
 // Available background images (001.jpg - 029.jpg) from Supabase storage
-const BACKGROUND_IMAGES = Array.from({ length: 29 }, (_, i) => 
-  String(i + 1).padStart(3, '0') + '.jpg'
+const BACKGROUND_IMAGES = Array.from({ length: 12 }, (_, i) => 
+  String(i + 1).padStart(3, '0') + '.png'
 )
 
 // Curated professional images for different entity types (fallback to Unsplash if needed)
@@ -67,11 +67,11 @@ export function getRandomBackgroundImage(seed?: string): string {
  * @returns Full URL to the background image
  */
 export function getBackgroundImage(number: number): string {
-  if (number < 1 || number > 29) {
+  if (number < 1 || number > 12) {
     throw new Error('Background image number must be between 1 and 29')
   }
   
-  const imageName = String(number).padStart(3, '0') + '.jpg'
+  const imageName = String(number).padStart(3, '0') + '.png'
   return `${SUPABASE_STORAGE_URL}/assets/${imageName}`
 }
 

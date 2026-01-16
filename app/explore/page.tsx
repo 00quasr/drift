@@ -107,7 +107,7 @@ async function ExplorePage() {
                   type="event"
                   id={events[0].id}
                   title={events[0].title}
-                  imageUrl={`https://jwxlskzmmdrwrlljtfdi.supabase.co/storage/v1/object/public/assets/${String(Math.floor(Math.random() * 9) + 1).padStart(3, '0')}.jpg`}
+                  imageUrl={`https://jwxlskzmmdrwrlljtfdi.supabase.co/storage/v1/object/public/assets/${String(Math.floor(Math.random() * 9) + 1).padStart(3, '0')}.png`}
                   category="FEATURED EVENT"
                   href={`/event/${events[0].id}`}
                   artist={events[0].artists?.[0]?.name || 'Various Artists'}
@@ -128,7 +128,7 @@ async function ExplorePage() {
                   type="venue"
                   id={venues[0].id}
                   title={venues[0].name}
-                  imageUrl={`https://jwxlskzmmdrwrlljtfdi.supabase.co/storage/v1/object/public/assets/${String(Math.floor(Math.random() * 9) + 1).padStart(3, '0')}.jpg`}
+                  imageUrl={`https://jwxlskzmmdrwrlljtfdi.supabase.co/storage/v1/object/public/assets/${String(Math.floor(Math.random() * 9) + 1).padStart(3, '0')}.png`}
                   category="TRENDING VENUE"
                   href={`/venue/${venues[0].id}`}
                   city={venues[0].city || 'Unknown'}
@@ -146,7 +146,7 @@ async function ExplorePage() {
                   type="artist"
                   id={artists[0].id}
                   title={artists[0].name}
-                  imageUrl={`https://jwxlskzmmdrwrlljtfdi.supabase.co/storage/v1/object/public/assets/${String(Math.floor(Math.random() * 9) + 1).padStart(3, '0')}.jpg`}
+                  imageUrl={`https://jwxlskzmmdrwrlljtfdi.supabase.co/storage/v1/object/public/assets/${String(Math.floor(Math.random() * 9) + 1).padStart(3, '0')}.png`}
                   category="TOP RATED ARTIST"
                   href={`/artist/${artists[0].id}`}
                   bio={artists[0].bio}
@@ -190,7 +190,7 @@ async function ExplorePage() {
                   type="event"
                   id={event.id}
                   title={event.title}
-                  imageUrl={`https://jwxlskzmmdrwrlljtfdi.supabase.co/storage/v1/object/public/assets/${String(Math.floor(Math.random() * 9) + 1).padStart(3, '0')}.jpg`}
+                  imageUrl={`https://jwxlskzmmdrwrlljtfdi.supabase.co/storage/v1/object/public/assets/${String(Math.floor(Math.random() * 9) + 1).padStart(3, '0')}.png`}
                   category="UPCOMING EVENT"
                   href={`/event/${event.id}`}
                   artist={event.artists?.[0]?.name || 'Various Artists'}
@@ -208,7 +208,7 @@ async function ExplorePage() {
                   type="event"
                   id={event.id}
                   title={event.title}
-                  imageUrl={`https://jwxlskzmmdrwrlljtfdi.supabase.co/storage/v1/object/public/assets/${String(Math.floor(Math.random() * 9) + 1).padStart(3, '0')}.jpg`}
+                  imageUrl={`https://jwxlskzmmdrwrlljtfdi.supabase.co/storage/v1/object/public/assets/${String(Math.floor(Math.random() * 9) + 1).padStart(3, '0')}.png`}
                   category="UPCOMING EVENT"
                   href={`/event/${event.id}`}
                   artist={event.artists?.[0]?.name || 'Various Artists'}
@@ -252,7 +252,7 @@ async function ExplorePage() {
                   type="venue"
                   id={venue.id}
                   title={venue.name}
-                  imageUrl={`https://jwxlskzmmdrwrlljtfdi.supabase.co/storage/v1/object/public/assets/${String(Math.floor(Math.random() * 9) + 1).padStart(3, '0')}.jpg`}
+                  imageUrl={`https://jwxlskzmmdrwrlljtfdi.supabase.co/storage/v1/object/public/assets/${String(Math.floor(Math.random() * 9) + 1).padStart(3, '0')}.png`}
                   category="VENUE"
                   href={`/venue/${venue.id}`}
                   city={venue.city || 'Unknown'}
@@ -293,7 +293,7 @@ async function ExplorePage() {
                   type="artist"
                   id={artist.id}
                   title={artist.name}
-                  imageUrl={`https://jwxlskzmmdrwrlljtfdi.supabase.co/storage/v1/object/public/assets/${String(Math.floor(Math.random() * 9) + 1).padStart(3, '0')}.jpg`}
+                  imageUrl={`https://jwxlskzmmdrwrlljtfdi.supabase.co/storage/v1/object/public/assets/${String(Math.floor(Math.random() * 9) + 1).padStart(3, '0')}.png`}
                   category="ARTIST"
                   href={`/artist/${artist.id}`}
                   bio={artist.bio}

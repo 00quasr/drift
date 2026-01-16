@@ -435,7 +435,7 @@ export default function TrendingPage() {
                                     <TooltipTrigger asChild>
                                       <Avatar className="h-6 w-6 ring-2 ring-black hover:z-10">
                                         <AvatarImage 
-                                          src={`https://jwxlskzmmdrwrlljtfdi.supabase.co/storage/v1/object/public/assets/${String(Math.floor(Math.random() * 9) + 1).padStart(3, '0')}.jpg`} 
+                                          src={`https://jwxlskzmmdrwrlljtfdi.supabase.co/storage/v1/object/public/assets/${String(Math.floor(Math.random() * 9) + 1).padStart(3, '0')}.png`} 
                                           alt={artist.name} 
                                         />
                                         <AvatarFallback className="bg-white/10 text-white text-xs">
@@ -569,7 +569,7 @@ export default function TrendingPage() {
                             <div className="flex items-center gap-3">
                               <Avatar className="h-8 w-8">
                                 <AvatarImage 
-                                  src={artist.images?.[0] || `https://jwxlskzmmdrwrlljtfdi.supabase.co/storage/v1/object/public/assets/${String(Math.floor(Math.random() * 9) + 1).padStart(3, '0')}.jpg`} 
+                                  src={artist.images?.[0] || `https://jwxlskzmmdrwrlljtfdi.supabase.co/storage/v1/object/public/assets/${String(Math.floor(Math.random() * 9) + 1).padStart(3, '0')}.png`} 
                                   alt={artist.name} 
                                 />
                                 <AvatarFallback className="bg-white/10 text-white text-xs">

@@ -247,9 +247,12 @@ export default function Header() {
               {loading ? (
                 <ClassicLoader />
               ) : user ? (
-                <div className="relative">
+                <div
+                  className="relative"
+                  onMouseEnter={() => setUserMenuOpen(true)}
+                  onMouseLeave={() => setUserMenuOpen(false)}
+                >
                   <motion.button
-                    onClick={() => setUserMenuOpen(!userMenuOpen)}
                     className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-white/90 hover:text-white hover:bg-white/[0.04] rounded-lg backdrop-blur-sm transition-all duration-300 border border-white/[0.04] hover:border-white/[0.08]"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -284,7 +287,7 @@ export default function Header() {
                       >
                         <div className="p-4">
                           {/* User info header */}
-                          <Link href={`/profile/${user.id}`} onClick={() => setUserMenuOpen(false)}>
+                          <Link href={`/profile/${user.id}`}>
                             <div className="flex items-center space-x-3 pb-4 mb-3 border-b border-white/[0.06] hover:bg-white/[0.02] rounded-lg p-2 -m-2 transition-colors duration-200 cursor-pointer">
                               {user.avatar_url ? (
                                 <div className="relative w-10 h-10 rounded-2xl overflow-hidden ring-1 ring-white/10">
@@ -317,7 +320,6 @@ export default function Header() {
                               <Link 
                                 href="/settings/profile" 
                                 className="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-300 group"
-                                onClick={() => setUserMenuOpen(false)}
                               >
                                 PROFILE
                               </Link>
@@ -327,7 +329,6 @@ export default function Header() {
                               <Link 
                                 href="/favorites" 
                                 className="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-300 group"
-                                onClick={() => setUserMenuOpen(false)}
                               >
                                 FAVORITES
                               </Link>
@@ -339,8 +340,7 @@ export default function Header() {
                                 <Link 
                                   href="/artist-profile" 
                                   className="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-300"
-                                  onClick={() => setUserMenuOpen(false)}
-                                >
+                                  >
                                   MY ARTIST PROFILE
                                 </Link>
                               </motion.div>
@@ -351,8 +351,7 @@ export default function Header() {
                                 <Link 
                                   href="/my-venue" 
                                   className="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-300"
-                                  onClick={() => setUserMenuOpen(false)}
-                                >
+                                  >
                                   MY VENUE
                                 </Link>
                               </motion.div>
@@ -364,8 +363,7 @@ export default function Header() {
                                   <Link 
                                     href="/events/manage" 
                                     className="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-300"
-                                    onClick={() => setUserMenuOpen(false)}
-                                  >
+                                      >
                                     MY EVENTS
                                   </Link>
                                 </motion.div>
@@ -373,8 +371,7 @@ export default function Header() {
                                   <Link 
                                     href="/events/create" 
                                     className="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-300"
-                                    onClick={() => setUserMenuOpen(false)}
-                                  >
+                                      >
                                     CREATE EVENT
                                   </Link>
                                 </motion.div>
@@ -386,8 +383,7 @@ export default function Header() {
                                 <Link 
                                   href="/dashboard" 
                                   className="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-300"
-                                  onClick={() => setUserMenuOpen(false)}
-                                >
+                                  >
                                   DASHBOARD
                                 </Link>
                               </motion.div>
@@ -399,8 +395,7 @@ export default function Header() {
                                 <Link 
                                   href="/verification" 
                                   className="block px-4 py-3 text-sm font-medium text-yellow-400/80 hover:text-yellow-400 hover:bg-yellow-400/[0.04] rounded-lg transition-all duration-300"
-                                  onClick={() => setUserMenuOpen(false)}
-                                >
+                                  >
                                   REQUEST VERIFICATION
                                 </Link>
                               </motion.div>
@@ -410,7 +405,6 @@ export default function Header() {
                               <Link 
                                 href="/settings" 
                                 className="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-300"
-                                onClick={() => setUserMenuOpen(false)}
                               >
                                 SETTINGS
                               </Link>
@@ -420,10 +414,7 @@ export default function Header() {
                           {/* Sign out */}
                           <div className="border-t border-white/[0.06] mt-3 pt-3">
                             <motion.button
-                              onClick={async () => {
-                                await signOut()
-                                setUserMenuOpen(false)
-                              }}
+                              onClick={signOut}
                               className="w-full text-left px-4 py-3 text-sm font-medium text-white/70 hover:text-white hover:bg-red-500/[0.08] rounded-lg transition-all duration-300 flex items-center space-x-3 group"
                               whileHover={{ x: 2 }}
                               transition={{ duration: 0.2 }}

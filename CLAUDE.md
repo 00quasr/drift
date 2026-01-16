@@ -399,32 +399,55 @@ git worktree add ../drift-DRI-456 feature/DRI-456-fix-search-performance
 ```
 
 #### Working in Worktrees
-```bash
-# 1. Open separate Claude Code instances for each worktree
-# Instance 1: cd /path/to/drift-DRI-123
-# Instance 2: cd /path/to/drift-DRI-456
 
-# 2. Each worktree is independent - install dependencies
+**IMPORTANT: Worktrees only contain tracked git files.** Files in `.gitignore` must be copied manually.
+
+**Crucial files to copy:**
+| File/Folder | Purpose |
+|-------------|---------|
+| `.env` | Supabase, OpenAI, Mapbox API keys |
+| `.claude/` | Agents, skills, Claude Code settings |
+| `.mcp.json` | MCP server configuration |
+
+```bash
+# After creating a worktree, set it up:
 cd ../drift-DRI-123
+
+# Copy essential untracked files
+cp ../drift/.env .
+cp ../drift/.mcp.json .
+cp -r ../drift/.claude .
+
+# Install dependencies
 npm install
 
-# 3. Work normally in each directory
-# Changes are isolated to that branch
+# Now open Claude Code in this directory
+```
+
+**One-liner setup for new worktrees:**
+```bash
+cd ../drift-DRI-123 && cp ../drift/.env . && cp ../drift/.mcp.json . && cp -r ../drift/.claude . && npm install
 ```
 
 #### Managing Worktrees
+
+**IMPORTANT: You must remove the worktree BEFORE deleting the branch.**
+
 ```bash
 # List all worktrees
 git worktree list
 
-# Remove a worktree when done
-git worktree remove ../drift-DRI-123
-# Or force remove if there are uncommitted changes
-git worktree remove --force ../drift-DRI-123
+# Step 1: Remove the worktree (use --force if it has untracked files like .env, node_modules)
+git worktree remove ../drift-DRI-123 --force
 
-# Prune worktree references
+# Step 2: Now delete the branch
+git branch -d feature/DRI-123-issue-title
+
+# Clean up stale worktree references
 git worktree prune
 ```
+
+**Common issue:** Worktrees with copied `.env`, `.claude/`, or `node_modules/` will require `--force` to remove since these are untracked files.
 
 ### Linear Integration Workflow
 

@@ -4,6 +4,23 @@ This document outlines the development process and key implementation details fo
 
 ## 🛠️ Development Environment
 
+### Claude Agents 
+Use Claude Code Subagents for specific tasks. Inside of .claude/agents & .claude/skills are .md that explain the project in a more specific ways. Always use one of those agents or skills for a specific task.
+
+/agents
+- drift-reviewer.md = Expert code reviewer for Drift platform
+- event-optimizer.md = Performance and UX specialist for event discovery features. Optimizes search, trending algorithms
+- maintenance-agent.md = Maintenance specialist that reviews and updates agents and skills to keep them current with the evolving codebase
+- security-auditor.md = Security specialist for content moderation, API protection, and data safety.
+- supabase-assistant.md = Database expert for Supabase queries, schema design, and RLS policies. Use when working with database tables, migrations, or query optimization. MUST BE USED for any database-related changes.
+- supabase-realtime-agent.md = You are an expert developer assistant specializing in Supabase Realtime implementations
+
+/skills
+- /drift-api-patterns/SKILL.md = Write secure Next.js API routes following Drift patterns.
+- /drift-component-generator/SKILL.md = Generate React components following Drift's minimalist design system
+- /supabase-query-helper/SKILL.md = Query Supabase schema, write SQL, and generate TypeScript types.
+- /typography-standards/SKILL.md = All typography must use Geist Sans.
+
 ### Required Tools & Versions
 - **Node.js**: 20.x or higher
 - **npm**: 9.x or higher
@@ -96,6 +113,7 @@ We aim for **minimalistic, calm, and clean interfaces**. Every design decision s
 - Unnecessary icons
 - Excessive borders, outlines, dividers
 - "UI tricks" that don't improve clarity
+- icons at all
 
 **Prefer:**
 - Typography hierarchy over boxes
@@ -113,7 +131,6 @@ We aim for **minimalistic, calm, and clean interfaces**. Every design decision s
 
 #### UI Library
 - Prefer **shadcn/ui** for primitives.
-- Follow Radix UI patterns.
 - Avoid one-off styling when a reusable component exists.
 
 #### TypeScript Standards
@@ -317,28 +334,6 @@ Prefer automated screenshots (Playwright) where feasible.
 ## 📝 Development Commands
 
 ### Essential Commands
-```bash
-# Development server 
-npm run dev 
-
-# Type checking
-npm run type-check
-
-# Linting and formatting
-npm run lint
-npm run lint:fix
-
-# Database operations
-npm run db:generate  # Generate TypeScript types
-npm run db:push      # Push schema changes
-npm run db:reset     # Reset database
-
-# Production build
-npm run build
-npm run start
-```
-
-All npm cmd are executed by user just tell him what to do.
 
 ### Supabase Operations
 ```bash
@@ -354,6 +349,225 @@ supabase db push
 # Generate types
 supabase gen types typescript --project-id=YOUR_PROJECT_ID > lib/types/database.ts
 ```
+
+## 🔄 Git Workflow for Linear Issues
+
+### Overview
+To work on multiple Linear issues simultaneously with separate Claude Code instances, we use Git branches and worktrees. This allows parallel development without branch switching conflicts.
+
+### Branch Naming Convention
+Always create branches with Linear issue IDs for traceability:
+```bash
+# Format: feature/[LINEAR-ID]-brief-description
+feature/DRI-123-add-user-authentication
+feature/DRI-456-fix-search-performance
+bugfix/DRI-789-resolve-upload-error
+```
+
+### Working with Single Branch (Traditional Approach)
+When working on one issue at a time:
+```bash
+# 1. Create and switch to new branch from main
+git checkout main
+git pull origin main
+git checkout -b feature/DRI-123-add-user-authentication
+
+# 2. Work on the issue
+# Make changes, commit regularly
+
+# 3. Push branch to remote
+git push -u origin feature/DRI-123-add-user-authentication
+
+# 4. Create PR when ready
+gh pr create --title "DRI-123: Add user authentication" --body "Implements OAuth..."
+```
+
+### Using Git Worktrees for Multiple Issues (Recommended)
+Git worktrees allow multiple branches to be checked out in different directories simultaneously, perfect for multiple Claude Code instances.
+
+#### Setting Up Worktrees
+```bash
+# 1. From main drift directory, create a worktree for each Linear issue
+git worktree add ../drift-DRI-123 feature/DRI-123-add-user-authentication
+git worktree add ../drift-DRI-456 feature/DRI-456-fix-search-performance
+
+# 2. Directory structure will be:
+# /Documents/GitHub/
+#   ├── drift/                  (main branch)
+#   ├── drift-DRI-123/          (feature/DRI-123 branch)
+#   └── drift-DRI-456/          (feature/DRI-456 branch)
+```
+
+#### Working in Worktrees
+```bash
+# 1. Open separate Claude Code instances for each worktree
+# Instance 1: cd /path/to/drift-DRI-123
+# Instance 2: cd /path/to/drift-DRI-456
+
+# 2. Each worktree is independent - install dependencies
+cd ../drift-DRI-123
+npm install
+
+# 3. Work normally in each directory
+# Changes are isolated to that branch
+```
+
+#### Managing Worktrees
+```bash
+# List all worktrees
+git worktree list
+
+# Remove a worktree when done
+git worktree remove ../drift-DRI-123
+# Or force remove if there are uncommitted changes
+git worktree remove --force ../drift-DRI-123
+
+# Prune worktree references
+git worktree prune
+```
+
+### Linear Integration Workflow
+
+#### 1. Start Work on Linear Issue
+```bash
+# Get issue details from Linear using MCP
+# Create branch with Linear issue ID
+git checkout -b feature/DRI-123-issue-title
+
+# Or with worktree
+git worktree add ../drift-DRI-123 feature/DRI-123-issue-title
+```
+
+#### 2. During Development
+```bash
+# Commit with Linear issue reference
+git commit -m "DRI-123: Add user profile editing
+
+- Implements profile form
+- Adds validation
+- Updates API endpoint"
+
+# Push regularly
+git push origin feature/DRI-123-issue-title
+```
+
+#### 3. Create Pull Request
+```bash
+# Use gh CLI with Linear reference in title
+gh pr create \
+  --title "DRI-123: Issue title from Linear" \
+  --body "## Linear Issue
+  [DRI-123](https://linear.app/drift/issue/DRI-123)
+
+  ## Changes
+  - Implementation details
+  - Testing notes
+
+  ## Screenshots
+  [Add if UI changes]"
+```
+
+### Best Practices for Multiple Issues
+
+1. **Keep Branches Updated**
+```bash
+# In each worktree/branch, regularly sync with main
+git fetch origin
+git rebase origin/main
+```
+
+2. **Stash Management**
+```bash
+# When switching context temporarily
+git stash push -m "DRI-123: WIP profile form"
+git stash list
+git stash pop
+```
+
+3. **Environment Files**
+```bash
+# Each worktree needs its own .env.local
+cp ../.env.local .env.local  # Copy from main directory
+```
+
+4. **Database Migrations**
+```bash
+# Be careful with migrations across branches
+# Always pull latest migrations from main before creating new ones
+git checkout main -- supabase/migrations/
+```
+
+5. **Clean Up Regularly**
+```bash
+# Remove merged branches
+git branch -d feature/DRI-123-completed-issue
+
+# Remove remote tracking branches
+git remote prune origin
+
+# Clean up worktrees
+git worktree prune
+```
+
+### Typical Multi-Issue Workflow
+
+```bash
+# Monday: Start 3 Linear issues
+git worktree add ../drift-DRI-100 feature/DRI-100-nav-update
+git worktree add ../drift-DRI-101 feature/DRI-101-search-fix
+git worktree add ../drift-DRI-102 feature/DRI-102-new-component
+
+# Open 3 Claude Code instances, one in each directory
+# Work on issues in parallel
+
+# Complete DRI-100
+cd ../drift-DRI-100
+git push origin feature/DRI-100-nav-update
+gh pr create --title "DRI-100: Update navigation"
+cd ../drift
+git worktree remove ../drift-DRI-100
+
+# Continue with other issues...
+```
+
+### Troubleshooting
+
+#### Worktree Conflicts
+```bash
+# If worktree is locked
+rm .git/worktrees/[worktree-name]/locked
+
+# If worktree path changed
+git worktree repair
+```
+
+#### Branch Conflicts
+```bash
+# Resolve conflicts during rebase
+git rebase origin/main
+# Fix conflicts in files
+git add .
+git rebase --continue
+```
+
+#### Clean State Reset
+```bash
+# If things go wrong, reset to clean state
+git worktree remove --force ../drift-DRI-XXX
+git branch -D feature/DRI-XXX-broken
+git worktree prune
+```
+
+### Quick Reference
+
+| Action | Command |
+|--------|---------|
+| Create worktree | `git worktree add ../drift-DRI-123 feature/DRI-123-title` |
+| List worktrees | `git worktree list` |
+| Remove worktree | `git worktree remove ../drift-DRI-123` |
+| Create branch | `git checkout -b feature/DRI-123-title` |
+| Link to Linear | Use `DRI-XXX:` prefix in commit messages |
+| Create PR | `gh pr create --title "DRI-123: Title"` |
 
 ## 🎯 Development Best Practices
 
@@ -429,25 +643,6 @@ supabase gen types typescript --project-id=YOUR_PROJECT_ID > lib/types/database.
 - **Check OpenAI API key** configuration
 - **Verify API quota** and usage limits
 - **Review moderation prompt** effectiveness
-
-### Debug Tools
-- **Browser Developer Tools** for frontend debugging
-- **Supabase Dashboard** for database and storage inspection
-- **Next.js Development Server** for server-side logging
-- **Claude Code** for AI-assisted debugging and problem solving
-
-## 📚 Additional Resources
-
-### Documentation
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Supabase Documentation](https://supabase.com/docs)
-- [OpenAI API Documentation](https://platform.openai.com/docs)
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
-
-### Community
-- [GitHub Repository Issues](https://github.com/your-username/drift/issues)
-- [Supabase Discord Community](https://discord.supabase.com/)
-- [Next.js Discord Community](https://nextjs.org/discord)
 
 ---
 

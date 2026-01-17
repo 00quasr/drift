@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { Search, Menu, X, Bell, User, LogOut, ArrowRight } from 'lucide-react'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
@@ -25,9 +25,37 @@ export default function Header() {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState({ venues: [], events: [], artists: [] })
   const [isSearching, setIsSearching] = useState(false)
+  const searchRef = useRef<HTMLDivElement>(null)
+  const searchInputRef = useRef<HTMLInputElement>(null)
   const pathname = usePathname()
   const router = useRouter()
   const { user, signOut, loading } = useAuth()
+
+  // Close search when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setSearchOpen(false)
+      }
+    }
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setSearchOpen(false)
+        setSearchQuery('')
+      }
+    }
+
+    if (searchOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+      document.addEventListener('keydown', handleEscape)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('keydown', handleEscape)
+    }
+  }, [searchOpen])
 
   // Debounced search function
   const searchContent = useCallback(async (query: string) => {
@@ -40,12 +68,15 @@ export default function Header() {
     try {
       const response = await fetch(`/api/search?q=${encodeURIComponent(query)}&limit=6`)
       const data = await response.json()
-      
-      if (data.success) {
-        setSearchResults(data.data)
+
+      if (data.success && data.data?.results) {
+        setSearchResults(data.data.results)
+      } else {
+        setSearchResults({ venues: [], events: [], artists: [] })
       }
     } catch (error) {
       console.error('Search error:', error)
+      setSearchResults({ venues: [], events: [], artists: [] })
     } finally {
       setIsSearching(false)
     }
@@ -466,44 +497,44 @@ export default function Header() {
       <AnimatePresence>
         {searchOpen && (
           <motion.div
+            ref={searchRef}
             className="absolute top-full left-0 right-0 bg-black border-b border-white/10 shadow-2xl"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
           >
-            <div className="max-w-7xl mx-auto px-6 py-4">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/60 w-5 h-5" />
+                <Search className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-white/60 w-5 h-5" />
                 <input
+                  ref={searchInputRef}
                   type="text"
                   placeholder="Search events, venues, artists..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-4 text-base bg-white/[0.03] backdrop-blur-sm border border-white/[0.08] rounded-lg text-white placeholder-white/60 focus:outline-none focus:border-white/[0.2] focus:bg-white/[0.05] transition-all duration-300"
+                  className="w-full pl-10 sm:pl-12 pr-4 py-3 sm:py-4 text-base bg-white/[0.03] backdrop-blur-sm border border-white/[0.08] rounded-lg text-white placeholder-white/60 focus:outline-none focus:border-white/[0.2] focus:bg-white/[0.05] transition-all duration-300"
                   autoFocus
                 />
               </div>
-              
-              {/* Search Results */}
-              {searchQuery && (
-                <div className="mt-6 space-y-4 max-h-96 overflow-y-auto">
+
+              {/* Search Results - Only show when there are actual results */}
+              {searchQuery && (searchResults.venues.length > 0 || searchResults.events.length > 0 || searchResults.artists.length > 0 || isSearching) && (
+                <div className="mt-4 sm:mt-6 space-y-4 max-h-[60vh] sm:max-h-96 overflow-y-auto">
                   {/* Venues */}
                   {searchResults.venues.length > 0 && (
                     <div>
-                      <H3 className="text-white/60 text-sm mb-3">VENUES</H3>
-                      <div className="space-y-2">
+                      <div className="text-white/50 text-xs font-medium tracking-wider mb-2 px-1">VENUES</div>
+                      <div className="space-y-1">
                         {searchResults.venues.map((venue: any) => (
-                          <motion.button
+                          <button
                             key={venue.id}
-                            onClick={() => handleSearchSelect('venue', venue.slug)}
-                            className="w-full text-left p-4 bg-white/[0.03] hover:bg-white/[0.06] rounded-lg border border-white/[0.06] hover:border-white/[0.12] backdrop-blur-sm transition-all duration-300"
-                            whileHover={{ scale: 1.01 }}
-                            whileTap={{ scale: 0.99 }}
+                            onClick={() => handleSearchSelect('venue', venue.slug || venue.id)}
+                            className="w-full text-left p-3 sm:p-4 hover:bg-white/[0.04] rounded-lg transition-colors duration-200"
                           >
-                            <div className="font-medium text-white">{venue.name}</div>
-                            <div className="text-white/60 text-sm">{venue.location} • {venue.type}</div>
-                          </motion.button>
+                            <div className="font-medium text-white text-sm sm:text-base">{venue.name}</div>
+                            <div className="text-white/50 text-xs sm:text-sm">{venue.city}{venue.country ? `, ${venue.country}` : ''}</div>
+                          </button>
                         ))}
                       </div>
                     </div>
@@ -512,21 +543,19 @@ export default function Header() {
                   {/* Events */}
                   {searchResults.events.length > 0 && (
                     <div>
-                      <H3 className="text-white/60 text-sm mb-3">EVENTS</H3>
-                      <div className="space-y-2">
+                      <div className="text-white/50 text-xs font-medium tracking-wider mb-2 px-1">EVENTS</div>
+                      <div className="space-y-1">
                         {searchResults.events.map((event: any) => (
-                          <motion.button
+                          <button
                             key={event.id}
-                            onClick={() => handleSearchSelect('event', event.slug)}
-                            className="w-full text-left p-4 bg-white/[0.03] hover:bg-white/[0.06] rounded-lg border border-white/[0.06] hover:border-white/[0.12] backdrop-blur-sm transition-all duration-300"
-                            whileHover={{ scale: 1.01 }}
-                            whileTap={{ scale: 0.99 }}
+                            onClick={() => handleSearchSelect('event', event.slug || event.id)}
+                            className="w-full text-left p-3 sm:p-4 hover:bg-white/[0.04] rounded-lg transition-colors duration-200"
                           >
-                            <div className="font-medium text-white">{event.title}</div>
-                            <div className="text-white/60 text-sm">
-                              {new Date(event.start_date).toLocaleDateString()} • {event.venue?.name}
+                            <div className="font-medium text-white text-sm sm:text-base">{event.title}</div>
+                            <div className="text-white/50 text-xs sm:text-sm">
+                              {event.start_date ? new Date(event.start_date).toLocaleDateString() : ''}{event.venue?.name ? ` • ${event.venue.name}` : ''}
                             </div>
-                          </motion.button>
+                          </button>
                         ))}
                       </div>
                     </div>
@@ -535,36 +564,41 @@ export default function Header() {
                   {/* Artists */}
                   {searchResults.artists.length > 0 && (
                     <div>
-                      <H3 className="text-white/60 text-sm mb-3">ARTISTS</H3>
-                      <div className="space-y-2">
+                      <div className="text-white/50 text-xs font-medium tracking-wider mb-2 px-1">ARTISTS</div>
+                      <div className="space-y-1">
                         {searchResults.artists.map((artist: any) => (
-                          <motion.button
+                          <button
                             key={artist.id}
-                            onClick={() => handleSearchSelect('artist', artist.slug)}
-                            className="w-full text-left p-4 bg-white/[0.03] hover:bg-white/[0.06] rounded-lg border border-white/[0.06] hover:border-white/[0.12] backdrop-blur-sm transition-all duration-300"
-                            whileHover={{ scale: 1.01 }}
-                            whileTap={{ scale: 0.99 }}
+                            onClick={() => handleSearchSelect('artist', artist.slug || artist.id)}
+                            className="w-full text-left p-3 sm:p-4 hover:bg-white/[0.04] rounded-lg transition-colors duration-200"
                           >
-                            <div className="font-medium text-white">{artist.name}</div>
-                            <div className="text-white/60 text-sm">
-                              {artist.genres?.join(', ')} • {artist.origin}
+                            <div className="font-medium text-white text-sm sm:text-base">{artist.name}</div>
+                            <div className="text-white/50 text-xs sm:text-sm">
+                              {artist.genres?.slice(0, 2).join(', ')}{artist.city ? ` • ${artist.city}` : ''}
                             </div>
-                          </motion.button>
+                          </button>
                         ))}
                       </div>
                     </div>
                   )}
 
-                  {/* No Results */}
-                  {!isSearching && searchQuery && 
-                   searchResults.venues.length === 0 && 
-                   searchResults.events.length === 0 && 
-                   searchResults.artists.length === 0 && (
-                    <div className="text-center py-8">
-                      <div className="text-white/60">NO RESULTS FOUND</div>
-                      <div className="text-white/40 text-sm mt-1">TRY DIFFERENT KEYWORDS</div>
+                  {/* Loading State */}
+                  {isSearching && (
+                    <div className="text-center py-6 sm:py-8">
+                      <div className="text-white/60 text-sm">SEARCHING...</div>
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* No Results - Show only when done searching and no results */}
+              {searchQuery && !isSearching &&
+               searchResults.venues.length === 0 &&
+               searchResults.events.length === 0 &&
+               searchResults.artists.length === 0 && (
+                <div className="mt-4 sm:mt-6 text-center py-6 sm:py-8">
+                  <div className="text-white/60 text-sm">NO RESULTS FOUND</div>
+                  <div className="text-white/40 text-xs mt-1">TRY DIFFERENT KEYWORDS</div>
                 </div>
               )}
             </div>

@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, ChevronLeft, ChevronRight, Download, ZoomIn, ZoomOut } from 'lucide-react'
 import Image from 'next/image'
-import ClassicLoader from '@/components/ui/loader'
 
 interface ImageViewerProps {
   images: string[]
@@ -193,12 +192,7 @@ export default function ImageViewer({
             className={`relative max-w-[90vw] max-h-[80vh] ${isZoomed ? 'max-w-none max-h-none' : ''}`}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Loading spinner */}
-            {!imageLoaded && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded">
-                <ClassicLoader />
-              </div>
-            )}
+            {/* Loading state - simple fade */}
 
             <Image
               src={images[currentIndex]}

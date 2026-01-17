@@ -19,7 +19,6 @@ import { useAuth } from '@/contexts/AuthContext'
 import { ReviewModal } from '@/components/reviews/ReviewModal'
 import { favoritesService } from '@/lib/services/favorites'
 import { H1, H2, H3 } from "@/components/ui/typography"
-import ClassicLoader from '@/components/ui/loader'
 
 interface VenuePageProps {
   params: { id: string }
@@ -104,11 +103,7 @@ export default function VenuePage({ params }: VenuePageProps) {
   }
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <ClassicLoader />
-      </div>
-    )
+    return null
   }
 
   if (!venue) {

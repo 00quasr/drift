@@ -6,7 +6,6 @@ import { Card } from '@/components/ui/card'
 import { H1, H2, H3, H4 } from '@/components/ui/typography'
 import Link from 'next/link'
 import Image from 'next/image'
-import ClassicLoader from '@/components/ui/loader'
 
 interface Label {
   id: string
@@ -136,16 +135,7 @@ export default function LabelsPage() {
   })
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-neutral-950 text-white flex items-center justify-center">
-        <div className="flex flex-col items-center justify-center space-y-6">
-          <ClassicLoader />
-          <p className="text-white/50 font-bold tracking-wider uppercase text-center">
-            LOADING LABELS & COLLECTIVES...
-          </p>
-        </div>
-      </div>
-    )
+    return null
   }
 
   if (error) {

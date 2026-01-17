@@ -20,7 +20,6 @@ import {
   CheckCircle2,
   X
 } from 'lucide-react'
-import ClassicLoader from '@/components/ui/loader'
 import { UserRole } from '@/lib/auth'
 import { verificationService, CreateVerificationRequest } from '@/lib/services/verification'
 
@@ -377,10 +376,7 @@ export function VerificationForm({ requestedRole, onSuccess, onCancel }: Verific
             className="px-8 h-12 bg-white text-black hover:bg-cyan-400 font-bold tracking-wider uppercase transition-all duration-200 disabled:opacity-50"
           >
             {isSubmitting ? (
-              <div className="flex items-center gap-2">
-                <div className="scale-50"><ClassicLoader /></div>
-                SUBMITTING...
-              </div>
+              'SUBMITTING...'
             ) : (
               <div className="flex items-center gap-2">
                 <Upload className="w-4 h-4" />

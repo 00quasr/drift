@@ -21,7 +21,6 @@ import {
 import Link from 'next/link'
 import Image from 'next/image'
 import { favoritesService } from '@/lib/services/favorites'
-import ClassicLoader from '@/components/ui/loader'
 import { H1, H3 } from "@/components/ui/typography"
 
 interface Favorite {
@@ -219,41 +218,7 @@ export default function FavoritesPage() {
   }
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-black text-white pt-24 pb-12">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold tracking-widest uppercase mb-4">MY FAVORITES</h1>
-            <p className="text-white/60 font-medium tracking-wider uppercase">Loading your collection...</p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            {[1, 2, 3, 4].map((i) => (
-              <Card key={i} className="bg-white/5 border border-white/20 p-4">
-                <div className="animate-pulse">
-                  <div className="h-4 bg-white/20 rounded mb-2"></div>
-                  <div className="h-8 bg-white/20 rounded"></div>
-                </div>
-              </Card>
-            ))}
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <Card key={i} className="bg-white/5 border border-white/20">
-                <div className="animate-pulse">
-                  <div className="h-48 bg-white/20 rounded-t"></div>
-                  <div className="p-4">
-                    <div className="h-4 bg-white/20 rounded mb-2"></div>
-                    <div className="h-3 bg-white/10 rounded"></div>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </div>
-    )
+    return null
   }
 
   return (

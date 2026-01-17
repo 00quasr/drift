@@ -22,7 +22,6 @@ import {
 } from 'lucide-react'
 import { uploadArtistImage, moderateImage, validateImageFile } from '@/lib/services/storage'
 import ImageGallery from '@/components/ui/ImageGallery'
-import ClassicLoader from '@/components/ui/loader'
 
 interface ArtistFormData {
   name: string
@@ -355,11 +354,7 @@ export default function ArtistProfilePage() {
   }
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <ClassicLoader />
-      </div>
-    )
+    return null
   }
 
   if (!user || user.role !== 'artist') {

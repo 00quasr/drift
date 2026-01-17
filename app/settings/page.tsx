@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { motion } from 'framer-motion'
-import ClassicLoader from '@/components/ui/loader'
 import {
   Settings,
   User,
@@ -121,11 +120,7 @@ export default function SettingsPage() {
   ]
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <ClassicLoader />
-      </div>
-    )
+    return null
   }
 
   if (!user) {

@@ -8,7 +8,6 @@ import { ProfileEditForm } from '@/components/profile/ProfileEditForm'
 import { Card } from '@/components/ui/card'
 import { ArrowLeft, Settings } from 'lucide-react'
 import Link from 'next/link'
-import ClassicLoader from '@/components/ui/loader'
 import { H1 } from "@/components/ui/typography"
 
 export default function ProfileEditPage() {
@@ -65,16 +64,7 @@ export default function ProfileEditPage() {
   }
 
   if (loading || isLoading) {
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="flex flex-col items-center justify-center space-y-6">
-          <ClassicLoader />
-          <p className="text-white/80 font-bold tracking-wider uppercase text-center">
-            LOADING PROFILE...
-          </p>
-        </div>
-      </div>
-    )
+    return null
   }
 
   if (!user) {

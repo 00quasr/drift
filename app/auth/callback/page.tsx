@@ -3,7 +3,6 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/auth'
-import ClassicLoader from '@/components/ui/loader'
 
 export default function AuthCallback() {
   const router = useRouter()
@@ -12,7 +11,7 @@ export default function AuthCallback() {
     const handleAuthCallback = async () => {
       try {
         const { data, error } = await supabase.auth.getSession()
-        
+
         if (error) {
           console.error('Auth callback error:', error)
           router.push('/auth/login?error=oauth_error')
@@ -69,14 +68,5 @@ export default function AuthCallback() {
     handleAuthCallback()
   }, [router])
 
-  return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center">
-      <div className="flex flex-col items-center justify-center space-y-6">
-        <ClassicLoader />
-        <p className="text-white/80 font-bold tracking-wider uppercase text-center">
-          PROCESSING AUTHENTICATION...
-        </p>
-      </div>
-    </div>
-  )
+  return null
 }

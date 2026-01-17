@@ -8,7 +8,7 @@ import { EntityViews } from '@/components/ui/entity-views'
 import { ViewSwitcher, ViewMode } from '@/components/ui/view-switcher'
 import { H1, H2 } from '@/components/ui/typography'
 import { getArtists } from '@/lib/services/artists'
-import ClassicLoader from '@/components/ui/loader'
+import { getFallbackImage, isValidImageUrl } from '@/lib/utils/imageUtils'
 
 export default function ArtistsPage() {
   const [artists, setArtists] = useState<any[]>([])
@@ -64,18 +64,7 @@ export default function ArtistsPage() {
   })
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-neutral-950 pt-24 pb-16">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center py-32">
-            <div className="mb-8 flex justify-center">
-              <ClassicLoader />
-            </div>
-            <p className="text-white/50 font-bold tracking-widest uppercase text-sm">LOADING ARTISTS...</p>
-          </div>
-        </div>
-      </div>
-    )
+    return null
   }
 
   return (

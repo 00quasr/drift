@@ -16,7 +16,6 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { ReviewModal } from '@/components/reviews/ReviewModal'
 import { favoritesService } from '@/lib/services/favorites'
-import ClassicLoader from '@/components/ui/loader'
 import { H1, H2, H3 } from "@/components/ui/typography"
 
 interface EventPageProps {
@@ -102,11 +101,7 @@ export default function EventPage({ params }: EventPageProps) {
   }
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <ClassicLoader />
-      </div>
-    )
+    return null
   }
 
   if (!event) {

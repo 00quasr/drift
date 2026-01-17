@@ -172,33 +172,7 @@ export const ProfileFavorites: React.FC<ProfileFavoritesProps> = ({
   )
 
   if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((i) => (
-            <Card key={i} className="bg-white/5 border border-white/20 p-4">
-              <div className="animate-pulse">
-                <div className="h-4 bg-white/20 rounded mb-2"></div>
-                <div className="h-8 bg-white/20 rounded"></div>
-              </div>
-            </Card>
-          ))}
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Card key={i} className="bg-white/5 border border-white/20">
-              <div className="animate-pulse">
-                <div className="h-48 bg-white/20 rounded-t"></div>
-                <div className="p-4">
-                  <div className="h-4 bg-white/20 rounded mb-2"></div>
-                  <div className="h-3 bg-white/10 rounded"></div>
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
-      </div>
-    )
+    return null
   }
 
   return (

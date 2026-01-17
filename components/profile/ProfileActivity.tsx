@@ -143,24 +143,7 @@ export const ProfileActivity: React.FC<ProfileActivityProps> = ({
   }
 
   if (isLoading) {
-    return (
-      <div className="space-y-4">
-        {[1, 2, 3, 4, 5].map((i) => (
-          <Card key={i} className="bg-white/5 border border-white/20 p-6">
-            <div className="animate-pulse">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-white/20 rounded"></div>
-                <div className="flex-1">
-                  <div className="h-4 bg-white/20 rounded mb-2"></div>
-                  <div className="h-3 bg-white/10 rounded w-1/2"></div>
-                </div>
-                <div className="h-3 bg-white/10 rounded w-20"></div>
-              </div>
-            </div>
-          </Card>
-        ))}
-      </div>
-    )
+    return null
   }
 
   if (activities.length === 0) {

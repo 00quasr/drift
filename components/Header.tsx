@@ -7,7 +7,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { usePathname, useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import Image from 'next/image'
-import ClassicLoader from '@/components/ui/loader'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -244,9 +243,7 @@ export default function Header() {
             
             {/* User Section */}
             <div className="hidden md:flex items-center space-x-3">
-              {loading ? (
-                <ClassicLoader />
-              ) : user ? (
+              {loading ? null : user ? (
                 <div
                   className="relative"
                   onMouseEnter={() => setUserMenuOpen(true)}
@@ -486,13 +483,6 @@ export default function Header() {
                   className="w-full pl-12 pr-4 py-4 text-base bg-white/[0.03] backdrop-blur-sm border border-white/[0.08] rounded-lg text-white placeholder-white/60 focus:outline-none focus:border-white/[0.2] focus:bg-white/[0.05] transition-all duration-300"
                   autoFocus
                 />
-                {isSearching && (
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                    <div className="scale-50">
-                      <ClassicLoader />
-                    </div>
-                  </div>
-                )}
               </div>
               
               {/* Search Results */}

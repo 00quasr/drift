@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Search, Calendar, MapPin, Users, Clock, SlidersHorizontal, Zap, Radio } from 'lucide-react'
+import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { EntityCard } from '@/components/ui/entity-card'
@@ -42,14 +42,14 @@ export default function EventsPage() {
 
   // Filter events based on search and filters
   const filteredEvents = events.filter(event => {
-    const matchesSearch = !searchTerm || 
+    const matchesSearch = !searchTerm ||
       event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       event.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       event.venue?.name?.toLowerCase().includes(searchTerm.toLowerCase())
-    
-    const matchesGenre = selectedGenre === 'all' || 
+
+    const matchesGenre = selectedGenre === 'all' ||
       event.genres?.includes(selectedGenre)
-    
+
     const isUpcoming = new Date(event.start_date) > new Date()
     const matchesTimeFilter = showUpcoming ? isUpcoming : !isUpcoming
 
@@ -58,13 +58,13 @@ export default function EventsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black pt-24 pb-16">
+      <div className="min-h-screen bg-neutral-950 pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center py-32">
             <div className="mb-8 flex justify-center">
               <ClassicLoader />
             </div>
-            <p className="text-white/80 font-bold tracking-widest uppercase text-sm">LOADING EVENTS...</p>
+            <p className="text-white/50 font-bold tracking-widest uppercase text-sm">LOADING EVENTS...</p>
           </div>
         </div>
       </div>
@@ -72,30 +72,48 @@ export default function EventsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black pt-24 pb-16">
-      <div className="max-w-7xl mx-auto px-6">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <H1 variant="display" className="text-5xl md:text-7xl mb-6 text-white">
-            ELECTRONIC MUSIC EVENTS
-          </H1>
-          <p className="text-white/80 text-lg max-w-3xl mx-auto font-medium tracking-wider uppercase">
-            DISCOVER THE HOTTEST ELECTRONIC MUSIC EVENTS HAPPENING AROUND THE WORLD
-          </p>
-        </div>
+    <div className="min-h-screen bg-neutral-950 text-white">
+      {/* Hero Section */}
+      <section className="w-full pt-24 pb-16 bg-neutral-950">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex items-start justify-between">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <H1 variant="display" className="text-5xl md:text-7xl mb-6 text-white">
+                EVENTS
+              </H1>
+              <p className="text-white/50 text-sm lg:text-base font-medium max-w-2xl tracking-wider uppercase">
+                DISCOVER THE HOTTEST ELECTRONIC MUSIC EVENTS HAPPENING AROUND THE WORLD
+              </p>
+            </motion.div>
 
-        {/* Search and Filters */}
-        <div className="mb-12">
-          <div className="flex flex-col lg:flex-row gap-6 mb-8">
+            <motion.div
+              className="hidden lg:block"
+              initial={{ opacity: 0, scaleY: 0 }}
+              animate={{ opacity: 1, scaleY: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              <div className="w-px h-24 bg-gradient-to-b from-white/40 to-transparent" />
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Filters Section */}
+      <section className="w-full py-8 bg-neutral-950">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex flex-col lg:flex-row gap-4 mb-6">
             {/* Search */}
-            <div className="flex-1 relative">
-              <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-white w-6 h-6" />
+            <div className="flex-1">
               <Input
                 type="text"
                 placeholder="SEARCH EVENTS..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                                  className="pl-16 pr-6 py-4 bg-black border-2 border-white/30 text-white placeholder-white/60 focus:border-white transition-colors duration-200 h-14 text-lg font-bold tracking-wider uppercase"
+                className="w-full px-6 py-4 bg-neutral-950 border border-white/20 text-white placeholder-white/40 focus:border-white/40 transition-colors duration-200 h-12 text-sm font-bold tracking-wider uppercase"
               />
             </div>
 
@@ -103,30 +121,29 @@ export default function EventsPage() {
             <Button
               onClick={() => setFiltersOpen(!filtersOpen)}
               variant="outline"
-              className="border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/60 font-bold tracking-wider uppercase px-6 h-14"
+              className="border border-white/20 text-white/60 hover:text-white hover:bg-white/5 hover:border-white/40 font-bold tracking-wider uppercase px-6 h-12 text-xs"
             >
-              <SlidersHorizontal className="w-5 h-5 mr-2" />
               FILTERS
             </Button>
           </div>
 
           {/* Expandable Filters */}
           {filtersOpen && (
-            <div className="bg-white/5 border border-white/20 p-6 mb-8">
+            <div className="bg-black/50 border border-white/10 p-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Time Filter */}
                 <div>
-                  <label className="block text-white font-bold tracking-widest uppercase text-sm mb-3">
+                  <label className="block text-white/50 font-bold tracking-widest uppercase text-xs mb-3">
                     TIME
                   </label>
                   <div className="flex gap-3">
                     <Button
                       onClick={() => setShowUpcoming(true)}
                       variant={showUpcoming ? 'default' : 'outline'}
-                      className={`flex-1 font-bold tracking-wider uppercase text-sm ${
-                        showUpcoming 
-                          ? 'bg-white text-black hover:bg-white/90' 
-                          : 'border-white/30 text-white hover:bg-white/10'
+                      className={`flex-1 font-bold tracking-wider uppercase text-xs ${
+                        showUpcoming
+                          ? 'bg-white text-black hover:bg-white/90'
+                          : 'border-white/20 text-white/60 hover:text-white hover:bg-white/5'
                       }`}
                     >
                       UPCOMING
@@ -134,10 +151,10 @@ export default function EventsPage() {
                     <Button
                       onClick={() => setShowUpcoming(false)}
                       variant={!showUpcoming ? 'default' : 'outline'}
-                      className={`flex-1 font-bold tracking-wider uppercase text-sm ${
-                        !showUpcoming 
-                          ? 'bg-white text-black hover:bg-white/90' 
-                          : 'border-white/30 text-white hover:bg-white/10'
+                      className={`flex-1 font-bold tracking-wider uppercase text-xs ${
+                        !showUpcoming
+                          ? 'bg-white text-black hover:bg-white/90'
+                          : 'border-white/20 text-white/60 hover:text-white hover:bg-white/5'
                       }`}
                     >
                       PAST
@@ -147,13 +164,13 @@ export default function EventsPage() {
 
                 {/* Genre Filter */}
                 <div>
-                  <label className="block text-white font-bold tracking-widest uppercase text-sm mb-3">
+                  <label className="block text-white/50 font-bold tracking-widest uppercase text-xs mb-3">
                     GENRE
                   </label>
                   <select
                     value={selectedGenre}
                     onChange={(e) => setSelectedGenre(e.target.value)}
-                    className="w-full px-4 py-3 bg-black border-2 border-white/30 text-white focus:border-white transition-colors duration-200 font-bold tracking-wider uppercase text-sm"
+                    className="w-full px-4 py-3 bg-black border border-white/20 text-white focus:border-white/40 transition-colors duration-200 font-bold tracking-wider uppercase text-xs"
                   >
                     <option value="all">ALL GENRES</option>
                     {allGenres.map((genre) => (
@@ -171,7 +188,7 @@ export default function EventsPage() {
                       setShowUpcoming(true)
                     }}
                     variant="outline"
-                    className="w-full border-white/30 text-white hover:bg-white/10 hover:border-white/60 font-bold tracking-wider uppercase"
+                    className="w-full border-white/20 text-white/60 hover:text-white hover:bg-white/5 hover:border-white/40 font-bold tracking-wider uppercase text-xs"
                   >
                     CLEAR ALL
                   </Button>
@@ -180,76 +197,94 @@ export default function EventsPage() {
             </div>
           )}
         </div>
+      </section>
 
-        {/* Results */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
+      {/* Results Section */}
+      <section className="w-full py-16 lg:py-24 bg-neutral-950">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex items-center justify-between mb-12">
             <div>
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-3 h-3 bg-white animate-pulse" />
-                <span className="text-white font-bold tracking-widest uppercase text-sm">
-                  {showUpcoming ? 'LIVE NOW' : 'ARCHIVE'}
-                </span>
-              </div>
+              <span className="text-white/50 font-bold tracking-widest uppercase text-xs mb-4 block">
+                {showUpcoming ? 'UPCOMING' : 'ARCHIVE'}
+              </span>
               <H2 variant="display" className="text-white">
-                {showUpcoming ? 'UPCOMING EVENTS' : 'PAST EVENTS'}
+                {showUpcoming ? 'EVENTS' : 'PAST EVENTS'}
               </H2>
             </div>
-            <ViewSwitcher 
+            <ViewSwitcher
               viewMode={viewMode}
               onViewModeChange={setViewMode}
             />
           </div>
-        </div>
 
-        {/* Events Views */}
-        {filteredEvents.length > 0 ? (
-          <EntityViews
-            entities={filteredEvents.map(event => ({
-              ...event,
-              name: event.title,
-              title: event.title,
-              start_date: event.start_date,
-              artist: event.artists?.[0]?.name || 'Various Artists',
-              venue: event.venue?.name || 'TBA',
-              city: event.venue?.city,
-              country: event.venue?.country
-              // Let EntityViews handle image fallback logic
-            }))}
-            viewMode={viewMode}
-            entityType="event"
-          />
-        ) : (
-          <div className="text-center py-32">
-            <div className="w-16 h-16 bg-white border-2 border-white mx-auto mb-8 relative">
-              <div className="absolute inset-2 bg-black" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Calendar className="w-8 h-8 text-white" />
-              </div>
+          {/* Events Views */}
+          {filteredEvents.length > 0 ? (
+            <EntityViews
+              entities={filteredEvents.map(event => ({
+                ...event,
+                name: event.title,
+                title: event.title,
+                start_date: event.start_date,
+                artist: event.artists?.[0]?.name || 'Various Artists',
+                venue: event.venue?.name || 'TBA',
+                city: event.venue?.city,
+                country: event.venue?.country
+              }))}
+              viewMode={viewMode}
+              entityType="event"
+            />
+          ) : (
+            <div className="text-center py-32">
+              <H3 variant="display" className="mb-4 text-white/60">
+                NO EVENTS FOUND
+              </H3>
+              <p className="text-white/40 max-w-md mx-auto font-medium tracking-wider uppercase text-sm">
+                {searchTerm || selectedGenre !== 'all'
+                  ? 'TRY ADJUSTING YOUR SEARCH CRITERIA OR FILTERS'
+                  : 'NO EVENTS AVAILABLE AT THE MOMENT'
+                }
+              </p>
+              {(searchTerm || selectedGenre !== 'all') && (
+                <Button
+                  onClick={() => {
+                    setSearchTerm('')
+                    setSelectedGenre('all')
+                  }}
+                  className="mt-6 bg-white text-black hover:bg-white/90 font-bold tracking-wider uppercase px-8 text-xs"
+                >
+                  CLEAR FILTERS
+                </Button>
+              )}
             </div>
-            <H3 variant="display" className="mb-4 text-white">
-              NO EVENTS FOUND
-            </H3>
-            <p className="text-white/80 max-w-md mx-auto font-medium tracking-wider uppercase text-sm">
-              {searchTerm || selectedGenre !== 'all'
-                ? 'TRY ADJUSTING YOUR SEARCH CRITERIA OR FILTERS'
-                : 'NO EVENTS AVAILABLE AT THE MOMENT'
-              }
+          )}
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="w-full py-16 lg:py-24 bg-neutral-950">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center">
+            <H2 variant="display" className="mb-4 text-white">
+              HOSTING AN EVENT?
+            </H2>
+            <p className="text-white/40 mb-8 max-w-md mx-auto text-sm tracking-wider uppercase">
+              List your event on Drift and reach thousands of electronic music fans
             </p>
-            {(searchTerm || selectedGenre !== 'all') && (
-              <Button
-                onClick={() => {
-                  setSearchTerm('')
-                  setSelectedGenre('all')
-                }}
-                className="mt-6 bg-white text-black hover:bg-white/90 border-2 border-white hover:border-white/60 font-bold tracking-wider uppercase px-8"
-              >
-                CLEAR FILTERS
-              </Button>
-            )}
+            <div className="flex gap-4 justify-center">
+              <a href="/events/create">
+                <button className="bg-white text-black hover:bg-white/90 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200 text-xs">
+                  CREATE EVENT
+                </button>
+              </a>
+              <a href="/venues">
+                <button className="border border-white/20 text-white hover:bg-white/10 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200 text-xs">
+                  FIND VENUES
+                </button>
+              </a>
+            </div>
           </div>
-        )}
-      </div>
+        </div>
+      </section>
     </div>
   )
 } 

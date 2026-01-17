@@ -1,12 +1,12 @@
 'use client'
 
 import { Suspense } from 'react'
-import { Search, Zap, Radar } from 'lucide-react'
+import { motion } from 'framer-motion'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { EntityCard } from '@/components/ui/entity-card'
 import { H1, H2 } from '@/components/ui/typography'
-import { getUpcomingEvents } from '@/lib/services/events'
+import { getUpcomingEvents, getTrendingEvents } from '@/lib/services/events'
 import { getTrendingVenues } from '@/lib/services/venues'
 import { getTopRatedArtists } from '@/lib/services/artists'
 import { getFallbackImage, isValidImageUrl } from '@/lib/utils/imageUtils'
@@ -15,21 +15,23 @@ import ClassicLoader from '@/components/ui/loader'
 const genreTags = ['ALL', 'TECHNO', 'HOUSE', 'TRANCE', 'DRUM & BASS', 'DUBSTEP', 'AMBIENT', 'MINIMAL', 'PROGRESSIVE']
 
 async function ExplorePage() {
-  const [events, venues, artists] = await Promise.all([
+  const [events, trendingEvents, venues, artists] = await Promise.all([
     getUpcomingEvents(12),
+    getTrendingEvents(8),
     getTrendingVenues(12),
     getTopRatedArtists(12)
   ])
 
   // Filter out empty results
   const hasEvents = events && events.length > 0
-  const hasVenues = venues && venues.length > 0  
+  const hasTrendingEvents = trendingEvents && trendingEvents.length > 0
+  const hasVenues = venues && venues.length > 0
   const hasArtists = artists && artists.length > 0
 
   // If no data, show loading state
   if (!hasEvents && !hasVenues && !hasArtists) {
     return (
-      <div className="min-h-screen bg-black pt-24 pb-16">
+      <div className="min-h-screen bg-neutral-950 pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center py-32">
             <div className="mb-8 flex justify-center">
@@ -49,41 +51,57 @@ async function ExplorePage() {
   }
 
   return (
-    <div className="min-h-screen bg-black pt-24 pb-16">
-      <div className="max-w-7xl mx-auto px-6">
-        {/* Search Header */}
-        <div className="mb-16">
-          <div className="max-w-4xl mx-auto text-center mb-12">
-            <H1 variant="display" className="text-5xl md:text-7xl mb-6 text-white">
-              EXPLORE
-            </H1>
-            <p className="text-white/80 text-lg font-medium tracking-wider uppercase">
-              DISCOVER THE BEST ELECTRONIC MUSIC EXPERIENCES AROUND THE WORLD
-            </p>
-          </div>
+    <div className="min-h-screen bg-neutral-950 text-white">
+      {/* Hero Section */}
+      <section className="w-full pt-24 pb-16 bg-neutral-950">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex items-start justify-between">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <H1 variant="display" className="text-5xl md:text-7xl mb-6 text-white">
+                EXPLORE
+              </H1>
+              <p className="text-white/50 text-sm lg:text-base font-medium max-w-2xl tracking-wider uppercase">
+                DISCOVER THE BEST ELECTRONIC MUSIC EXPERIENCES AROUND THE WORLD
+              </p>
+            </motion.div>
 
-          <div className="relative max-w-3xl mx-auto">
-            <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-white w-6 h-6" />
+            <motion.div
+              className="hidden lg:block"
+              initial={{ opacity: 0, scaleY: 0 }}
+              animate={{ opacity: 1, scaleY: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              <div className="w-px h-24 bg-gradient-to-b from-white/40 to-transparent" />
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Search & Filters Section */}
+      <section className="w-full pb-8 bg-neutral-950">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="relative max-w-3xl">
             <Input
               type="text"
               placeholder="SEARCH EVENTS, VENUES, ARTISTS..."
-                              className="pl-16 pr-6 py-4 bg-black border-2 border-white/30 text-white placeholder-white/60 focus:border-white transition-colors duration-200 h-16 text-lg font-bold tracking-wider uppercase"
+              className="pl-6 pr-6 py-4 bg-black border border-white/20 text-white placeholder-white/40 focus:border-white/40 transition-colors duration-200 h-14 text-sm font-bold tracking-wider uppercase"
             />
-            <div className="absolute right-6 top-1/2 transform -translate-y-1/2">
-              <div className="w-3 h-3 bg-white animate-pulse" />
-            </div>
           </div>
 
           {/* Genre Filter Pills */}
-          <div className="flex flex-wrap justify-center gap-3 mt-8">
+          <div className="flex flex-wrap gap-2 mt-8">
             {genreTags.map((genre) => (
               <Badge
                 key={genre}
                 variant={genre === 'ALL' ? 'default' : 'secondary'}
-                className={`cursor-pointer transition-all duration-200 px-4 py-2 font-bold tracking-wider uppercase ${
+                className={`cursor-pointer transition-all duration-200 px-4 py-2 text-xs font-bold tracking-wider uppercase ${
                   genre === 'ALL'
-                    ? 'bg-white text-black hover:bg-cyan-400 border-2 border-white hover:border-cyan-400'
-                    : 'bg-white/10 text-white/80 hover:bg-white/20 border border-white/30 hover:border-white/60'
+                    ? 'bg-white text-black hover:bg-white/90 border border-white'
+                    : 'bg-transparent text-white/60 hover:text-white border border-white/20 hover:border-white/40'
                 }`}
               >
                 {genre}
@@ -91,12 +109,13 @@ async function ExplorePage() {
             ))}
           </div>
         </div>
+      </section>
 
-        {/* Featured Content Hero Section */}
-        <div className="mb-24">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-3 h-3 bg-white animate-pulse" />
-            <span className="text-white/80 font-bold tracking-widest uppercase text-sm">FEATURED</span>
+      {/* Featured Content Section */}
+      <section className="w-full py-16 lg:py-24 bg-neutral-950">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="mb-12">
+            <span className="text-white/50 font-bold tracking-widest uppercase text-xs">FEATURED</span>
           </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 md:gap-6 h-auto lg:h-[600px]">
@@ -160,31 +179,73 @@ async function ExplorePage() {
             )}
           </div>
         </div>
+      </section>
 
-        {/* Events Section */}
-        {hasEvents && events.length > 0 && (
-          <section className="mb-24">
+      {/* Trending Events Section */}
+      {hasTrendingEvents && (
+        <section className="w-full py-16 lg:py-24 bg-neutral-950">
+          <div className="max-w-7xl mx-auto px-6">
             <div className="flex items-center justify-between mb-12">
               <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-3 h-3 bg-yellow-400 animate-pulse" />
-                  <span className="text-yellow-400 font-bold tracking-widest uppercase text-sm">LIVE</span>
-                </div>
+                <span className="text-white/50 font-bold tracking-widest uppercase text-xs mb-4 block">TRENDING</span>
                 <H2 variant="display" className="text-3xl text-white">
-                  UPCOMING EVENTS
+                  EVENTS
                 </H2>
               </div>
-              <a 
-                href="/events" 
-                className="text-white/80 hover:text-cyan-400 transition-colors font-bold tracking-wider uppercase text-sm border border-white/30 hover:border-cyan-400/50 px-4 py-2"
+              <a
+                href="/events"
+                className="text-white/60 hover:text-white transition-colors font-bold tracking-wider uppercase text-xs border border-white/20 hover:border-white/40 px-4 py-2"
               >
                 VIEW ALL →
               </a>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-              {events.length === 1 
-                ? events.map((event) => ( // Show the same event if only one exists
+              {trendingEvents.slice(0, 8).map((event) => (
+                <EntityCard
+                  key={`trending-${event.id}`}
+                  type="event"
+                  id={event.id}
+                  title={event.title}
+                  imageUrl={`https://jwxlskzmmdrwrlljtfdi.supabase.co/storage/v1/object/public/assets/${String(Math.floor(Math.random() * 9) + 1).padStart(3, '0')}.png`}
+                  category="TRENDING EVENT"
+                  href={`/event/${event.id}`}
+                  artist={event.artists?.[0]?.name || 'Various Artists'}
+                  date={new Date(event.start_date).toLocaleDateString()}
+                  time={new Date(event.start_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  venue={event.venue?.name || 'TBA'}
+                  location={event.venue?.city ? `${event.venue.city}, ${event.venue.country}` : 'Location TBA'}
+                  price={event.ticket_price_min && event.ticket_price_max ? `€${event.ticket_price_min}-${event.ticket_price_max}` : undefined}
+                  isUpcoming={new Date(event.start_date) > new Date()}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Events Section */}
+      {hasEvents && events.length > 0 && (
+        <section className="w-full py-16 lg:py-24 bg-neutral-950">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="flex items-center justify-between mb-12">
+              <div>
+                <span className="text-white/50 font-bold tracking-widest uppercase text-xs mb-4 block">UPCOMING</span>
+                <H2 variant="display" className="text-3xl text-white">
+                  EVENTS
+                </H2>
+              </div>
+              <a
+                href="/events"
+                className="text-white/60 hover:text-white transition-colors font-bold tracking-wider uppercase text-xs border border-white/20 hover:border-white/40 px-4 py-2"
+              >
+                VIEW ALL →
+              </a>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+              {events.length === 1
+                ? events.map((event) => (
                 <EntityCard
                   key={`upcoming-${event.id}`}
                   type="event"
@@ -202,7 +263,7 @@ async function ExplorePage() {
                   isUpcoming={true}
                 />
               ))
-                : events.slice(1, 9).map((event) => ( // Show remaining events if multiple exist
+                : events.slice(1, 9).map((event) => (
                 <EntityCard
                   key={event.id}
                   type="event"
@@ -221,25 +282,24 @@ async function ExplorePage() {
                 />
               ))}
             </div>
-          </section>
-        )}
+          </div>
+        </section>
+      )}
 
-        {/* Venues Section */}
-        {hasVenues && (
-          <section className="mb-24">
+      {/* Venues Section */}
+      {hasVenues && (
+        <section className="w-full py-16 lg:py-24 bg-neutral-950">
+          <div className="max-w-7xl mx-auto px-6">
             <div className="flex items-center justify-between mb-12">
               <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-3 h-3 bg-white animate-pulse" />
-                  <span className="text-white/80 font-bold tracking-widest uppercase text-sm">TRENDING</span>
-                </div>
+                <span className="text-white/50 font-bold tracking-widest uppercase text-xs mb-4 block">TRENDING</span>
                 <H2 variant="display" className="text-3xl text-white">
-                  HOT VENUES
+                  VENUES
                 </H2>
               </div>
-              <a 
-                href="/venues" 
-                className="text-white/80 hover:text-white transition-colors font-bold tracking-wider uppercase text-sm border border-white/30 hover:border-white/50 px-4 py-2"
+              <a
+                href="/venues"
+                className="text-white/60 hover:text-white transition-colors font-bold tracking-wider uppercase text-xs border border-white/20 hover:border-white/40 px-4 py-2"
               >
                 VIEW ALL →
               </a>
@@ -262,25 +322,24 @@ async function ExplorePage() {
                 />
               ))}
             </div>
-          </section>
-        )}
+          </div>
+        </section>
+      )}
 
-        {/* Artists Section */}
-        {hasArtists && (
-          <section>
+      {/* Artists Section */}
+      {hasArtists && (
+        <section className="w-full py-16 lg:py-24 bg-neutral-950">
+          <div className="max-w-7xl mx-auto px-6">
             <div className="flex items-center justify-between mb-12">
               <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-3 h-3 bg-white animate-pulse" />
-                  <span className="text-white/80 font-bold tracking-widest uppercase text-sm">TOP RATED</span>
-                </div>
+                <span className="text-white/50 font-bold tracking-widest uppercase text-xs mb-4 block">TOP RATED</span>
                 <H2 variant="display" className="text-3xl text-white">
-                  FEATURED ARTISTS
+                  ARTISTS
                 </H2>
               </div>
-              <a 
-                href="/artists" 
-                className="text-white/80 hover:text-white transition-colors font-bold tracking-wider uppercase text-sm border border-white/30 hover:border-white/50 px-4 py-2"
+              <a
+                href="/artists"
+                className="text-white/60 hover:text-white transition-colors font-bold tracking-wider uppercase text-xs border border-white/20 hover:border-white/40 px-4 py-2"
               >
                 VIEW ALL →
               </a>
@@ -305,9 +364,35 @@ async function ExplorePage() {
                 />
               ))}
             </div>
-          </section>
-        )}
-      </div>
+          </div>
+        </section>
+      )}
+
+      {/* CTA Section */}
+      <section className="w-full py-16 lg:py-24 bg-neutral-950">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center">
+            <H2 variant="display" className="mb-4 text-white">
+              JOIN THE COMMUNITY
+            </H2>
+            <p className="text-white/40 mb-8 max-w-md mx-auto text-sm tracking-wider uppercase">
+              Connect with artists, discover venues, and never miss an event in the electronic music scene
+            </p>
+            <div className="flex gap-4 justify-center">
+              <a href="/auth/signin?mode=register">
+                <button className="bg-white text-black hover:bg-white/90 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200 text-xs">
+                  GET STARTED
+                </button>
+              </a>
+              <a href="/events">
+                <button className="border border-white/20 text-white hover:bg-white/10 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200 text-xs">
+                  BROWSE EVENTS
+                </button>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   )
 }
@@ -315,7 +400,7 @@ async function ExplorePage() {
 export default function ExplorePageWrapper() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-black pt-24 pb-16">
+      <div className="min-h-screen bg-neutral-950 pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center py-32">
             <div className="mb-8 flex justify-center">

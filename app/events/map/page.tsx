@@ -123,7 +123,7 @@ export default function EventsMapPage() {
   )).sort()
 
   if (isLoading) {
-    return null
+    return <div className="min-h-screen bg-neutral-950" />
   }
 
   if (error) {

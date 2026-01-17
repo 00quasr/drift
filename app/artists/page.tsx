@@ -64,7 +64,7 @@ export default function ArtistsPage() {
   })
 
   if (loading) {
-    return null
+    return <div className="min-h-screen bg-neutral-950" />
   }
 
   return (

@@ -64,11 +64,11 @@ export default function ProfileEditPage() {
   }
 
   if (loading || isLoading) {
-    return null
+    return <div className="min-h-screen bg-neutral-950" />
   }
 
   if (!user) {
-    return null
+    return <div className="min-h-screen bg-neutral-950" />
   }
 
   if (error) {

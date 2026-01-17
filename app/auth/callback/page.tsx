@@ -68,5 +68,5 @@ export default function AuthCallback() {
     handleAuthCallback()
   }, [router])
 
-  return null
+  return <div className="min-h-screen bg-neutral-950" />
 }

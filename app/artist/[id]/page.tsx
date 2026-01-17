@@ -99,7 +99,7 @@ export default function ArtistPage({ params }: ArtistPageProps) {
   }
 
   if (loading) {
-    return null
+    return <div className="min-h-screen bg-neutral-950" />
   }
 
   if (!artist) {

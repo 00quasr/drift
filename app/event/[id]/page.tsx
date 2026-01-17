@@ -101,7 +101,7 @@ export default function EventPage({ params }: EventPageProps) {
   }
 
   if (loading) {
-    return null
+    return <div className="min-h-screen bg-neutral-950" />
   }
 
   if (!event) {

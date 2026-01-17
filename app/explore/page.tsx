@@ -395,7 +395,7 @@ async function ExplorePage() {
 
 export default function ExplorePageWrapper() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<div className="min-h-screen bg-neutral-950" />}>
       <ExplorePage />
     </Suspense>
   )

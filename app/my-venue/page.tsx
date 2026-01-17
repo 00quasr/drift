@@ -395,7 +395,7 @@ export default function MyVenuePage() {
   }
 
   if (loading || isLoading) {
-    return null
+    return <div className="min-h-screen bg-neutral-950" />
   }
 
   if (!user || user.role !== 'club_owner') {

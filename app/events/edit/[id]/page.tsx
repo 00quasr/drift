@@ -510,7 +510,7 @@ export default function EditEventPage({ params }: { params: { id: string } }) {
   }
 
   if (loading || loading_event) {
-    return null
+    return <div className="min-h-screen bg-neutral-950" />
   }
 
   if (!user || user.role !== 'promoter') {

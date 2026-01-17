@@ -120,11 +120,11 @@ export default function SettingsPage() {
   ]
 
   if (loading) {
-    return null
+    return <div className="min-h-screen bg-neutral-950" />
   }
 
   if (!user) {
-    return null
+    return <div className="min-h-screen bg-neutral-950" />
   }
 
   return (

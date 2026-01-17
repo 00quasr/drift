@@ -103,7 +103,7 @@ export default function VenuePage({ params }: VenuePageProps) {
   }
 
   if (loading) {
-    return null
+    return <div className="min-h-screen bg-neutral-950" />
   }
 
   if (!venue) {

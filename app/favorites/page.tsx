@@ -218,7 +218,7 @@ export default function FavoritesPage() {
   }
 
   if (isLoading) {
-    return null
+    return <div className="min-h-screen bg-neutral-950" />
   }
 
   return (

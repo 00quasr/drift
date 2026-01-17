@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Sparkles, Users, Calendar, MapPin, ExternalLink } from 'lucide-react'
+import { H1, H2, H3 } from '@/components/ui/typography'
 import { Card } from '@/components/ui/card'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -124,10 +124,10 @@ export default function NewcomersPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="min-h-screen bg-neutral-950 text-white flex items-center justify-center">
         <div className="flex flex-col items-center justify-center space-y-6">
           <ClassicLoader />
-          <p className="text-white/80 font-bold tracking-wider uppercase text-center">
+          <p className="text-white/50 font-bold tracking-wider uppercase text-center">
             LOADING NEWCOMER ARTISTS...
           </p>
         </div>
@@ -137,7 +137,7 @@ export default function NewcomersPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="min-h-screen bg-neutral-950 text-white flex items-center justify-center">
         <Card className="bg-white/5 border border-red-500/30 p-8 max-w-md w-full">
           <div className="text-center space-y-4">
             <p className="text-red-400 font-bold tracking-wider uppercase">
@@ -156,67 +156,83 @@ export default function NewcomersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <div className="max-w-7xl mx-auto px-6 pt-24 pb-12">
-        {/* Header */}
-        <motion.div 
-          className="mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <Sparkles className="w-8 h-8 text-yellow-500" />
-            <h1 className="text-4xl md:text-5xl font-bold tracking-wider uppercase">
-              NEWCOMERS
-            </h1>
-          </div>
-          <p className="text-white/70 text-lg font-medium max-w-2xl">
-            DISCOVER FRESH TALENT JOINING THE UNDERGROUND ELECTRONIC MUSIC SCENE
-          </p>
-        </motion.div>
+    <div className="min-h-screen bg-neutral-950 text-white">
+      {/* Hero Section */}
+      <section className="w-full pt-24 pb-16 bg-neutral-950">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex items-start justify-between">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <H1 variant="display" className="text-5xl md:text-7xl mb-6 text-white">
+                NEWCOMERS
+              </H1>
+              <p className="text-white/50 text-sm lg:text-base font-medium max-w-2xl tracking-wider uppercase">
+                DISCOVER FRESH TALENT JOINING THE UNDERGROUND ELECTRONIC MUSIC SCENE
+              </p>
+            </motion.div>
 
-        {/* Filters & Sort */}
-        <motion.div 
-          className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-        >
-          {/* Filter Tabs */}
-          <div className="flex gap-4 border-b border-white/10 pb-4">
-            {[
-              { key: 'all', label: 'ALL NEWCOMERS' },
-              { key: 'this-month', label: 'THIS MONTH' },
-              { key: 'verified', label: 'VERIFIED ONLY' }
-            ].map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => setFilter(tab.key as any)}
-                className={`px-4 py-2 font-bold tracking-wider uppercase text-sm transition-all duration-300 ${
-                  filter === tab.key 
-                    ? 'text-white border-b-2 border-white' 
-                    : 'text-white/60 hover:text-white'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
+            <motion.div
+              className="hidden lg:block"
+              initial={{ opacity: 0, scaleY: 0 }}
+              animate={{ opacity: 1, scaleY: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              <div className="w-px h-24 bg-gradient-to-b from-white/40 to-transparent" />
+            </motion.div>
           </div>
+        </div>
+      </section>
 
-          {/* Sort Dropdown */}
-          <div className="flex items-center gap-2">
+      {/* Filters Section */}
+      <section className="w-full py-8 bg-neutral-950">
+        <div className="max-w-7xl mx-auto px-6">
+          <motion.div
+            className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            {/* Filter Tabs */}
+            <div className="flex gap-4">
+              {[
+                { key: 'all', label: 'ALL NEWCOMERS' },
+                { key: 'this-month', label: 'THIS MONTH' },
+                { key: 'verified', label: 'VERIFIED ONLY' }
+              ].map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => setFilter(tab.key as any)}
+                  className={`px-4 py-2 font-bold tracking-wider uppercase text-xs transition-all duration-300 ${
+                    filter === tab.key
+                      ? 'text-white border-b-2 border-white'
+                      : 'text-white/60 hover:text-white'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Sort Dropdown */}
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="bg-white/10 border border-white/20 rounded px-3 py-2 text-sm font-bold tracking-wider uppercase text-white focus:outline-none focus:border-white/40"
+              className="bg-neutral-950 border border-white/20 px-4 py-2 text-xs font-bold tracking-wider uppercase text-white focus:outline-none focus:border-white/40"
             >
               <option value="newest">NEWEST FIRST</option>
               <option value="events">MOST EVENTS</option>
               <option value="followers">MOST FOLLOWERS</option>
             </select>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Results Section */}
+      <section className="w-full py-16 lg:py-24 bg-neutral-950">
+        <div className="max-w-7xl mx-auto px-6">
 
         {/* Newcomers Grid */}
         {sortedArtists.length > 0 ? (
@@ -241,7 +257,7 @@ export default function NewcomersPage() {
                         />
                       ) : (
                         <div className="w-full h-full bg-white/10 flex items-center justify-center">
-                          <Users className="w-16 h-16 text-white/40" />
+                          <span className="text-4xl font-bold text-white/40">{artist.name?.[0] || 'A'}</span>
                         </div>
                       )}
                       <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-300" />
@@ -272,11 +288,8 @@ export default function NewcomersPage() {
                       
                       {/* Origin */}
                       {artist.origin && (
-                        <div className="flex items-center gap-2 text-white/60 text-sm font-medium mb-3">
-                          <MapPin className="w-4 h-4" />
-                          <span className="font-bold tracking-wider uppercase">
-                            {artist.origin}
-                          </span>
+                        <div className="text-white/50 text-sm font-bold tracking-wider uppercase mb-3">
+                          {artist.origin}
                         </div>
                       )}
                       
@@ -331,15 +344,12 @@ export default function NewcomersPage() {
                       {/* Recent Events */}
                       {artist.recent_events && artist.recent_events.length > 0 && (
                         <div className="mb-4">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Calendar className="w-4 h-4 text-white/60" />
-                            <span className="text-white/60 text-xs font-bold tracking-wider uppercase">
-                              RECENT SHOWS
-                            </span>
-                          </div>
+                          <span className="text-white/50 text-xs font-bold tracking-widest uppercase block mb-2">
+                            RECENT SHOWS
+                          </span>
                           <div className="space-y-1">
                             {artist.recent_events.slice(0, 2).map((event) => (
-                              <div key={event.id} className="text-xs text-white/70 font-medium">
+                              <div key={event.id} className="text-xs text-white/60 font-medium">
                                 {event.venue.name} • {new Date(event.start_date).toLocaleDateString()}
                               </div>
                             ))}
@@ -350,7 +360,7 @@ export default function NewcomersPage() {
                       {/* Social Links */}
                       {artist.social_links && (
                         <div className="mt-auto pt-4 border-t border-white/10">
-                          <div className="flex gap-2 justify-center">
+                          <div className="flex gap-3 justify-center">
                             {Object.entries(artist.social_links).slice(0, 3).map(([platform, url]) => (
                               <a
                                 key={platform}
@@ -358,9 +368,9 @@ export default function NewcomersPage() {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 onClick={(e) => e.stopPropagation()}
-                                className="flex items-center justify-center w-8 h-8 bg-white/10 hover:bg-white/20 rounded text-white/60 hover:text-white transition-all duration-200"
+                                className="text-white/50 hover:text-white text-xs font-bold tracking-wider uppercase transition-all duration-200"
                               >
-                                <ExternalLink className="w-3 h-3" />
+                                {platform}
                               </a>
                             ))}
                           </div>
@@ -374,31 +384,30 @@ export default function NewcomersPage() {
           </div>
         ) : (
           /* Empty State */
-          <motion.div 
+          <motion.div
             className="text-center py-16"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <Sparkles className="w-16 h-16 text-white/20 mx-auto mb-6" />
-            <h2 className="text-2xl font-bold tracking-wider uppercase text-white/60 mb-4">
+            <H2 variant="display" className="mb-4 text-white/60">
               NO NEW ARTISTS YET
-            </h2>
-            <p className="text-white/40 max-w-md mx-auto mb-8">
-              {filter === 'this-month' 
+            </H2>
+            <p className="text-white/40 max-w-md mx-auto mb-8 text-sm tracking-wider uppercase">
+              {filter === 'this-month'
                 ? 'No new artists joined this month. Check back soon for fresh talent!'
                 : 'Check back as new artists join our platform and start their journey'
               }
             </p>
             <div className="flex gap-4 justify-center">
-              <button 
+              <button
                 onClick={() => setFilter('all')}
-                className="bg-white text-black hover:bg-white/90 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200"
+                className="bg-white text-black hover:bg-white/90 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200 text-xs"
               >
                 VIEW ALL NEWCOMERS
               </button>
               <Link href="/artists">
-                <button className="border border-white/20 text-white hover:bg-white/10 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200">
+                <button className="border border-white/20 text-white hover:bg-white/10 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200 text-xs">
                   ALL ARTISTS
                 </button>
               </Link>
@@ -406,80 +415,39 @@ export default function NewcomersPage() {
           </motion.div>
         )}
 
-        {/* Call to Action */}
-        {sortedArtists.length > 0 && (
-          <motion.div 
-            className="text-center mt-16 pt-12 border-t border-white/10"
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="w-full py-16 lg:py-24 bg-neutral-950">
+        <div className="max-w-7xl mx-auto px-6">
+          <motion.div
+            className="text-center"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.5 }}
           >
-            <h3 className="text-2xl font-bold tracking-wider uppercase text-white mb-4">
+            <H2 variant="display" className="mb-4 text-white">
               ARE YOU A NEW ARTIST?
-            </h3>
-            <p className="text-white/60 mb-6 max-w-md mx-auto">
+            </H2>
+            <p className="text-white/40 mb-8 max-w-md mx-auto text-sm tracking-wider uppercase">
               Join our platform and connect with fans, venues, and other artists in the electronic music community
             </p>
             <div className="flex gap-4 justify-center">
               <Link href="/verification">
-                <button className="bg-white text-black hover:bg-white/90 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200">
+                <button className="bg-white text-black hover:bg-white/90 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200 text-xs">
                   JOIN AS ARTIST
                 </button>
               </Link>
-              <Link href="/venues">
-                <button className="border border-white/20 text-white hover:bg-white/10 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200">
-                  FIND VENUES
+              <Link href="/artists">
+                <button className="border border-white/20 text-white hover:bg-white/10 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200 text-xs">
+                  ALL ARTISTS
                 </button>
               </Link>
             </div>
           </motion.div>
-        )}
-
-        {/* Stats Footer */}
-        {sortedArtists.length > 0 && (
-          <motion.div 
-            className="mt-12 pt-8 border-t border-white/10"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-          >
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-              <div>
-                <div className="text-2xl font-bold text-white mb-2">
-                  {sortedArtists.length}
-                </div>
-                <div className="text-white/60 text-sm font-bold tracking-wider uppercase">
-                  NEW ARTISTS
-                </div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-white mb-2">
-                  {sortedArtists.filter(a => a.is_verified).length}
-                </div>
-                <div className="text-white/60 text-sm font-bold tracking-wider uppercase">
-                  VERIFIED
-                </div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-white mb-2">
-                  {Array.from(new Set(sortedArtists.flatMap(a => a.genres))).length}
-                </div>
-                <div className="text-white/60 text-sm font-bold tracking-wider uppercase">
-                  GENRES
-                </div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-white mb-2">
-                  {sortedArtists.reduce((sum, a) => sum + (a.upcoming_events_count || 0), 0)}
-                </div>
-                <div className="text-white/60 text-sm font-bold tracking-wider uppercase">
-                  UPCOMING SHOWS
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </div>
+        </div>
+      </section>
     </div>
   )
 }

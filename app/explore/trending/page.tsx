@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowRight, MapPin, Calendar, Users, Star, Music } from 'lucide-react'
 import { H1, H2 } from '@/components/ui/typography'
 import {
   Table,
@@ -132,10 +131,10 @@ export default function TrendingPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center pt-24">
+      <div className="min-h-screen bg-neutral-950 text-white flex items-center justify-center pt-24">
         <div className="flex flex-col items-center justify-center space-y-6">
           <ClassicLoader />
-          <p className="text-white/80 font-bold tracking-wider uppercase text-center">
+          <p className="text-white/50 font-bold tracking-wider uppercase text-center">
             LOADING TRENDING CONTENT...
           </p>
         </div>
@@ -145,7 +144,7 @@ export default function TrendingPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center pt-24">
+      <div className="min-h-screen bg-neutral-950 text-white flex items-center justify-center pt-24">
         <div className="bg-white/5 border border-red-500/30 p-8 max-w-md w-full rounded-xl">
           <div className="text-center space-y-4">
             <p className="text-red-400 font-bold tracking-wider uppercase">
@@ -179,44 +178,57 @@ export default function TrendingPage() {
   )
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <div className="max-w-7xl mx-auto px-6 pt-24 pb-12">
-        {/* Header */}
-        <motion.div 
-          className="mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <H1 variant="display" className="text-4xl md:text-5xl mb-4">
-            TRENDING NOW
-          </H1>
-          <p className="text-white/70 text-lg font-medium max-w-2xl">
-            DISCOVER WHAT'S HOT IN THE UNDERGROUND ELECTRONIC MUSIC SCENE
-          </p>
-        </motion.div>
+    <div className="min-h-screen bg-neutral-950 text-white">
+      {/* Hero Section */}
+      <section className="w-full pt-24 pb-16 bg-neutral-950">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex items-start justify-between">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <H1 variant="display" className="text-5xl md:text-7xl mb-6 text-white">
+                TRENDING
+              </H1>
+              <p className="text-white/50 text-sm lg:text-base font-medium max-w-2xl tracking-wider uppercase">
+                DISCOVER WHAT'S HOT IN THE UNDERGROUND ELECTRONIC MUSIC SCENE
+              </p>
+            </motion.div>
 
-        {/* Trending Venues Table */}
-        {data.venues.length > 0 && (
-          <motion.section 
-            className="mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-          >
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-3">
-                <MapPin className="w-6 h-6 text-white/80" />
-                <H2 variant="display">TRENDING VENUES</H2>
+            <motion.div
+              className="hidden lg:block"
+              initial={{ opacity: 0, scaleY: 0 }}
+              animate={{ opacity: 1, scaleY: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              <div className="w-px h-24 bg-gradient-to-b from-white/40 to-transparent" />
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Trending Venues Section */}
+      {data.venues.length > 0 && (
+        <section className="w-full py-16 lg:py-24 bg-neutral-950">
+          <div className="max-w-7xl mx-auto px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+            >
+              <div className="flex items-center justify-between mb-12">
+                <div>
+                  <span className="text-white/50 font-bold tracking-widest uppercase text-xs mb-4 block">TRENDING</span>
+                  <H2 variant="display">VENUES</H2>
+                </div>
+                <Link
+                  href="/venues"
+                  className="flex items-center gap-2 text-white/60 hover:text-white transition-colors font-bold tracking-wider uppercase text-xs border border-white/20 hover:border-white/40 px-4 py-2"
+                >
+                  VIEW ALL →
+                </Link>
               </div>
-              <Link 
-                href="/venues" 
-                className="flex items-center gap-2 text-white/60 hover:text-white transition-colors"
-              >
-                <span className="font-bold tracking-wider uppercase text-sm">VIEW ALL</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
 
             <div className="space-y-4 p-4 border border-white/10 rounded-lg bg-white/[0.02] shadow-sm overflow-x-auto">
               <div className="flex flex-wrap gap-4 items-center justify-between mb-6">
@@ -297,8 +309,8 @@ export default function TrendingPage() {
                           <TableCell className="text-white/70">
                             {venue.average_rating ? (
                               <div className="flex items-center gap-1">
-                                <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                                <span>{venue.average_rating.toFixed(1)}</span>
+                                <div className="w-2 h-2 rounded-full bg-yellow-400"></div>
+                                <span className="font-bold">{venue.average_rating.toFixed(1)}</span>
                               </div>
                             ) : (
                               'No rating'
@@ -332,32 +344,34 @@ export default function TrendingPage() {
                 </TableBody>
               </Table>
             </div>
-          </motion.section>
-        )}
+          </motion.div>
+        </div>
+      </section>
+      )}
 
-        {/* Trending Events Table */}
-        {data.events.length > 0 && (
-          <motion.section 
-            className="mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-3">
-                <Calendar className="w-6 h-6 text-white/80" />
-                <H2 variant="display">UPCOMING EVENTS</H2>
+      {/* Trending Events Section */}
+      {data.events.length > 0 && (
+        <section className="w-full py-16 lg:py-24 bg-neutral-950">
+          <div className="max-w-7xl mx-auto px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <div className="flex items-center justify-between mb-12">
+                <div>
+                  <span className="text-white/50 font-bold tracking-widest uppercase text-xs mb-4 block">UPCOMING</span>
+                  <H2 variant="display">EVENTS</H2>
+                </div>
+                <Link
+                  href="/events"
+                  className="flex items-center gap-2 text-white/60 hover:text-white transition-colors font-bold tracking-wider uppercase text-xs border border-white/20 hover:border-white/40 px-4 py-2"
+                >
+                  VIEW ALL →
+                </Link>
               </div>
-              <Link 
-                href="/events" 
-                className="flex items-center gap-2 text-white/60 hover:text-white transition-colors"
-              >
-                <span className="font-bold tracking-wider uppercase text-sm">VIEW ALL</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
 
-            <div className="space-y-4 p-4 border border-white/10 rounded-lg bg-white/[0.02] shadow-sm overflow-x-auto">
+            <div className="space-y-4 p-4 border border-white/10 bg-white/[0.02] shadow-sm overflow-x-auto">
               <div className="flex flex-wrap gap-4 items-center justify-between mb-6">
                 <div className="flex gap-2 flex-wrap">
                   <Input
@@ -469,12 +483,12 @@ export default function TrendingPage() {
                           <TableCell className="text-white/70">
                             {event.average_rating ? (
                               <div className="flex items-center gap-1">
-                                <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                                <div className="w-2 h-2 rounded-full bg-yellow-400"></div>
                                 <span className="font-bold">{event.average_rating.toFixed(1)}</span>
                               </div>
                             ) : (
                               <div className="flex items-center gap-1">
-                                <Star className="w-4 h-4 text-gray-400" />
+                                <div className="w-2 h-2 rounded-full bg-gray-400"></div>
                                 <span>No rating</span>
                               </div>
                             )}
@@ -492,32 +506,34 @@ export default function TrendingPage() {
                 </TableBody>
               </Table>
             </div>
-          </motion.section>
-        )}
+          </motion.div>
+        </div>
+      </section>
+      )}
 
-        {/* Top Rated Artists Table */}
-        {data.artists.length > 0 && (
-          <motion.section 
-            className="mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-          >
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-3">
-                <Music className="w-6 h-6 text-white/80" />
-                <H2 variant="display">TOP RATED ARTISTS</H2>
+      {/* Top Rated Artists Section */}
+      {data.artists.length > 0 && (
+        <section className="w-full py-16 lg:py-24 bg-neutral-950">
+          <div className="max-w-7xl mx-auto px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+            >
+              <div className="flex items-center justify-between mb-12">
+                <div>
+                  <span className="text-white/50 font-bold tracking-widest uppercase text-xs mb-4 block">TOP RATED</span>
+                  <H2 variant="display">ARTISTS</H2>
+                </div>
+                <Link
+                  href="/artists"
+                  className="flex items-center gap-2 text-white/60 hover:text-white transition-colors font-bold tracking-wider uppercase text-xs border border-white/20 hover:border-white/40 px-4 py-2"
+                >
+                  VIEW ALL →
+                </Link>
               </div>
-              <Link 
-                href="/artists" 
-                className="flex items-center gap-2 text-white/60 hover:text-white transition-colors"
-              >
-                <span className="font-bold tracking-wider uppercase text-sm">VIEW ALL</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
 
-            <div className="space-y-4 p-4 border border-white/10 rounded-lg bg-white/[0.02] shadow-sm overflow-x-auto">
+            <div className="space-y-4 p-4 border border-white/10 bg-white/[0.02] shadow-sm overflow-x-auto">
               <div className="flex flex-wrap gap-4 items-center justify-between mb-6">
                 <div className="flex gap-2 flex-wrap">
                   <Input
@@ -631,26 +647,31 @@ export default function TrendingPage() {
                 </TableBody>
               </Table>
             </div>
-          </motion.section>
-        )}
-
-        {/* Empty State */}
-        {data.venues.length === 0 && data.events.length === 0 && data.artists.length === 0 && (
-          <motion.div 
-            className="text-center py-16"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <H2 variant="display" className="mb-4 text-white/60">
-              NO TRENDING CONTENT YET
-            </H2>
-            <p className="text-white/40 max-w-md mx-auto">
-              Check back soon as the community grows and trending content emerges
-            </p>
           </motion.div>
-        )}
-      </div>
+        </div>
+      </section>
+      )}
+
+      {/* Empty State */}
+      {data.venues.length === 0 && data.events.length === 0 && data.artists.length === 0 && (
+        <section className="w-full py-16 lg:py-24 bg-neutral-950">
+          <div className="max-w-7xl mx-auto px-6">
+            <motion.div
+              className="text-center py-16"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <H2 variant="display" className="mb-4 text-white/60">
+                NO TRENDING CONTENT YET
+              </H2>
+              <p className="text-white/40 max-w-md mx-auto text-sm tracking-wider uppercase">
+                Check back soon as the community grows and trending content emerges
+              </p>
+            </motion.div>
+          </div>
+        </section>
+      )}
     </div>
   )
 }

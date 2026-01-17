@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
 import { Search, MapPin, Users, Star, SlidersHorizontal, Building, Zap } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -56,44 +57,60 @@ export default function VenuesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black pt-24 pb-16">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center py-32">
-            <div className="mb-8 flex justify-center">
-              <ClassicLoader />
-            </div>
-            <p className="text-white/80 font-bold tracking-widest uppercase text-sm">LOADING VENUES...</p>
-          </div>
+      <div className="min-h-screen bg-neutral-950 text-white flex items-center justify-center">
+        <div className="flex flex-col items-center justify-center space-y-6">
+          <ClassicLoader />
+          <p className="text-white/50 font-bold tracking-wider uppercase text-center">
+            LOADING VENUES...
+          </p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-black pt-24 pb-16">
-      <div className="max-w-7xl mx-auto px-6">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <H1 variant="display" className="text-5xl md:text-7xl mb-6 text-white">
-            DISCOVER VENUES
-          </H1>
-          <p className="text-white/80 text-lg max-w-3xl mx-auto font-medium tracking-wider uppercase">
-            FROM UNDERGROUND WAREHOUSES TO ICONIC CLUBS, EXPLORE THE VENUES THAT DEFINE ELECTRONIC MUSIC CULTURE WORLDWIDE
-          </p>
-        </div>
+    <div className="min-h-screen bg-neutral-950 text-white">
+      {/* Hero Section */}
+      <section className="w-full pt-24 pb-16 bg-neutral-950">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex items-start justify-between">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <H1 variant="display" className="text-5xl md:text-7xl mb-6 text-white">
+                VENUES
+              </H1>
+              <p className="text-white/50 text-sm lg:text-base font-medium max-w-2xl tracking-wider uppercase">
+                FROM UNDERGROUND WAREHOUSES TO ICONIC CLUBS, EXPLORE THE VENUES THAT DEFINE ELECTRONIC MUSIC
+              </p>
+            </motion.div>
 
-        {/* Search and Filters */}
-        <div className="mb-12">
-          <div className="flex flex-col lg:flex-row gap-6 mb-8">
+            <motion.div
+              className="hidden lg:block"
+              initial={{ opacity: 0, scaleY: 0 }}
+              animate={{ opacity: 1, scaleY: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              <div className="w-px h-24 bg-gradient-to-b from-white/40 to-transparent" />
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Search and Filters Section */}
+      <section className="w-full pb-8 bg-neutral-950">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex flex-col lg:flex-row gap-6">
             {/* Search */}
             <div className="flex-1 relative">
-              <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-white w-6 h-6" />
               <Input
                 type="text"
                 placeholder="SEARCH VENUES..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                                  className="pl-16 pr-6 py-4 bg-black border-2 border-white/30 text-white placeholder-white/60 focus:border-white transition-colors duration-200 h-14 text-lg font-bold tracking-wider uppercase"
+                className="pl-6 pr-6 py-4 bg-black border border-white/20 text-white placeholder-white/40 focus:border-white/40 transition-colors duration-200 h-14 text-sm font-bold tracking-wider uppercase"
               />
             </div>
 
@@ -101,26 +118,25 @@ export default function VenuesPage() {
             <Button
               onClick={() => setFiltersOpen(!filtersOpen)}
               variant="outline"
-              className="border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/60 font-bold tracking-wider uppercase px-6 h-14"
+              className="border border-white/20 text-white hover:bg-white/10 hover:border-white/40 font-bold tracking-wider uppercase px-6 h-14"
             >
-              <SlidersHorizontal className="w-5 h-5 mr-2" />
               FILTERS
             </Button>
           </div>
 
           {/* Expandable Filters */}
           {filtersOpen && (
-            <div className="bg-white/5 border border-white/20 p-6 mb-8">
+            <div className="bg-white/5 border border-white/10 p-6 mt-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Country Filter */}
                 <div>
-                  <label className="block text-white font-bold tracking-widest uppercase text-sm mb-3">
+                  <label className="block text-white/50 font-bold tracking-widest uppercase text-xs mb-3">
                     COUNTRY
                   </label>
                   <select
                     value={selectedCountry}
                     onChange={(e) => setSelectedCountry(e.target.value)}
-                    className="w-full bg-black border-2 border-white/30 text-white font-bold tracking-wider uppercase text-sm px-4 py-3 focus:border-white transition-colors"
+                    className="w-full bg-black border border-white/20 text-white font-bold tracking-wider uppercase text-sm px-4 py-3 focus:border-white/40 transition-colors"
                   >
                     <option value="all">ALL COUNTRIES</option>
                     {allCountries.map(country => (
@@ -131,13 +147,13 @@ export default function VenuesPage() {
 
                 {/* Genre Filter */}
                 <div>
-                  <label className="block text-white font-bold tracking-widest uppercase text-sm mb-3">
+                  <label className="block text-white/50 font-bold tracking-widest uppercase text-xs mb-3">
                     GENRE
                   </label>
                   <select
                     value={selectedGenre}
                     onChange={(e) => setSelectedGenre(e.target.value)}
-                    className="w-full bg-black border-2 border-white/30 text-white font-bold tracking-wider uppercase text-sm px-4 py-3 focus:border-white transition-colors"
+                    className="w-full bg-black border border-white/20 text-white font-bold tracking-wider uppercase text-sm px-4 py-3 focus:border-white/40 transition-colors"
                   >
                     <option value="all">ALL GENRES</option>
                     {allGenres.map(genre => (
@@ -148,7 +164,7 @@ export default function VenuesPage() {
               </div>
 
               <div className="mt-6 flex justify-between items-center">
-                <p className="text-white/60 font-bold tracking-widest uppercase text-sm">
+                <p className="text-white/50 font-bold tracking-widest uppercase text-xs">
                   {filteredVenues.length} VENUES FOUND
                 </p>
                 <Button
@@ -157,7 +173,7 @@ export default function VenuesPage() {
                     setSelectedGenre('all')
                   }}
                   variant="outline"
-                  className="border-white/30 text-white hover:bg-white/10 font-bold tracking-wider uppercase text-sm px-6"
+                  className="border-white/20 text-white hover:bg-white/10 font-bold tracking-wider uppercase text-xs px-6"
                 >
                   CLEAR ALL
                 </Button>
@@ -165,33 +181,37 @@ export default function VenuesPage() {
             </div>
           )}
         </div>
+      </section>
 
-        {/* Results */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-white font-bold tracking-widest uppercase text-sm flex items-center gap-3">
-              <div className="w-2 h-2 bg-white" />
-              VENUES
-            </h2>
-            <ViewSwitcher 
+      {/* Venues Grid Section */}
+      <section className="w-full py-16 lg:py-24 bg-neutral-950">
+        <div className="max-w-7xl mx-auto px-6">
+          {/* Results Header */}
+          <div className="flex items-center justify-between mb-12">
+            <div>
+              <span className="text-white/50 font-bold tracking-widest uppercase text-xs mb-4 block">DISCOVER</span>
+              <h2 className="text-3xl font-bold tracking-tight text-white">
+                ALL VENUES
+              </h2>
+            </div>
+            <ViewSwitcher
               viewMode={viewMode}
               onViewModeChange={setViewMode}
             />
           </div>
-        </div>
 
-        {/* Venues Views */}
-        <EntityViews
-          entities={filteredVenues.map(venue => ({
-            ...venue,
-            name: venue.name
-            // Let EntityViews handle image fallback logic
-          }))}
-          viewMode={viewMode}
-          entityType="venue"
-          emptyMessage="NO VENUES FOUND - TRY ADJUSTING YOUR SEARCH OR FILTERS"
-        />
-      </div>
+          {/* Venues Views */}
+          <EntityViews
+            entities={filteredVenues.map(venue => ({
+              ...venue,
+              name: venue.name
+            }))}
+            viewMode={viewMode}
+            entityType="venue"
+            emptyMessage="NO VENUES FOUND - TRY ADJUSTING YOUR SEARCH OR FILTERS"
+          />
+        </div>
+      </section>
     </div>
   )
 } 

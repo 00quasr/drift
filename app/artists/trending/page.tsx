@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { TrendingUp, Users, MapPin, ArrowRight, Crown } from 'lucide-react'
+import { H1, H2, H3 } from '@/components/ui/typography'
 import { Card } from '@/components/ui/card'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -105,12 +105,12 @@ export default function TrendingArtistsPage() {
     fetchTrendingArtists()
   }, [timeframe, category])
 
-  const getRankIcon = (index: number) => {
+  const getRankBadge = (index: number) => {
     switch (index) {
-      case 0: return <Crown className="w-5 h-5 text-yellow-500" />
-      case 1: return <Crown className="w-5 h-5 text-gray-400" />
-      case 2: return <Crown className="w-5 h-5 text-orange-600" />
-      default: return <span className="text-white/60 font-bold text-lg">#{index + 1}</span>
+      case 0: return '#1'
+      case 1: return '#2'
+      case 2: return '#3'
+      default: return `#${index + 1}`
     }
   }
 
@@ -122,10 +122,10 @@ export default function TrendingArtistsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="min-h-screen bg-neutral-950 text-white flex items-center justify-center">
         <div className="flex flex-col items-center justify-center space-y-6">
           <ClassicLoader />
-          <p className="text-white/80 font-bold tracking-wider uppercase text-center">
+          <p className="text-white/50 font-bold tracking-wider uppercase text-center">
             LOADING TRENDING ARTISTS...
           </p>
         </div>
@@ -135,7 +135,7 @@ export default function TrendingArtistsPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="min-h-screen bg-neutral-950 text-white flex items-center justify-center">
         <Card className="bg-white/5 border border-red-500/30 p-8 max-w-md w-full">
           <div className="text-center space-y-4">
             <p className="text-red-400 font-bold tracking-wider uppercase">
@@ -154,68 +154,84 @@ export default function TrendingArtistsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <div className="max-w-7xl mx-auto px-6 pt-24 pb-12">
-        {/* Header */}
-        <motion.div 
-          className="mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <TrendingUp className="w-8 h-8 text-green-500" />
-            <h1 className="text-4xl md:text-5xl font-bold tracking-wider uppercase">
-              TRENDING ARTISTS
-            </h1>
-          </div>
-          <p className="text-white/70 text-lg font-medium max-w-2xl">
-            MOST FOLLOWED, SEARCHED, AND BOOKED ARTISTS IN THE ELECTRONIC MUSIC SCENE
-          </p>
-        </motion.div>
+    <div className="min-h-screen bg-neutral-950 text-white">
+      {/* Hero Section */}
+      <section className="w-full pt-24 pb-16 bg-neutral-950">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex items-start justify-between">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <H1 variant="display" className="text-5xl md:text-7xl mb-6 text-white">
+                TRENDING ARTISTS
+              </H1>
+              <p className="text-white/50 text-sm lg:text-base font-medium max-w-2xl tracking-wider uppercase">
+                MOST FOLLOWED, SEARCHED, AND BOOKED ARTISTS IN THE ELECTRONIC MUSIC SCENE
+              </p>
+            </motion.div>
 
-        {/* Filters */}
-        <motion.div 
-          className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-        >
-          {/* Timeframe Tabs */}
-          <div className="flex gap-4 border-b border-white/10 pb-4">
-            {[
-              { key: 'week', label: 'THIS WEEK' },
-              { key: 'month', label: 'THIS MONTH' },
-              { key: 'year', label: 'THIS YEAR' }
-            ].map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => setTimeframe(tab.key as any)}
-                className={`px-4 py-2 font-bold tracking-wider uppercase text-sm transition-all duration-300 ${
-                  timeframe === tab.key 
-                    ? 'text-white border-b-2 border-white' 
-                    : 'text-white/60 hover:text-white'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
+            <motion.div
+              className="hidden lg:block"
+              initial={{ opacity: 0, scaleY: 0 }}
+              animate={{ opacity: 1, scaleY: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              <div className="w-px h-24 bg-gradient-to-b from-white/40 to-transparent" />
+            </motion.div>
           </div>
+        </div>
+      </section>
 
-          {/* Category Filter */}
-          <div className="flex items-center gap-2">
+      {/* Filters Section */}
+      <section className="w-full py-8 bg-neutral-950">
+        <div className="max-w-7xl mx-auto px-6">
+          <motion.div
+            className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            {/* Timeframe Tabs */}
+            <div className="flex gap-4">
+              {[
+                { key: 'week', label: 'THIS WEEK' },
+                { key: 'month', label: 'THIS MONTH' },
+                { key: 'year', label: 'THIS YEAR' }
+              ].map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => setTimeframe(tab.key as any)}
+                  className={`px-4 py-2 font-bold tracking-wider uppercase text-xs transition-all duration-300 ${
+                    timeframe === tab.key
+                      ? 'text-white border-b-2 border-white'
+                      : 'text-white/60 hover:text-white'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Category Filter */}
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value as any)}
-              className="bg-white/10 border border-white/20 rounded px-3 py-2 text-sm font-bold tracking-wider uppercase text-white focus:outline-none focus:border-white/40"
+              className="bg-neutral-950 border border-white/20 px-4 py-2 text-xs font-bold tracking-wider uppercase text-white focus:outline-none focus:border-white/40"
             >
               <option value="all">ALL TRENDING</option>
               <option value="bookings">MOST BOOKED</option>
               <option value="followers">MOST FOLLOWED</option>
               <option value="plays">MOST PLAYED</option>
             </select>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Results Section */}
+      <section className="w-full py-16 lg:py-24 bg-neutral-950">
+        <div className="max-w-7xl mx-auto px-6">
 
         {/* Top 3 Artists - Featured Cards */}
         {artists.length > 0 && (
@@ -246,7 +262,11 @@ export default function TrendingArtistsPage() {
                     }`}>
                       {/* Rank Badge */}
                       <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
-                        {getRankIcon(index)}
+                        <span className={`text-2xl font-bold ${
+                          index === 0 ? 'text-yellow-400' : index === 1 ? 'text-gray-300' : 'text-orange-400'
+                        }`}>
+                          {getRankBadge(index)}
+                        </span>
                       </div>
 
                       {/* Growth Badge */}
@@ -265,7 +285,7 @@ export default function TrendingArtistsPage() {
                           />
                         ) : (
                           <div className="w-full h-full bg-white/10 flex items-center justify-center">
-                            <Users className="w-16 h-16 text-white/40" />
+                            <span className="text-6xl font-bold text-white/40">{artist.name?.[0] || 'A'}</span>
                           </div>
                         )}
                         <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-all duration-300" />
@@ -278,12 +298,9 @@ export default function TrendingArtistsPage() {
                         </h3>
                         
                         {artist.origin && (
-                          <div className="flex items-center gap-2 text-white/60 text-sm font-medium mb-4">
-                            <MapPin className="w-4 h-4" />
-                            <span className="font-bold tracking-wider uppercase">
-                              {artist.origin}
-                            </span>
-                          </div>
+                          <p className="text-white/60 text-sm font-bold tracking-wider uppercase mb-4">
+                            {artist.origin}
+                          </p>
                         )}
 
                         {/* Trending Stats */}
@@ -368,7 +385,7 @@ export default function TrendingArtistsPage() {
                               />
                             ) : (
                               <div className="w-full h-full bg-white/10 flex items-center justify-center">
-                                <Users className="w-8 h-8 text-white/40" />
+                                <span className="text-2xl font-bold text-white/40">{artist.name?.[0] || 'A'}</span>
                               </div>
                             )}
                           </div>
@@ -421,14 +438,16 @@ export default function TrendingArtistsPage() {
                           </div>
 
                           {/* Trending Score */}
-                          <div className="flex items-center gap-2">
-                            <TrendingUp className="w-4 h-4 text-green-500" />
-                            <span className="text-white font-bold">
+                          <div className="text-center">
+                            <div className="text-white font-bold text-green-500">
                               {artist.trending_score}
-                            </span>
+                            </div>
+                            <div className="text-white/60 text-xs font-bold tracking-wider uppercase">
+                              SCORE
+                            </div>
                           </div>
 
-                          <ArrowRight className="w-5 h-5 text-white/40 group-hover:text-white transition-colors" />
+                          <span className="text-white/40 group-hover:text-white transition-colors font-bold">→</span>
                         </div>
                       </div>
                     </Card>
@@ -441,56 +460,59 @@ export default function TrendingArtistsPage() {
 
         {/* Empty State */}
         {artists.length === 0 && (
-          <motion.div 
+          <motion.div
             className="text-center py-16"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <TrendingUp className="w-16 h-16 text-white/20 mx-auto mb-6" />
-            <h2 className="text-2xl font-bold tracking-wider uppercase text-white/60 mb-4">
+            <H2 variant="display" className="mb-4 text-white/60">
               NO TRENDING DATA YET
-            </h2>
-            <p className="text-white/40 max-w-md mx-auto mb-8">
+            </H2>
+            <p className="text-white/40 max-w-md mx-auto mb-8 text-sm tracking-wider uppercase">
               Check back as our community grows and trending patterns emerge
             </p>
             <Link href="/artists">
-              <button className="bg-white text-black hover:bg-white/90 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200">
+              <button className="bg-white text-black hover:bg-white/90 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200 text-xs">
                 VIEW ALL ARTISTS
               </button>
             </Link>
           </motion.div>
         )}
 
-        {/* Call to Action */}
-        {artists.length > 0 && (
-          <motion.div 
-            className="text-center mt-16 pt-12 border-t border-white/10"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-          >
-            <h3 className="text-2xl font-bold tracking-wider uppercase text-white mb-4">
-              WANT TO BE TRENDING?
-            </h3>
-            <p className="text-white/60 mb-6 max-w-md mx-auto">
-              Build your fanbase, get more bookings, and climb the trending charts
-            </p>
-            <div className="flex gap-4 justify-center">
-              <Link href="/verification">
-                <button className="bg-white text-black hover:bg-white/90 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200">
-                  JOIN AS ARTIST
-                </button>
-              </Link>
-              <Link href="/events/create">
-                <button className="border border-white/20 text-white hover:bg-white/10 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200">
-                  CREATE EVENT
-                </button>
-              </Link>
-            </div>
-          </motion.div>
-        )}
-      </div>
+        </div>
+      </section>
+
+      {/* Call to Action Section */}
+      <section className="w-full py-16 lg:py-24 bg-neutral-950">
+          <div className="max-w-7xl mx-auto px-6">
+            <motion.div
+              className="text-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+            >
+              <H3 variant="display" className="mb-4 text-white">
+                WANT TO BE TRENDING?
+              </H3>
+              <p className="text-white/40 mb-6 max-w-md mx-auto text-sm tracking-wider uppercase">
+                Build your fanbase, get more bookings, and climb the trending charts
+              </p>
+              <div className="flex gap-4 justify-center">
+                <Link href="/verification">
+                  <button className="bg-white text-black hover:bg-white/90 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200 text-xs">
+                    JOIN AS ARTIST
+                  </button>
+                </Link>
+                <Link href="/events/create">
+                  <button className="border border-white/20 text-white hover:bg-white/10 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200 text-xs">
+                    CREATE EVENT
+                  </button>
+                </Link>
+              </div>
+            </motion.div>
+          </div>
+        </section>
     </div>
   )
 }

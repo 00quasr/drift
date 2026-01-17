@@ -1,15 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Search, Music, Star, SlidersHorizontal, Mic, Zap } from 'lucide-react'
+import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { EntityCard } from '@/components/ui/entity-card'
 import { EntityViews } from '@/components/ui/entity-views'
 import { ViewSwitcher, ViewMode } from '@/components/ui/view-switcher'
-import { H1 } from '@/components/ui/typography'
+import { H1, H2 } from '@/components/ui/typography'
 import { getArtists } from '@/lib/services/artists'
-import { getFallbackImage, isValidImageUrl } from '@/lib/utils/imageUtils'
 import ClassicLoader from '@/components/ui/loader'
 
 export default function ArtistsPage() {
@@ -44,10 +42,10 @@ export default function ArtistsPage() {
 
   // Filter and sort artists
   const filteredArtists = artists.filter(artist => {
-    const matchesSearch = !searchTerm || 
+    const matchesSearch = !searchTerm ||
       artist.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       artist.bio?.toLowerCase().includes(searchTerm.toLowerCase())
-    
+
     const matchesGenre = selectedGenre === 'all' || artist.genres?.includes(selectedGenre)
     const matchesCountry = selectedCountry === 'all' || artist.country === selectedCountry
 
@@ -67,13 +65,13 @@ export default function ArtistsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black pt-24 pb-16">
+      <div className="min-h-screen bg-neutral-950 pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center py-32">
             <div className="mb-8 flex justify-center">
               <ClassicLoader />
             </div>
-            <p className="text-white/80 font-bold tracking-widest uppercase text-sm">LOADING ARTISTS...</p>
+            <p className="text-white/50 font-bold tracking-widest uppercase text-sm">LOADING ARTISTS...</p>
           </div>
         </div>
       </div>
@@ -81,30 +79,48 @@ export default function ArtistsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black pt-24 pb-16">
-      <div className="max-w-7xl mx-auto px-6">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <H1 variant="display" className="text-5xl md:text-7xl mb-6 text-white">
-            DISCOVER ARTISTS
-          </H1>
-          <p className="text-white/80 text-lg max-w-3xl mx-auto font-medium tracking-wider uppercase">
-            FROM RISING STARS TO LEGENDARY DJS, EXPLORE THE ARTISTS SHAPING ELECTRONIC MUSIC CULTURE ACROSS THE GLOBE
-          </p>
-        </div>
+    <div className="min-h-screen bg-neutral-950 text-white">
+      {/* Hero Section */}
+      <section className="w-full pt-24 pb-16 bg-neutral-950">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex items-start justify-between">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <H1 variant="display" className="text-5xl md:text-7xl mb-6 text-white">
+                ARTISTS
+              </H1>
+              <p className="text-white/50 text-sm lg:text-base font-medium max-w-2xl tracking-wider uppercase">
+                FROM RISING STARS TO LEGENDARY DJS, EXPLORE THE ARTISTS SHAPING ELECTRONIC MUSIC
+              </p>
+            </motion.div>
 
-        {/* Search and Filters */}
-        <div className="mb-12">
-          <div className="flex flex-col lg:flex-row gap-6 mb-8">
+            <motion.div
+              className="hidden lg:block"
+              initial={{ opacity: 0, scaleY: 0 }}
+              animate={{ opacity: 1, scaleY: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              <div className="w-px h-24 bg-gradient-to-b from-white/40 to-transparent" />
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Filters Section */}
+      <section className="w-full py-8 bg-neutral-950">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex flex-col lg:flex-row gap-4 mb-6">
             {/* Search */}
-            <div className="flex-1 relative">
-              <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-white w-6 h-6" />
+            <div className="flex-1">
               <Input
                 type="text"
                 placeholder="SEARCH ARTISTS..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                                  className="pl-16 pr-6 py-4 bg-black border-2 border-white/30 text-white placeholder-white/60 focus:border-white transition-colors duration-200 h-14 text-lg font-bold tracking-wider uppercase"
+                className="w-full px-6 py-4 bg-neutral-950 border border-white/20 text-white placeholder-white/40 focus:border-white/40 transition-colors duration-200 h-12 text-sm font-bold tracking-wider uppercase"
               />
             </div>
 
@@ -112,26 +128,25 @@ export default function ArtistsPage() {
             <Button
               onClick={() => setFiltersOpen(!filtersOpen)}
               variant="outline"
-              className="border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/60 font-bold tracking-wider uppercase px-6 h-14"
+              className="border border-white/20 text-white/60 hover:text-white hover:bg-white/5 hover:border-white/40 font-bold tracking-wider uppercase px-6 h-12 text-xs"
             >
-              <SlidersHorizontal className="w-5 h-5 mr-2" />
               FILTERS
             </Button>
           </div>
 
           {/* Expandable Filters */}
           {filtersOpen && (
-            <div className="bg-white/5 border border-white/20 p-6 mb-8">
+            <div className="bg-black/50 border border-white/10 p-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Genre Filter */}
                 <div>
-                  <label className="block text-white font-bold tracking-widest uppercase text-sm mb-3">
+                  <label className="block text-white/50 font-bold tracking-widest uppercase text-xs mb-3">
                     GENRE
                   </label>
                   <select
                     value={selectedGenre}
                     onChange={(e) => setSelectedGenre(e.target.value)}
-                    className="w-full bg-black border-2 border-white/30 text-white font-bold tracking-wider uppercase text-sm px-4 py-3 focus:border-white transition-colors"
+                    className="w-full bg-black border border-white/20 text-white font-bold tracking-wider uppercase text-xs px-4 py-3 focus:border-white/40 transition-colors"
                   >
                     <option value="all">ALL GENRES</option>
                     {allGenres.map(genre => (
@@ -142,13 +157,13 @@ export default function ArtistsPage() {
 
                 {/* Country Filter */}
                 <div>
-                  <label className="block text-white font-bold tracking-widest uppercase text-sm mb-3">
+                  <label className="block text-white/50 font-bold tracking-widest uppercase text-xs mb-3">
                     COUNTRY
                   </label>
                   <select
                     value={selectedCountry}
                     onChange={(e) => setSelectedCountry(e.target.value)}
-                    className="w-full bg-black border-2 border-white/30 text-white font-bold tracking-wider uppercase text-sm px-4 py-3 focus:border-white transition-colors"
+                    className="w-full bg-black border border-white/20 text-white font-bold tracking-wider uppercase text-xs px-4 py-3 focus:border-white/40 transition-colors"
                   >
                     <option value="all">ALL COUNTRIES</option>
                     {allCountries.map(country => (
@@ -159,13 +174,13 @@ export default function ArtistsPage() {
 
                 {/* Sort Filter */}
                 <div>
-                  <label className="block text-white font-bold tracking-widest uppercase text-sm mb-3">
+                  <label className="block text-white/50 font-bold tracking-widest uppercase text-xs mb-3">
                     SORT BY
                   </label>
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
-                    className="w-full bg-black border-2 border-white/30 text-white font-bold tracking-wider uppercase text-sm px-4 py-3 focus:border-white transition-colors"
+                    className="w-full bg-black border border-white/20 text-white font-bold tracking-wider uppercase text-xs px-4 py-3 focus:border-white/40 transition-colors"
                   >
                     <option value="name">NAME (A-Z)</option>
                     <option value="rating">HIGHEST RATED</option>
@@ -175,7 +190,7 @@ export default function ArtistsPage() {
               </div>
 
               <div className="mt-6 flex justify-between items-center">
-                <p className="text-white/60 font-bold tracking-widest uppercase text-sm">
+                <p className="text-white/40 font-bold tracking-widest uppercase text-xs">
                   {filteredArtists.length} ARTISTS FOUND
                 </p>
                 <Button
@@ -185,7 +200,7 @@ export default function ArtistsPage() {
                     setSortBy('name')
                   }}
                   variant="outline"
-                  className="border-white/30 text-white hover:bg-white/10 font-bold tracking-wider uppercase text-sm px-6"
+                  className="border-white/20 text-white/60 hover:text-white hover:bg-white/5 hover:border-white/40 font-bold tracking-wider uppercase text-xs px-6"
                 >
                   CLEAR ALL
                 </Button>
@@ -193,33 +208,64 @@ export default function ArtistsPage() {
             </div>
           )}
         </div>
+      </section>
 
-        {/* Results */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-white font-bold tracking-widest uppercase text-sm flex items-center gap-3">
-              <div className="w-2 h-2 bg-white" />
-              ARTISTS
-            </h2>
-            <ViewSwitcher 
+      {/* Results Section */}
+      <section className="w-full py-16 lg:py-24 bg-neutral-950">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex items-center justify-between mb-12">
+            <div>
+              <span className="text-white/50 font-bold tracking-widest uppercase text-xs mb-4 block">
+                DISCOVER
+              </span>
+              <H2 variant="display" className="text-white">
+                ALL ARTISTS
+              </H2>
+            </div>
+            <ViewSwitcher
               viewMode={viewMode}
               onViewModeChange={setViewMode}
             />
           </div>
-        </div>
 
-        {/* Artists Views */}
-        <EntityViews
-          entities={filteredArtists.map(artist => ({
-            ...artist,
-            name: artist.name
-            // Let EntityViews handle image fallback logic
-          }))}
-          viewMode={viewMode}
-          entityType="artist"
-          emptyMessage="NO ARTISTS FOUND - TRY ADJUSTING YOUR SEARCH OR FILTERS"
-        />
-      </div>
+          {/* Artists Views */}
+          <EntityViews
+            entities={filteredArtists.map(artist => ({
+              ...artist,
+              name: artist.name
+            }))}
+            viewMode={viewMode}
+            entityType="artist"
+            emptyMessage="NO ARTISTS FOUND - TRY ADJUSTING YOUR SEARCH OR FILTERS"
+          />
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="w-full py-16 lg:py-24 bg-neutral-950">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center">
+            <H2 variant="display" className="mb-4 text-white">
+              ARE YOU AN ARTIST?
+            </H2>
+            <p className="text-white/40 mb-8 max-w-md mx-auto text-sm tracking-wider uppercase">
+              Join Drift and connect with venues, promoters, and fans in the electronic music scene
+            </p>
+            <div className="flex gap-4 justify-center">
+              <a href="/verification">
+                <button className="bg-white text-black hover:bg-white/90 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200 text-xs">
+                  JOIN AS ARTIST
+                </button>
+              </a>
+              <a href="/events">
+                <button className="border border-white/20 text-white hover:bg-white/10 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200 text-xs">
+                  FIND EVENTS
+                </button>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   )
-} 
+}

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Calendar, MapPin, Users, Clock, Star, Music, ArrowRight, Filter } from 'lucide-react'
+import { H1, H2, H3 } from '@/components/ui/typography'
 import { Card } from '@/components/ui/card'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -116,10 +116,10 @@ export default function FestivalsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="min-h-screen bg-neutral-950 text-white flex items-center justify-center">
         <div className="flex flex-col items-center justify-center space-y-6">
           <ClassicLoader />
-          <p className="text-white/80 font-bold tracking-wider uppercase text-center">
+          <p className="text-white/50 font-bold tracking-wider uppercase text-center">
             LOADING FESTIVALS...
           </p>
         </div>
@@ -129,7 +129,7 @@ export default function FestivalsPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="min-h-screen bg-neutral-950 text-white flex items-center justify-center">
         <Card className="bg-white/5 border border-red-500/30 p-8 max-w-md w-full">
           <div className="text-center space-y-4">
             <p className="text-red-400 font-bold tracking-wider uppercase">
@@ -148,68 +148,83 @@ export default function FestivalsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <div className="max-w-7xl mx-auto px-6 pt-24 pb-12">
-        {/* Header */}
-        <motion.div 
-          className="mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <Music className="w-8 h-8 text-green-500" />
-            <h1 className="text-4xl md:text-5xl font-bold tracking-wider uppercase">
-              FESTIVALS
-            </h1>
-          </div>
-          <p className="text-white/70 text-lg font-medium max-w-2xl">
-            MULTI-DAY ELECTRONIC MUSIC EXPERIENCES WITH LINEUPS AND OPEN-AIR VIBES
-          </p>
-        </motion.div>
+    <div className="min-h-screen bg-neutral-950 text-white">
+      {/* Hero Section */}
+      <section className="w-full pt-24 pb-16 bg-neutral-950">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex items-start justify-between">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <H1 variant="display" className="text-5xl md:text-7xl mb-6 text-white">
+                FESTIVALS
+              </H1>
+              <p className="text-white/50 text-sm lg:text-base font-medium max-w-2xl tracking-wider uppercase">
+                MULTI-DAY ELECTRONIC MUSIC EXPERIENCES WITH WORLD-CLASS LINEUPS
+              </p>
+            </motion.div>
 
-        {/* Filters & Sort */}
-        <motion.div 
-          className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-        >
-          {/* Filter Tabs */}
-          <div className="flex gap-4 border-b border-white/10 pb-4">
-            {[
-              { key: 'upcoming', label: 'UPCOMING' },
-              { key: 'this-month', label: 'THIS MONTH' },
-              { key: 'all', label: 'ALL FESTIVALS' }
-            ].map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => setFilter(tab.key as any)}
-                className={`px-4 py-2 font-bold tracking-wider uppercase text-sm transition-all duration-300 ${
-                  filter === tab.key 
-                    ? 'text-white border-b-2 border-white' 
-                    : 'text-white/60 hover:text-white'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
+            <motion.div
+              className="hidden lg:block"
+              initial={{ opacity: 0, scaleY: 0 }}
+              animate={{ opacity: 1, scaleY: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              <div className="w-px h-24 bg-gradient-to-b from-white/40 to-transparent" />
+            </motion.div>
           </div>
+        </div>
+      </section>
 
-          {/* Sort Dropdown */}
-          <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-white/60" />
+      {/* Filters Section */}
+      <section className="w-full py-8 bg-neutral-950">
+        <div className="max-w-7xl mx-auto px-6">
+          <motion.div
+            className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            {/* Filter Tabs */}
+            <div className="flex gap-4">
+              {[
+                { key: 'upcoming', label: 'UPCOMING' },
+                { key: 'this-month', label: 'THIS MONTH' },
+                { key: 'all', label: 'ALL FESTIVALS' }
+              ].map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => setFilter(tab.key as any)}
+                  className={`px-4 py-2 font-bold tracking-wider uppercase text-xs transition-all duration-300 ${
+                    filter === tab.key
+                      ? 'text-white border-b-2 border-white'
+                      : 'text-white/60 hover:text-white'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Sort Dropdown */}
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="bg-white/10 border border-white/20 rounded px-3 py-2 text-sm font-bold tracking-wider uppercase text-white focus:outline-none focus:border-white/40"
+              className="bg-neutral-950 border border-white/20 px-4 py-2 text-xs font-bold tracking-wider uppercase text-white focus:outline-none focus:border-white/40"
             >
               <option value="date">SORT BY DATE</option>
               <option value="duration">SORT BY DURATION</option>
               <option value="rating">SORT BY RATING</option>
             </select>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Results Section */}
+      <section className="w-full py-16 lg:py-24 bg-neutral-950">
+        <div className="max-w-7xl mx-auto px-6">
 
         {/* Festivals Grid */}
         {sortedFestivals.length > 0 ? (
@@ -250,7 +265,7 @@ export default function FestivalsPage() {
                           )}
                           {festival.rating && (
                             <div className="bg-black/60 backdrop-blur-sm px-2 py-1 rounded flex items-center gap-1">
-                              <Star className="w-3 h-3 text-yellow-400 fill-current" />
+                              <div className="w-2 h-2 rounded-full bg-yellow-400"></div>
                               <span className="text-white text-xs font-bold">
                                 {festival.rating.toFixed(1)}
                               </span>
@@ -267,26 +282,20 @@ export default function FestivalsPage() {
                       </h3>
                       
                       {/* Date Range */}
-                      <div className="flex items-center gap-2 text-white/70 text-sm font-bold tracking-wider uppercase mb-3">
-                        <Calendar className="w-4 h-4" />
-                        <span>
-                          {new Date(festival.start_date).toLocaleDateString('en-US', { 
-                            month: 'short', 
-                            day: 'numeric' 
-                          })} - {new Date(festival.end_date).toLocaleDateString('en-US', { 
-                            month: 'short', 
-                            day: 'numeric',
-                            year: 'numeric'
-                          })}
-                        </span>
+                      <div className="text-white/60 text-sm font-bold tracking-wider uppercase mb-3">
+                        {new Date(festival.start_date).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric'
+                        })} - {new Date(festival.end_date).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric'
+                        })}
                       </div>
-                      
+
                       {/* Venue & Location */}
-                      <div className="flex items-center gap-2 text-white/60 text-sm font-medium mb-4">
-                        <MapPin className="w-4 h-4" />
-                        <span className="font-bold tracking-wider uppercase">
-                          {festival.venue.name} • {festival.venue.location}
-                        </span>
+                      <div className="text-white/50 text-sm font-bold tracking-wider uppercase mb-4">
+                        {festival.venue.name} • {festival.venue.location}
                       </div>
 
                       {/* Festival Stats */}
@@ -320,12 +329,9 @@ export default function FestivalsPage() {
                       {/* Headliner Artists */}
                       {festival.artists.length > 0 && (
                         <div className="mb-4">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Users className="w-4 h-4 text-white/60" />
-                            <span className="text-white/60 text-xs font-bold tracking-wider uppercase">
-                              HEADLINERS
-                            </span>
-                          </div>
+                          <span className="text-white/50 text-xs font-bold tracking-widest uppercase block mb-2">
+                            HEADLINERS
+                          </span>
                           <div className="flex flex-wrap gap-2">
                             {festival.artists.slice(0, 4).map((artist) => (
                               <span 
@@ -385,31 +391,30 @@ export default function FestivalsPage() {
           </div>
         ) : (
           /* Empty State */
-          <motion.div 
+          <motion.div
             className="text-center py-16"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <Music className="w-16 h-16 text-white/20 mx-auto mb-6" />
-            <h2 className="text-2xl font-bold tracking-wider uppercase text-white/60 mb-4">
+            <H2 variant="display" className="mb-4 text-white/60">
               NO FESTIVALS FOUND
-            </h2>
-            <p className="text-white/40 max-w-md mx-auto mb-8">
-              {filter === 'upcoming' 
+            </H2>
+            <p className="text-white/40 max-w-md mx-auto mb-8 text-sm tracking-wider uppercase">
+              {filter === 'upcoming'
                 ? 'No upcoming festivals scheduled. Check back soon for new announcements!'
                 : 'Try adjusting your filter to find festivals that match your preferences'
               }
             </p>
             <div className="flex gap-4 justify-center">
-              <button 
+              <button
                 onClick={() => setFilter('all')}
-                className="bg-white text-black hover:bg-white/90 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200"
+                className="bg-white text-black hover:bg-white/90 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200 text-xs"
               >
                 VIEW ALL FESTIVALS
               </button>
               <Link href="/events">
-                <button className="border border-white/20 text-white hover:bg-white/10 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200">
+                <button className="border border-white/20 text-white hover:bg-white/10 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200 text-xs">
                   ALL EVENTS
                 </button>
               </Link>
@@ -417,35 +422,39 @@ export default function FestivalsPage() {
           </motion.div>
         )}
 
-        {/* Call to Action */}
-        {sortedFestivals.length > 0 && (
-          <motion.div 
-            className="text-center mt-16 pt-12 border-t border-white/10"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-          >
-            <h3 className="text-2xl font-bold tracking-wider uppercase text-white mb-4">
-              ORGANIZING A FESTIVAL?
-            </h3>
-            <p className="text-white/60 mb-6 max-w-md mx-auto">
-              Showcase your multi-day event to thousands of electronic music fans
-            </p>
-            <div className="flex gap-4 justify-center">
-              <Link href="/events/create">
-                <button className="bg-white text-black hover:bg-white/90 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200">
-                  LIST YOUR FESTIVAL
-                </button>
-              </Link>
-              <Link href="/venues">
-                <button className="border border-white/20 text-white hover:bg-white/10 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200">
-                  FIND VENUES
-                </button>
-              </Link>
-            </div>
-          </motion.div>
-        )}
-      </div>
+        </div>
+      </section>
+
+      {/* Call to Action Section */}
+      <section className="w-full py-16 lg:py-24 bg-neutral-950">
+          <div className="max-w-7xl mx-auto px-6">
+            <motion.div
+              className="text-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+            >
+              <H3 variant="display" className="mb-4 text-white">
+                ORGANIZING A FESTIVAL?
+              </H3>
+              <p className="text-white/40 mb-6 max-w-md mx-auto text-sm tracking-wider uppercase">
+                Showcase your multi-day event to thousands of electronic music fans
+              </p>
+              <div className="flex gap-4 justify-center">
+                <Link href="/events/create">
+                  <button className="bg-white text-black hover:bg-white/90 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200 text-xs">
+                    LIST YOUR FESTIVAL
+                  </button>
+                </Link>
+                <Link href="/venues">
+                  <button className="border border-white/20 text-white hover:bg-white/10 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200 text-xs">
+                    FIND VENUES
+                  </button>
+                </Link>
+              </div>
+            </motion.div>
+          </div>
+        </section>
     </div>
   )
 }

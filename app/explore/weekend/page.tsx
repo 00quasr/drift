@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Calendar, Clock, MapPin, ArrowRight, Star, Users } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { H1, H2, H3 } from '@/components/ui/typography'
 import Link from 'next/link'
@@ -91,10 +90,10 @@ export default function WeekendPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="min-h-screen bg-neutral-950 text-white flex items-center justify-center">
         <div className="flex flex-col items-center justify-center space-y-6">
           <ClassicLoader />
-          <p className="text-white/80 font-bold tracking-wider uppercase text-center">
+          <p className="text-white/50 font-bold tracking-wider uppercase text-center">
             LOADING WEEKEND EVENTS...
           </p>
         </div>
@@ -104,7 +103,7 @@ export default function WeekendPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="min-h-screen bg-neutral-950 text-white flex items-center justify-center">
         <Card className="bg-white/5 border border-red-500/30 p-8 max-w-md w-full">
           <div className="text-center space-y-4">
             <p className="text-red-400 font-bold tracking-wider uppercase">
@@ -123,25 +122,39 @@ export default function WeekendPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <div className="max-w-7xl mx-auto px-6 pt-24 pb-12">
-        {/* Header */}
-        <motion.div 
-          className="mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <Calendar className="w-8 h-8 text-blue-500" />
-            <H1 variant="display" className="text-4xl md:text-5xl">
-              THIS WEEKEND
-            </H1>
+    <div className="min-h-screen bg-neutral-950 text-white">
+      {/* Hero Section */}
+      <section className="w-full pt-24 pb-16 bg-neutral-950">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex items-start justify-between">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <H1 variant="display" className="text-5xl md:text-7xl mb-6 text-white">
+                THIS WEEKEND
+              </H1>
+              <p className="text-white/50 text-sm lg:text-base font-medium max-w-2xl tracking-wider uppercase">
+                CURATED ELECTRONIC MUSIC EVENTS • {friday} - {sunday}
+              </p>
+            </motion.div>
+
+            <motion.div
+              className="hidden lg:block"
+              initial={{ opacity: 0, scaleY: 0 }}
+              animate={{ opacity: 1, scaleY: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              <div className="w-px h-24 bg-gradient-to-b from-white/40 to-transparent" />
+            </motion.div>
           </div>
-          <p className="text-white/70 text-lg font-medium max-w-2xl">
-            CURATED ELECTRONIC MUSIC EVENTS • {friday} - {sunday}
-          </p>
-        </motion.div>
+        </div>
+      </section>
+
+      {/* Events Section */}
+      <section className="w-full py-16 lg:py-24 bg-neutral-950">
+        <div className="max-w-7xl mx-auto px-6">
 
         {/* Weekend Events Grid */}
         {events.length > 0 ? (
@@ -180,7 +193,7 @@ export default function WeekendPage() {
                         {/* Rating Badge */}
                         {event.rating && (
                           <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-sm px-2 py-1 rounded-lg flex items-center gap-1">
-                            <Star className="w-3 h-3 text-yellow-400 fill-current" />
+                            <div className="w-2 h-2 rounded-full bg-yellow-400"></div>
                             <span className="text-white text-xs font-bold">
                               {event.rating.toFixed(1)}
                             </span>
@@ -196,30 +209,21 @@ export default function WeekendPage() {
                       </h3>
                       
                       {/* Venue & Location */}
-                      <div className="flex items-center gap-2 text-white/60 text-sm font-medium mb-3">
-                        <MapPin className="w-4 h-4" />
-                        <span className="font-bold tracking-wider uppercase">
-                          {event.venue.name}
-                        </span>
+                      <div className="text-white/60 text-sm font-bold tracking-wider uppercase mb-3">
+                        {event.venue.name}
                       </div>
                       
                       {/* Time */}
-                      <div className="flex items-center gap-2 text-white/60 text-sm font-medium mb-4">
-                        <Clock className="w-4 h-4" />
-                        <span className="font-bold tracking-wider uppercase">
-                          {event.start_time} - {event.end_time || 'LATE'}
-                        </span>
+                      <div className="text-white/60 text-sm font-bold tracking-wider uppercase mb-4">
+                        {event.start_time} - {event.end_time || 'LATE'}
                       </div>
                       
                       {/* Artists */}
                       {event.artists && event.artists.length > 0 && (
                         <div className="mb-4">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Users className="w-4 h-4 text-white/60" />
-                            <span className="text-white/60 text-xs font-bold tracking-wider uppercase">
-                              LINEUP
-                            </span>
-                          </div>
+                          <span className="text-white/50 text-xs font-bold tracking-widest uppercase block mb-2">
+                            LINEUP
+                          </span>
                           <div className="flex flex-wrap gap-2">
                             {event.artists.slice(0, 3).map((artist) => (
                               <span 
@@ -270,21 +274,20 @@ export default function WeekendPage() {
           </div>
         ) : (
           /* Empty State */
-          <motion.div 
+          <motion.div
             className="text-center py-16"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <Calendar className="w-16 h-16 text-white/20 mx-auto mb-6" />
             <H2 variant="display" className="mb-4 text-white/60">
               NO WEEKEND EVENTS SCHEDULED
             </H2>
-            <p className="text-white/40 max-w-md mx-auto mb-8">
+            <p className="text-white/40 max-w-md mx-auto mb-8 text-sm tracking-wider uppercase">
               Check back later for upcoming weekend events or explore all events
             </p>
             <Link href="/events">
-              <button className="bg-white text-black hover:bg-white/90 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200">
+              <button className="bg-white text-black hover:bg-white/90 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200 text-xs">
                 VIEW ALL EVENTS
               </button>
             </Link>
@@ -293,7 +296,7 @@ export default function WeekendPage() {
 
         {/* Call to Action */}
         {events.length > 0 && (
-          <motion.div 
+          <motion.div
             className="text-center mt-16 pt-12 border-t border-white/10"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -302,24 +305,25 @@ export default function WeekendPage() {
             <H3 variant="display" className="mb-4 text-white">
               PLANNING AHEAD?
             </H3>
-            <p className="text-white/60 mb-6 max-w-md mx-auto">
+            <p className="text-white/40 mb-6 max-w-md mx-auto text-sm tracking-wider uppercase">
               Browse all upcoming events and discover new venues and artists
             </p>
             <div className="flex gap-4 justify-center">
               <Link href="/events">
-                <button className="bg-white text-black hover:bg-white/90 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200">
+                <button className="bg-white text-black hover:bg-white/90 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200 text-xs">
                   ALL EVENTS
                 </button>
               </Link>
               <Link href="/venues">
-                <button className="border border-white/20 text-white hover:bg-white/10 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200">
+                <button className="border border-white/20 text-white hover:bg-white/10 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200 text-xs">
                   VENUES
                 </button>
               </Link>
             </div>
           </motion.div>
         )}
-      </div>
+        </div>
+      </section>
     </div>
   )
 }

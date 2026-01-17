@@ -24,7 +24,6 @@ import {
 } from 'lucide-react'
 import { uploadVenueImage, moderateImage, validateImageFile } from '@/lib/services/storage'
 import ImageGallery from '@/components/ui/ImageGallery'
-import ClassicLoader from '@/components/ui/loader'
 import { H1, H2, H3 } from "@/components/ui/typography"
 
 interface VenueFormData {
@@ -396,11 +395,7 @@ export default function MyVenuePage() {
   }
 
   if (loading || isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <ClassicLoader />
-      </div>
-    )
+    return null
   }
 
   if (!user || user.role !== 'club_owner') {

@@ -33,7 +33,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
-import ClassicLoader from '@/components/ui/loader'
 
 interface TrendingData {
   venues: any[]
@@ -130,16 +129,7 @@ export default function TrendingPage() {
   }
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-neutral-950 text-white flex items-center justify-center pt-24">
-        <div className="flex flex-col items-center justify-center space-y-6">
-          <ClassicLoader />
-          <p className="text-white/50 font-bold tracking-wider uppercase text-center">
-            LOADING TRENDING CONTENT...
-          </p>
-        </div>
-      </div>
-    )
+    return null
   }
 
   if (error) {

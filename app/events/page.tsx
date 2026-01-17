@@ -10,7 +10,6 @@ import { ViewSwitcher, ViewMode } from '@/components/ui/view-switcher'
 import { H1, H2, H3 } from '@/components/ui/typography'
 import { getEvents } from '@/lib/services/events'
 import { getFallbackImage, isValidImageUrl } from '@/lib/utils/imageUtils'
-import ClassicLoader from '@/components/ui/loader'
 
 export default function EventsPage() {
   const [events, setEvents] = useState<any[]>([])
@@ -57,18 +56,7 @@ export default function EventsPage() {
   })
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-neutral-950 pt-24 pb-16">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center py-32">
-            <div className="mb-8 flex justify-center">
-              <ClassicLoader />
-            </div>
-            <p className="text-white/50 font-bold tracking-widest uppercase text-sm">LOADING EVENTS...</p>
-          </div>
-        </div>
-      </div>
-    )
+    return null
   }
 
   return (

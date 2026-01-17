@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import ClassicLoader from '@/components/ui/loader'
 import { H1, H3 } from '@/components/ui/typography'
 import {
   Calendar,
@@ -173,11 +172,7 @@ export default function ManageEventsPage() {
   })
 
   if (loading || isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <ClassicLoader />
-      </div>
-    )
+    return null
   }
 
   if (!user || user.role !== 'promoter') {

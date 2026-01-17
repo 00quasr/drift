@@ -6,7 +6,6 @@ import { Map, MapPin, Calendar, Clock, Users, Star, Filter, List, Navigation } f
 import { Card } from '@/components/ui/card'
 import Link from 'next/link'
 import Image from 'next/image'
-import ClassicLoader from '@/components/ui/loader'
 
 interface EventLocation {
   id: string
@@ -124,16 +123,7 @@ export default function EventsMapPage() {
   )).sort()
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="flex flex-col items-center justify-center space-y-6">
-          <ClassicLoader />
-          <p className="text-white/80 font-bold tracking-wider uppercase text-center">
-            LOADING EVENT MAP...
-          </p>
-        </div>
-      </div>
-    )
+    return null
   }
 
   if (error) {

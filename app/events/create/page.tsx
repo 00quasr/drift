@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { motion } from 'framer-motion'
-import ClassicLoader from '@/components/ui/loader'
 import {
   Calendar,
   MapPin,
@@ -428,11 +427,7 @@ export default function CreateEventPage() {
   }
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <ClassicLoader />
-      </div>
-    )
+    return null
   }
 
   if (!user || user.role !== 'promoter') {

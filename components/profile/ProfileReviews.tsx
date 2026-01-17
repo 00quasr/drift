@@ -219,31 +219,7 @@ export const ProfileReviews: React.FC<ProfileReviewsProps> = ({
   }
 
   if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {[1, 2, 3].map((i) => (
-            <Card key={i} className="bg-white/5 border border-white/20 p-4">
-              <div className="animate-pulse">
-                <div className="h-4 bg-white/20 rounded mb-2"></div>
-                <div className="h-8 bg-white/20 rounded"></div>
-              </div>
-            </Card>
-          ))}
-        </div>
-        <div className="space-y-4">
-          {[1, 2, 3].map((i) => (
-            <Card key={i} className="bg-white/5 border border-white/20 p-6">
-              <div className="animate-pulse">
-                <div className="h-4 bg-white/20 rounded mb-4"></div>
-                <div className="h-3 bg-white/10 rounded mb-3"></div>
-                <div className="h-20 bg-white/10 rounded"></div>
-              </div>
-            </Card>
-          ))}
-        </div>
-      </div>
-    )
+    return null
   }
 
   return (

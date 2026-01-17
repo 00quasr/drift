@@ -10,7 +10,6 @@ import { getUpcomingEvents, getTrendingEvents } from '@/lib/services/events'
 import { getTrendingVenues } from '@/lib/services/venues'
 import { getTopRatedArtists } from '@/lib/services/artists'
 import { getFallbackImage, isValidImageUrl } from '@/lib/utils/imageUtils'
-import ClassicLoader from '@/components/ui/loader'
 
 const genreTags = ['ALL', 'TECHNO', 'HOUSE', 'TRANCE', 'DRUM & BASS', 'DUBSTEP', 'AMBIENT', 'MINIMAL', 'PROGRESSIVE']
 
@@ -28,22 +27,19 @@ async function ExplorePage() {
   const hasVenues = venues && venues.length > 0
   const hasArtists = artists && artists.length > 0
 
-  // If no data, show loading state
+  // If no data, show empty state
   if (!hasEvents && !hasVenues && !hasArtists) {
     return (
       <div className="min-h-screen bg-neutral-950 pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center py-32">
-            <div className="mb-8 flex justify-center">
-              <ClassicLoader />
-            </div>
             <H1 variant="display" className="mb-4 text-white">
               EXPLORE
             </H1>
             <p className="text-white/80 text-lg mb-8 font-medium tracking-wider uppercase">
               DISCOVER THE BEST ELECTRONIC MUSIC EXPERIENCES AROUND THE WORLD
             </p>
-            <p className="text-white/60 mt-4 font-bold tracking-widest uppercase text-sm">DISCOVERING AMAZING CONTENT...</p>
+            <p className="text-white/60 mt-4 font-bold tracking-widest uppercase text-sm">NO CONTENT AVAILABLE YET</p>
           </div>
         </div>
       </div>
@@ -399,24 +395,7 @@ async function ExplorePage() {
 
 export default function ExplorePageWrapper() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-neutral-950 pt-24 pb-16">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center py-32">
-            <div className="mb-8 flex justify-center">
-              <ClassicLoader />
-            </div>
-            <H1 variant="display" className="mb-4 text-white">
-              EXPLORE
-            </H1>
-            <p className="text-white/80 text-lg mb-8 font-medium tracking-wider uppercase">
-              DISCOVER THE BEST ELECTRONIC MUSIC EXPERIENCES AROUND THE WORLD
-            </p>
-            <p className="text-white/60 mt-4 font-bold tracking-widest uppercase text-sm">LOADING AMAZING CONTENT...</p>
-          </div>
-        </div>
-      </div>
-    }>
+    <Suspense fallback={null}>
       <ExplorePage />
     </Suspense>
   )

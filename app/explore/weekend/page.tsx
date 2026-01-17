@@ -6,7 +6,6 @@ import { Card } from '@/components/ui/card'
 import { H1, H2, H3 } from '@/components/ui/typography'
 import Link from 'next/link'
 import Image from 'next/image'
-import ClassicLoader from '@/components/ui/loader'
 
 interface WeekendEvent {
   id: string
@@ -89,16 +88,7 @@ export default function WeekendPage() {
   const { friday, sunday } = getWeekendDates()
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-neutral-950 text-white flex items-center justify-center">
-        <div className="flex flex-col items-center justify-center space-y-6">
-          <ClassicLoader />
-          <p className="text-white/50 font-bold tracking-wider uppercase text-center">
-            LOADING WEEKEND EVENTS...
-          </p>
-        </div>
-      </div>
-    )
+    return null
   }
 
   if (error) {

@@ -7,7 +7,6 @@ import { StarRating } from '@/components/ui/star-rating'
 import { useAuth } from '@/contexts/AuthContext'
 import { authService } from '@/lib/auth'
 import { formatDistanceToNow } from 'date-fns'
-import ClassicLoader from '@/components/ui/loader'
 
 interface Review {
   id: string
@@ -172,26 +171,7 @@ export const VenueReviews: React.FC<VenueReviewsProps> = ({ venueId, venueName }
   }
 
   if (loading) {
-    return (
-      <div className="relative bg-black border-2 border-white/20 p-6">
-        <div className="absolute top-4 right-4 w-6 h-6 z-10">
-          <div className="w-full h-full border-l-2 border-t-2 border-white/60 transform rotate-45" />
-        </div>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold tracking-widest uppercase text-white">
-            REVIEWS & RATINGS
-          </h2>
-        </div>
-        <div className="text-center py-12">
-          <div className="flex justify-center mb-4">
-            <ClassicLoader />
-          </div>
-          <p className="text-white/60 font-bold tracking-widest uppercase text-sm">
-            LOADING REVIEWS...
-          </p>
-        </div>
-      </div>
-    )
+    return null
   }
 
   return (
@@ -391,9 +371,7 @@ export const VenueReviews: React.FC<VenueReviewsProps> = ({ venueId, venueName }
                           title="Delete Review"
                         >
                           {deletingReviewId === review.id ? (
-                            <div className="scale-50">
-                              <ClassicLoader />
-                            </div>
+                            <span className="text-xs">...</span>
                           ) : (
                             <Trash2 className="w-4 h-4" />
                           )}

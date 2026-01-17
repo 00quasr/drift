@@ -11,7 +11,6 @@ import { ViewSwitcher, ViewMode } from '@/components/ui/view-switcher'
 import { H1 } from '@/components/ui/typography'
 import { getVenues } from '@/lib/services/venues'
 import { getFallbackImage, isValidImageUrl } from '@/lib/utils/imageUtils'
-import ClassicLoader from '@/components/ui/loader'
 
 export default function VenuesPage() {
   const [venues, setVenues] = useState<any[]>([])
@@ -56,16 +55,7 @@ export default function VenuesPage() {
   })
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-neutral-950 text-white flex items-center justify-center">
-        <div className="flex flex-col items-center justify-center space-y-6">
-          <ClassicLoader />
-          <p className="text-white/50 font-bold tracking-wider uppercase text-center">
-            LOADING VENUES...
-          </p>
-        </div>
-      </div>
-    )
+    return null
   }
 
   return (

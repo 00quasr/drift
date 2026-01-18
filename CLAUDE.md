@@ -422,7 +422,7 @@ cp -r ../drift/.claude .
 # Install dependencies
 npm install
 
-# Now open Claude Code in this directory
+
 ```
 
 **One-liner setup for new worktrees:**

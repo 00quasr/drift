@@ -10,6 +10,7 @@ Use Claude Code Subagents for specific tasks. Inside of .claude/agents & .claude
 /agents
 - drift-reviewer.md = Expert code reviewer for Drift platform
 - event-optimizer.md = Performance and UX specialist for event discovery features. Optimizes search, trending algorithms
+- linear-auditor.md = Linear ticket auditor that scans all issues, verifies status against codebase, identifies stale/incorrect issues, and discovers new problems. Use periodically to keep Linear in sync with reality.
 - maintenance-agent.md = Maintenance specialist that reviews and updates agents and skills to keep them current with the evolving codebase
 - security-auditor.md = Security specialist for content moderation, API protection, and data safety.
 - supabase-assistant.md = Database expert for Supabase queries, schema design, and RLS policies. Use when working with database tables, migrations, or query optimization. MUST BE USED for any database-related changes.

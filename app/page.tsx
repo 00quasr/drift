@@ -578,7 +578,7 @@ export default function HomePage() {
               {/* Background Image */}
               <div className="absolute inset-0">
                 <Image
-                  src={`${storageUrl}/__krk_Light_leak_effect_cyber_atmosphere_underground_rave_vib_6725855e-4b73-47cd-95d4-0ea900cf9469_3.png`}
+                  src={`${storageUrl}/__krk_Grainy_black_and_white_photo_taken_inside_a_small_rave_ve_5ff6646a-7807-4389-a910-fba604cbdcdc.png`}
                   alt="Join the movement"
                   fill
                   className="object-cover"

@@ -2,16 +2,13 @@
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
-import { motion } from 'framer-motion'
 import {
   MapPin,
   Calendar,
   Music,
-  Users,
   Eye,
-  Heart,
   TrendingUp,
-  Plus,
+  ArrowRight,
   Shield
 } from 'lucide-react'
 import Link from 'next/link'
@@ -118,25 +115,21 @@ export default function DashboardOverview() {
   const quickActions = getQuickActions()
 
   const StatCard = ({ icon: Icon, label, value, trend }: any) => (
-    <motion.div
-      className="bg-black/50 border border-white/20 p-6 backdrop-blur-sm"
-      whileHover={{ scale: 1.02 }}
-      transition={{ duration: 0.2 }}
-    >
+    <div className="bg-neutral-900/50 border border-white/10 p-6 hover:border-white/20 transition-colors">
       <div className="flex items-center justify-between mb-4">
-        <Icon className="w-8 h-8 text-white/60" />
+        <Icon className="w-6 h-6 text-white/50" />
         {trend && (
-          <div className="flex items-center space-x-1 text-green-400 text-sm font-bold">
-            <TrendingUp className="w-4 h-4" />
+          <div className="flex items-center space-x-1 text-emerald-400 text-xs font-medium">
+            <TrendingUp className="w-3 h-3" />
             <span>+{trend}%</span>
           </div>
         )}
       </div>
-      <div className="text-3xl font-bold text-white mb-2">{value}</div>
-      <div className="text-white/60 text-sm font-bold tracking-wider uppercase">
+      <div className="text-3xl font-bold text-white mb-1">{value}</div>
+      <div className="text-white/50 text-xs font-medium tracking-wider uppercase">
         {label}
       </div>
-    </motion.div>
+    </div>
   )
 
   if (loading) {
@@ -148,13 +141,13 @@ export default function DashboardOverview() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       {/* Welcome Header */}
-      <div className="border-b border-white/20 pb-6">
+      <div className="border-b border-white/10 pb-8">
         <H1 variant="display" className="mb-2">
           Welcome back, {user?.display_name || user?.email}
         </H1>
-        <p className="text-white/60 font-bold tracking-wider uppercase">
+        <p className="text-white/50 font-medium tracking-wider uppercase text-sm">
           {user?.role} Dashboard • {user?.is_verified ? 'VERIFIED' : 'PENDING VERIFICATION'}
         </p>
       </div>
@@ -165,34 +158,30 @@ export default function DashboardOverview() {
           <H2 variant="display" className="mb-6">
             Quick Actions
           </H2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {quickActions.map((action) => {
               const Icon = action.icon
               return (
                 <Link key={action.href} href={action.href}>
-                  <motion.div
-                    className="bg-black/50 border border-white/20 p-6 backdrop-blur-sm hover:border-white/40 transition-all duration-200 cursor-pointer group"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <div className="flex items-center space-x-4 mb-4">
-                      <div className="w-12 h-12 bg-white/10 border border-white/20 flex items-center justify-center group-hover:bg-white/20 transition-colors">
-                        <Icon className="w-6 h-6 text-white" />
+                  <div className="bg-neutral-900/50 border border-white/10 p-5 hover:border-white/20 transition-colors cursor-pointer group h-full">
+                    <div className="flex items-start space-x-4 mb-4">
+                      <div className="w-10 h-10 bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-colors">
+                        <Icon className="w-5 h-5 text-white/70" />
                       </div>
-                      <div>
-                        <H3>
+                      <div className="flex-1 min-w-0">
+                        <H3 className="text-base mb-1">
                           {action.title}
                         </H3>
-                        <p className="text-white/60 text-sm">
+                        <p className="text-white/50 text-xs font-medium tracking-wide uppercase">
                           {action.description}
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center text-white/80 text-sm font-bold tracking-wider uppercase group-hover:text-white transition-colors">
-                      <Plus className="w-4 h-4 mr-2" />
-                      CREATE NOW
+                    <div className="flex items-center text-white/50 text-xs font-medium tracking-wider uppercase group-hover:text-white transition-colors">
+                      <ArrowRight className="w-3 h-3 mr-2" />
+                      CREATE
                     </div>
-                  </motion.div>
+                  </div>
                 </Link>
               )
             })}
@@ -205,7 +194,7 @@ export default function DashboardOverview() {
         <H2 variant="display" className="mb-6">
           Overview
         </H2>
-        <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 ${user?.role === 'admin' ? 'lg:grid-cols-5' : 'lg:grid-cols-4'}`}>
+        <div className={`grid grid-cols-2 gap-4 ${user?.role === 'admin' ? 'lg:grid-cols-5' : 'lg:grid-cols-4'}`}>
           <StatCard
             icon={MapPin}
             label="Total Venues"
@@ -248,32 +237,32 @@ export default function DashboardOverview() {
         <H2 variant="display" className="mb-6">
           Recent Activity
         </H2>
-        <div className="bg-black/50 border border-white/20 backdrop-blur-sm">
+        <div className="bg-neutral-900/30 border border-white/10">
           {stats.recentActivity.length > 0 ? (
-            <div className="divide-y divide-white/10">
+            <div className="divide-y divide-white/5">
               {stats.recentActivity.map((activity, index) => (
-                <div key={index} className="p-4 flex items-center space-x-4">
-                  <div className="w-2 h-2 bg-white" />
+                <div key={index} className="p-4 flex items-center space-x-4 hover:bg-white/5 transition-colors">
+                  <div className="w-1.5 h-1.5 bg-white/50 rounded-full" />
                   <div className="flex-1">
-                    <p className="text-white font-bold tracking-wider uppercase text-sm">
+                    <p className="text-white font-medium tracking-wider uppercase text-sm">
                       {activity.action}
                     </p>
-                    <p className="text-white/60 text-sm">
+                    <p className="text-white/50 text-xs mt-0.5">
                       {activity.description}
                     </p>
                   </div>
-                  <div className="text-white/40 text-sm">
+                  <div className="text-white/40 text-xs">
                     {activity.time}
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="p-8 text-center">
-              <p className="text-white/60 font-bold tracking-wider uppercase">
+            <div className="p-12 text-center">
+              <p className="text-white/50 font-medium tracking-wider uppercase text-sm">
                 No recent activity
               </p>
-              <p className="text-white/40 text-sm mt-2">
+              <p className="text-white/40 text-xs mt-2">
                 Start creating content to see activity here
               </p>
             </div>

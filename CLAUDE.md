@@ -386,69 +386,77 @@ gh pr create --title "DRI-123: Add user authentication" --body "Implements OAuth
 ### Using Git Worktrees for Multiple Issues (Recommended)
 Git worktrees allow multiple branches to be checked out in different directories simultaneously, perfect for multiple Claude Code instances.
 
-#### Setting Up Worktrees
-```bash
-# 1. From main drift directory, create a worktree for each Linear issue
-git worktree add ../drift-DRI-123 feature/DRI-123-add-user-authentication
-git worktree add ../drift-DRI-456 feature/DRI-456-fix-search-performance
+#### Automated Worktree Script (Preferred Method)
 
-# 2. Directory structure will be:
-# /Documents/GitHub/
-#   ├── drift/                  (main branch)
-#   ├── drift-DRI-123/          (feature/DRI-123 branch)
-#   └── drift-DRI-456/          (feature/DRI-456 branch)
+We have a script at `scripts/worktree.sh` that automates the entire worktree workflow:
+
+```bash
+# Start a new worktree for an issue (creates branch, copies config, installs deps)
+npm run wt:start DRI-123 brief-description
+
+# Or use the script directly
+./scripts/worktree.sh start DRI-123 brief-description
+
+# List all current worktrees
+npm run wt:list
+
+# Clean up when done (removes worktree, deletes local & remote branch, prunes)
+npm run wt:stop DRI-123
 ```
 
-#### Working in Worktrees
+**What `wt:start` does automatically:**
+1. Fetches latest from origin/main
+2. Creates worktree at `../drift-DRI-XXX`
+3. Creates branch `feature/DRI-XXX-description`
+4. Copies `.env`, `.mcp.json`, `.claude/`
+5. Runs `npm install --legacy-peer-deps`
 
-**IMPORTANT: Worktrees only contain tracked git files.** Files in `.gitignore` must be copied manually.
+**What `wt:stop` does automatically:**
+1. Removes worktree (with --force)
+2. Deletes local branch
+3. Deletes remote branch
+4. Prunes stale references
 
-**Crucial files to copy:**
-| File/Folder | Purpose |
-|-------------|---------|
-| `.env` | Supabase, OpenAI, Mapbox API keys |
-| `.claude/` | Agents, skills, Claude Code settings |
-| `.mcp.json` | MCP server configuration |
+#### Directory Structure
+```
+/Documents/GitHub/
+  ├── drift/                  (main branch)
+  ├── drift-DRI-123/          (feature/DRI-123 branch)
+  └── drift-DRI-456/          (feature/DRI-456 branch)
+```
+
+#### Manual Worktree Setup (Alternative)
+
+If you need to set up worktrees manually:
 
 ```bash
-# After creating a worktree, set it up:
-cd ../drift-DRI-123
+# Create worktree
+git worktree add ../drift-DRI-123 -b feature/DRI-123-description origin/main
 
-# Copy essential untracked files
+# Copy essential files
+cd ../drift-DRI-123
 cp ../drift/.env .
 cp ../drift/.mcp.json .
 cp -r ../drift/.claude .
-
-# Install dependencies
-npm install
-
-
+npm install --legacy-peer-deps
 ```
 
-**One-liner setup for new worktrees:**
-```bash
-cd ../drift-DRI-123 && cp ../drift/.env . && cp ../drift/.mcp.json . && cp -r ../drift/.claude . && npm install
-```
-
-#### Managing Worktrees
+#### Manual Cleanup (Alternative)
 
 **IMPORTANT: You must remove the worktree BEFORE deleting the branch.**
 
 ```bash
-# List all worktrees
-git worktree list
-
-# Step 1: Remove the worktree (use --force if it has untracked files like .env, node_modules)
+# Step 1: Remove the worktree
 git worktree remove ../drift-DRI-123 --force
 
-# Step 2: Now delete the branch
-git branch -d feature/DRI-123-issue-title
+# Step 2: Delete the branch
+git branch -D feature/DRI-123-description
+git push origin --delete feature/DRI-123-description
 
-# Clean up stale worktree references
+# Step 3: Prune references
 git worktree prune
+git remote prune origin
 ```
-
-**Common issue:** Worktrees with copied `.env`, `.claude/`, or `node_modules/` will require `--force` to remove since these are untracked files.
 
 ### Linear Integration Workflow
 
@@ -588,9 +596,9 @@ git worktree prune
 
 | Action | Command |
 |--------|---------|
-| Create worktree | `git worktree add ../drift-DRI-123 feature/DRI-123-title` |
-| List worktrees | `git worktree list` |
-| Remove worktree | `git worktree remove ../drift-DRI-123` |
+| **Start worktree** | `npm run wt:start DRI-123 description` |
+| **Stop worktree** | `npm run wt:stop DRI-123` |
+| **List worktrees** | `npm run wt:list` |
 | Create branch | `git checkout -b feature/DRI-123-title` |
 | Link to Linear | Use `DRI-XXX:` prefix in commit messages |
 | Create PR | `gh pr create --title "DRI-123: Title"` |

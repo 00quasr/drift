@@ -34,7 +34,11 @@
     "db:push": "supabase db push",
     "db:reset": "supabase db reset",
     "test": "echo \"No tests specified\" && exit 0",
-    "analyze": "cross-env ANALYZE=true next build"
+    "analyze": "cross-env ANALYZE=true next build",
+    "wt": "./scripts/worktree.sh",
+    "wt:start": "./scripts/worktree.sh start",
+    "wt:stop": "./scripts/worktree.sh stop",
+    "wt:list": "./scripts/worktree.sh list"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.10",

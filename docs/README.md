@@ -76,6 +76,12 @@ Marketing strategy and design documentation:
 - **[SOCIAL_MEDIA_MARKETING.md](./08-marketing/SOCIAL_MEDIA_MARKETING.md)** - Marketing strategy and social media
 - **[moodboard-design-assets.md](./08-marketing/moodboard-design-assets.md)** - Design assets and branding
 
+### 09. Future Features - Feature Ideas & Research
+
+Brainstorming and planning for future development:
+
+- **[FEATURE_IDEAS.md](./09-future-features/FEATURE_IDEAS.md)** - Unique feature ideas to differentiate Drift
+
 ---
 
 ## Quick Navigation
@@ -210,7 +216,7 @@ This project is licensed under the MIT License. See the main repository for lice
 
 ## Documentation Organization
 
-This documentation is organized into 8 logical sections for better navigation:
+This documentation is organized into 9 logical sections for better navigation:
 
 1. **Overview** - Project status and planning documents
 2. **Features** - Specific feature implementations and guides
@@ -220,6 +226,7 @@ This documentation is organized into 8 logical sections for better navigation:
 6. **Development** - Development workflow and contribution guides
 7. **Audits** - Project assessments and comprehensive reviews
 8. **Marketing** - Marketing strategy and design documentation
+9. **Future Features** - Feature ideas and research for differentiation
 
 **Last Updated**: January 2026
 **Documentation Version**: 3.1.0

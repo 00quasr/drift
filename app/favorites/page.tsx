@@ -1,27 +1,14 @@
 "use client"
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
-import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { ViewSwitcher, ViewMode } from '@/components/ui/view-switcher'
 import { supabase } from '@/lib/auth'
 import { formatDistanceToNow } from 'date-fns'
-import {
-  Heart,
-  MapPin,
-  Calendar,
-  Music,
-  Clock,
-  Users,
-  Star,
-  ExternalLink,
-  Trash2
-} from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { favoritesService } from '@/lib/services/favorites'
-import { H1, H3 } from "@/components/ui/typography"
+import { motion, AnimatePresence } from 'framer-motion'
+import { cn } from '@/lib/utils'
 
 interface Favorite {
   id: string
@@ -38,588 +25,460 @@ interface Favorite {
   target_date?: string
 }
 
+type FilterType = 'all' | 'venue' | 'event' | 'artist'
+type SortType = 'newest' | 'oldest' | 'name-asc' | 'name-desc'
+
+const filterOptions: { value: FilterType; label: string }[] = [
+  { value: 'all', label: 'All' },
+  { value: 'venue', label: 'Venues' },
+  { value: 'event', label: 'Events' },
+  { value: 'artist', label: 'Artists' },
+]
+
+const sortOptions: { value: SortType; label: string }[] = [
+  { value: 'newest', label: 'Recently added' },
+  { value: 'oldest', label: 'Oldest first' },
+  { value: 'name-asc', label: 'Name A-Z' },
+  { value: 'name-desc', label: 'Name Z-A' },
+]
+
 export default function FavoritesPage() {
   const { user } = useAuth()
   const [favorites, setFavorites] = useState<Favorite[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [filter, setFilter] = useState<'all' | 'venue' | 'event' | 'artist'>('all')
-  const [viewMode, setViewMode] = useState<ViewMode>('grid')
+  const [error, setError] = useState<string | null>(null)
+  const [filter, setFilter] = useState<FilterType>('all')
+  const [sort, setSort] = useState<SortType>('newest')
   const [removingId, setRemovingId] = useState<string | null>(null)
-  const [stats, setStats] = useState({
-    total: 0,
-    venues: 0,
-    events: 0,
-    artists: 0
-  })
 
-  useEffect(() => {
+  const fetchFavorites = useCallback(async () => {
     if (!user) return
 
-    const fetchFavorites = async () => {
-      try {
-        setIsLoading(true)
+    try {
+      setIsLoading(true)
+      setError(null)
 
-        // Fetch favorites
-        const { data: favoritesData, error } = await supabase
-          .from('favorites')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false })
+      const { data: favoritesData, error: fetchError } = await supabase
+        .from('favorites')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
 
-        if (error) throw error
+      if (fetchError) throw fetchError
 
-        // Enrich favorites with target details
-        const enrichedFavorites = await Promise.all(
-          favoritesData.map(async (favorite) => {
-            let targetData: any = {}
+      // Enrich favorites with target details
+      const enrichedFavorites = await Promise.all(
+        favoritesData.map(async (favorite) => {
+          let targetData: Partial<Favorite> = {}
 
-            try {
-              if (favorite.target_type === 'venue') {
-                const { data } = await supabase
-                  .from('venues')
-                  .select('name, slug, city, country, description, images, capacity, genres')
-                  .eq('id', favorite.target_id)
-                  .single()
-                
-                if (data) {
-                  targetData = {
-                    target_name: data.name,
-                    target_slug: data.slug,
-                    target_location: `${data.city}, ${data.country}`,
-                    target_description: data.description,
-                    target_image: data.images?.[0] || null,
-                    target_capacity: data.capacity,
-                    target_genres: data.genres
-                  }
-                }
-              } else if (favorite.target_type === 'event') {
-                const { data } = await supabase
-                  .from('events')
-                  .select('title, slug, description, start_date, images, genres, venues(city, country)')
-                  .eq('id', favorite.target_id)
-                  .single()
-                
-                if (data) {
-                  targetData = {
-                    target_name: data.title,
-                    target_slug: data.slug,
-                    target_description: data.description,
-                    target_date: data.start_date,
-                    target_image: data.images?.[0] || null,
-                    target_genres: data.genres,
-                    target_location: data.venues ? `${data.venues.city}, ${data.venues.country}` : undefined
-                  }
-                }
-              } else if (favorite.target_type === 'artist') {
-                const { data } = await supabase
-                  .from('artists')
-                  .select('name, slug, bio, city, country, images, genres')
-                  .eq('id', favorite.target_id)
-                  .single()
-                
-                if (data) {
-                  targetData = {
-                    target_name: data.name,
-                    target_slug: data.slug,
-                    target_location: data.city && data.country ? `${data.city}, ${data.country}` : null,
-                    target_description: data.bio,
-                    target_image: data.images?.[0] || null,
-                    target_genres: data.genres
-                  }
+          try {
+            if (favorite.target_type === 'venue') {
+              const { data } = await supabase
+                .from('venues')
+                .select('name, slug, city, country, description, images, capacity, genres')
+                .eq('id', favorite.target_id)
+                .single()
+
+              if (data) {
+                targetData = {
+                  target_name: data.name,
+                  target_slug: data.slug,
+                  target_location: `${data.city}, ${data.country}`,
+                  target_description: data.description,
+                  target_image: data.images?.[0] || null,
+                  target_capacity: data.capacity,
+                  target_genres: data.genres
                 }
               }
-            } catch (e) {
-              console.error('Error fetching target details:', e)
+            } else if (favorite.target_type === 'event') {
+              const { data } = await supabase
+                .from('events')
+                .select('title, slug, description, start_date, images, genres, venues(city, country)')
+                .eq('id', favorite.target_id)
+                .single()
+
+              if (data) {
+                const venue = data.venues as unknown as { city: string; country: string } | null
+                targetData = {
+                  target_name: data.title,
+                  target_slug: data.slug,
+                  target_description: data.description,
+                  target_date: data.start_date,
+                  target_image: data.images?.[0] || null,
+                  target_genres: data.genres,
+                  target_location: venue ? `${venue.city}, ${venue.country}` : undefined
+                }
+              }
+            } else if (favorite.target_type === 'artist') {
+              const { data } = await supabase
+                .from('artists')
+                .select('name, slug, bio, city, country, images, genres')
+                .eq('id', favorite.target_id)
+                .single()
+
+              if (data) {
+                targetData = {
+                  target_name: data.name,
+                  target_slug: data.slug,
+                  target_location: data.city && data.country ? `${data.city}, ${data.country}` : undefined,
+                  target_description: data.bio,
+                  target_image: data.images?.[0] || null,
+                  target_genres: data.genres
+                }
+              }
             }
+          } catch (e) {
+            console.error('Error fetching target details:', e)
+          }
 
-            return {
-              ...favorite,
-              ...targetData
-            }
-          })
-        )
+          return { ...favorite, ...targetData }
+        })
+      )
 
-        setFavorites(enrichedFavorites)
-
-        // Calculate stats
-        const total = favoritesData.length
-        const venues = favoritesData.filter(f => f.target_type === 'venue').length
-        const events = favoritesData.filter(f => f.target_type === 'event').length
-        const artists = favoritesData.filter(f => f.target_type === 'artist').length
-
-        setStats({ total, venues, events, artists })
-
-      } catch (error) {
-        console.error('Error fetching favorites:', error)
-      } finally {
-        setIsLoading(false)
-      }
+      setFavorites(enrichedFavorites)
+    } catch (err) {
+      console.error('Error fetching favorites:', err)
+      setError('Failed to load favorites. Please try again.')
+    } finally {
+      setIsLoading(false)
     }
-
-    fetchFavorites()
   }, [user])
+
+  useEffect(() => {
+    fetchFavorites()
+  }, [fetchFavorites])
 
   const handleRemoveFavorite = async (favoriteId: string, targetType: string, targetId: string) => {
     if (!user) return
 
     setRemovingId(favoriteId)
+
+    // Optimistic update
+    const previousFavorites = [...favorites]
+    setFavorites(prev => prev.filter(f => f.id !== favoriteId))
+
     try {
-      await favoritesService.removeFavorite(targetType as any, targetId)
-      setFavorites(prev => prev.filter(f => f.id !== favoriteId))
-      
-      // Update stats
-      setStats(prev => ({
-        ...prev,
-        total: prev.total - 1,
-        [targetType + 's']: Math.max(0, prev[targetType + 's' as keyof typeof prev] - 1)
-      }))
-    } catch (error) {
-      console.error('Error removing favorite:', error)
-      alert('Failed to remove favorite. Please try again.')
+      await favoritesService.removeFavorite(targetType as 'artist' | 'venue' | 'event', targetId)
+    } catch (err) {
+      console.error('Error removing favorite:', err)
+      // Revert on error
+      setFavorites(previousFavorites)
     } finally {
       setRemovingId(null)
     }
   }
 
-  const getTargetIcon = (type: string) => {
-    switch (type) {
-      case 'venue': return MapPin
-      case 'event': return Calendar
-      case 'artist': return Music
-      default: return Heart
-    }
+  const filteredAndSortedFavorites = favorites
+    .filter(favorite => filter === 'all' || favorite.target_type === filter)
+    .sort((a, b) => {
+      switch (sort) {
+        case 'newest':
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        case 'oldest':
+          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        case 'name-asc':
+          return (a.target_name || '').localeCompare(b.target_name || '')
+        case 'name-desc':
+          return (b.target_name || '').localeCompare(a.target_name || '')
+        default:
+          return 0
+      }
+    })
+
+  const stats = {
+    all: favorites.length,
+    venue: favorites.filter(f => f.target_type === 'venue').length,
+    event: favorites.filter(f => f.target_type === 'event').length,
+    artist: favorites.filter(f => f.target_type === 'artist').length,
   }
 
-  const filteredFavorites = favorites.filter(favorite => 
-    filter === 'all' || favorite.target_type === filter
-  )
-
+  // Unauthenticated state
   if (!user) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center pt-24">
-        <Card className="bg-white/5 border border-white/20 p-8 max-w-md w-full mx-6">
-          <div className="text-center space-y-4">
-            <Heart className="w-12 h-12 text-white/60 mx-auto" />
-            <H1 variant="display">
-              SIGN IN REQUIRED
-            </H1>
-            <p className="text-white/80 font-medium">
-              Please sign in to view your favorites collection.
+      <div className="min-h-screen bg-neutral-950 pt-24 pb-12">
+        <div className="max-w-lg mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="border border-neutral-800 bg-neutral-900/50 p-8 text-center"
+          >
+            <h1 className="text-2xl font-semibold tracking-tight text-white mb-3">
+              Sign in required
+            </h1>
+            <p className="text-neutral-400 mb-6">
+              Please sign in to view your favorites.
             </p>
-            <Link href="/auth/signin" className="block">
-              <button className="w-full mt-6 bg-white text-black hover:bg-white/90 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200">
-                SIGN IN
+            <Link href="/auth/signin">
+              <button className="bg-white text-black px-6 py-2.5 text-sm font-medium hover:bg-neutral-200 transition-colors">
+                Sign in
               </button>
             </Link>
-          </div>
-        </Card>
+          </motion.div>
+        </div>
       </div>
     )
   }
 
+  // Loading state
   if (isLoading) {
-    return <div className="min-h-screen bg-neutral-950" />
+    return (
+      <div className="min-h-screen bg-neutral-950 pt-24 pb-12">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="mb-10">
+            <div className="h-8 w-48 bg-neutral-800 animate-pulse mb-2" />
+            <div className="h-4 w-64 bg-neutral-800/50 animate-pulse" />
+          </div>
+          <div className="flex gap-2 mb-8">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="h-9 w-20 bg-neutral-800 animate-pulse" />
+            ))}
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[1, 2, 3, 4, 5, 6].map(i => (
+              <div key={i} className="aspect-[4/3] bg-neutral-800 animate-pulse" />
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-neutral-950 pt-24 pb-12">
+        <div className="max-w-lg mx-auto px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="border border-red-900/50 bg-red-950/20 p-8 text-center"
+          >
+            <h1 className="text-xl font-semibold tracking-tight text-white mb-3">
+              Something went wrong
+            </h1>
+            <p className="text-neutral-400 mb-6">{error}</p>
+            <button
+              onClick={fetchFavorites}
+              className="bg-white text-black px-6 py-2.5 text-sm font-medium hover:bg-neutral-200 transition-colors"
+            >
+              Try again
+            </button>
+          </motion.div>
+        </div>
+      </div>
+    )
   }
 
   return (
-    <div className="min-h-screen bg-black text-white pt-24 pb-12">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="mb-8">
-          <H1 variant="display" className="mb-4">MY FAVORITES</H1>
-          <p className="text-white/60 font-medium tracking-wider uppercase">
-            Your personal collection of favorite artists, venues, and events
+    <div className="min-h-screen bg-neutral-950 pt-24 pb-12">
+      <div className="max-w-6xl mx-auto px-6">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-10"
+        >
+          <h1 className="text-3xl font-semibold tracking-tight text-white mb-2">
+            Favorites
+          </h1>
+          <p className="text-neutral-500">
+            {favorites.length === 0
+              ? 'Your saved items will appear here'
+              : `${favorites.length} saved ${favorites.length === 1 ? 'item' : 'items'}`
+            }
           </p>
-        </div>
+        </motion.div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <Card 
-            className={`bg-white/5 border cursor-pointer transition-all duration-300 ${
-              filter === 'all' ? 'border-white' : 'border-white/20 hover:border-white/40'
-            }`}
-            onClick={() => setFilter('all')}
-          >
-            <div className="p-4 text-center">
-              <div className="text-2xl font-bold text-white mb-1">{stats.total}</div>
-              <div className="text-white/60 font-bold tracking-wider uppercase text-sm">
-                ALL FAVORITES
-              </div>
-            </div>
-          </Card>
-          
-          <Card 
-            className={`bg-white/5 border cursor-pointer transition-all duration-300 ${
-              filter === 'venue' ? 'border-white' : 'border-white/20 hover:border-white/40'
-            }`}
-            onClick={() => setFilter('venue')}
-          >
-            <div className="p-4 text-center">
-              <div className="text-2xl font-bold text-white mb-1">{stats.venues}</div>
-              <div className="text-white/60 font-bold tracking-wider uppercase text-sm">
-                VENUES
-              </div>
-            </div>
-          </Card>
-          
-          <Card 
-            className={`bg-white/5 border cursor-pointer transition-all duration-300 ${
-              filter === 'event' ? 'border-white' : 'border-white/20 hover:border-white/40'
-            }`}
-            onClick={() => setFilter('event')}
-          >
-            <div className="p-4 text-center">
-              <div className="text-2xl font-bold text-white mb-1">{stats.events}</div>
-              <div className="text-white/60 font-bold tracking-wider uppercase text-sm">
-                EVENTS
-              </div>
-            </div>
-          </Card>
-          
-          <Card 
-            className={`bg-white/5 border cursor-pointer transition-all duration-300 ${
-              filter === 'artist' ? 'border-white' : 'border-white/20 hover:border-white/40'
-            }`}
-            onClick={() => setFilter('artist')}
-          >
-            <div className="p-4 text-center">
-              <div className="text-2xl font-bold text-white mb-1">{stats.artists}</div>
-              <div className="text-white/60 font-bold tracking-wider uppercase text-sm">
-                ARTISTS
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        {/* Favorites Grid */}
-        <div>
-          <div className="flex items-center justify-between mb-6">
-            <H3>
-              {filter === 'all' ? 'ALL FAVORITES' : `${filter.toUpperCase()} FAVORITES`}
-            </H3>
-            <ViewSwitcher
-              viewMode={viewMode}
-              onViewModeChange={setViewMode}
-            />
+        {/* Filter and Sort controls */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8"
+        >
+          {/* Filter tabs */}
+          <div className="flex flex-wrap gap-2">
+            {filterOptions.map(option => (
+              <button
+                key={option.value}
+                onClick={() => setFilter(option.value)}
+                className={cn(
+                  "px-4 py-2 text-sm font-medium transition-all",
+                  filter === option.value
+                    ? "bg-white text-black"
+                    : "bg-neutral-900 text-neutral-400 hover:text-white hover:bg-neutral-800"
+                )}
+              >
+                {option.label}
+                <span className="ml-2 text-xs opacity-60">
+                  {stats[option.value]}
+                </span>
+              </button>
+            ))}
           </div>
 
-          {filteredFavorites.length === 0 ? (
-            <Card className="bg-white/5 border border-white/20 p-12">
-              <div className="text-center space-y-4">
-                <Heart className="w-16 h-16 text-white/40 mx-auto" />
-                <H3>
-                  NO FAVORITES YET
-                </H3>
-                <p className="text-white/60 font-medium max-w-md mx-auto">
-                  Start building your collection by favoriting venues, events, and artists you love!
-                </p>
-                <Link href="/explore" className="inline-block">
-                  <button className="mt-4 bg-white text-black hover:bg-white/90 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200">
-                    EXPLORE DRIFT
-                  </button>
-                </Link>
-              </div>
-            </Card>
-          ) : (
-            <>
-              {/* Grid View */}
-              {viewMode === 'grid' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredFavorites.map((favorite) => {
-                    const Icon = getTargetIcon(favorite.target_type)
+          {/* Sort dropdown */}
+          <div className="flex items-center gap-2">
+            <span className="text-neutral-500 text-sm">Sort by</span>
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value as SortType)}
+              className="bg-neutral-900 border border-neutral-800 text-white text-sm px-3 py-2 focus:outline-none focus:border-neutral-700 cursor-pointer"
+            >
+              {sortOptions.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </motion.div>
 
-                    return (
-                      <Card key={favorite.id} className="bg-white/5 border border-white/20 overflow-hidden hover:border-white/40 transition-all duration-300 group">
-                        <Link href={`/${favorite.target_type}/${favorite.target_id}`}>
-                          <div className="relative h-48 bg-white/10">
-                            {favorite.target_image ? (
-                              <Image
-                                src={favorite.target_image}
-                                alt={favorite.target_name || ''}
-                                fill
-                                className="object-cover group-hover:scale-105 transition-transform duration-300"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center">
-                                <Icon className="w-16 h-16 text-white/60" />
-                              </div>
-                            )}
-                            
-                            <div className="absolute top-4 left-4">
-                              <Badge className="font-bold tracking-wider uppercase text-xs bg-white/10 text-white border-white/20">
-                                {favorite.target_type}
-                              </Badge>
-                            </div>
-                            
-                            <div className="absolute top-4 right-4">
-                              <button
-                                onClick={(e) => {
-                                  e.preventDefault()
-                                  e.stopPropagation()
-                                  handleRemoveFavorite(favorite.id, favorite.target_type, favorite.target_id)
-                                }}
-                                disabled={removingId === favorite.id}
-                                className="w-8 h-8 bg-red-500/20 border border-red-500/40 hover:bg-red-500/30 flex items-center justify-center transition-all duration-200 disabled:opacity-50"
-                                title="Remove from favorites"
-                              >
-                                {removingId === favorite.id ? (
-                                  <div className="scale-50">
-                                    <ClassicLoader />
-                                  </div>
-                                ) : (
-                                  <Trash2 className="w-4 h-4 text-red-400" />
-                                )}
-                              </button>
-                            </div>
-                          </div>
-                        </Link>
+        {/* Empty state */}
+        {filteredAndSortedFavorites.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="border border-neutral-800 bg-neutral-900/30 p-12 text-center"
+          >
+            <h2 className="text-xl font-semibold tracking-tight text-white mb-3">
+              {filter === 'all' ? 'No favorites yet' : `No ${filter}s saved`}
+            </h2>
+            <p className="text-neutral-500 mb-6 max-w-md mx-auto">
+              {filter === 'all'
+                ? 'Start exploring and save items you love to find them here later.'
+                : `You haven't saved any ${filter}s yet. Explore to find some.`
+              }
+            </p>
+            <Link href="/explore">
+              <button className="bg-white text-black px-6 py-2.5 text-sm font-medium hover:bg-neutral-200 transition-colors">
+                Explore
+              </button>
+            </Link>
+          </motion.div>
+        )}
 
-                        <div className="p-4">
-                          <Link href={`/${favorite.target_type}/${favorite.target_id}`}>
-                            <H3 className="mb-2 group-hover:text-white/80 transition-colors">
-                              {favorite.target_name || 'Unknown'}
-                            </H3>
-                            
-                            {favorite.target_location && (
-                              <div className="flex items-center gap-2 mb-2">
-                                <MapPin className="w-4 h-4 text-white/40" />
-                                <span className="text-white/60 text-sm font-medium">
-                                  {favorite.target_location}
-                                </span>
-                              </div>
-                            )}
-                            
-                            {favorite.target_capacity && (
-                              <div className="flex items-center gap-2 mb-2">
-                                <Users className="w-4 h-4 text-white/40" />
-                                <span className="text-white/60 text-sm font-medium">
-                                  {favorite.target_capacity.toLocaleString()} capacity
-                                </span>
-                              </div>
-                            )}
-                            
-                            {favorite.target_genres && favorite.target_genres.length > 0 && (
-                              <div className="flex flex-wrap gap-1 mb-3">
-                                {favorite.target_genres.slice(0, 2).map((genre) => (
-                                  <div key={genre} className="bg-white/10 border border-white/20 px-2 py-1">
-                                    <span className="text-white/80 text-xs font-bold tracking-wider uppercase">
-                                      {genre}
-                                    </span>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                            
-                            <div className="flex items-center justify-between text-white/40">
-                              <div className="flex items-center gap-1">
-                                <Clock className="w-3 h-3" />
-                                <span className="text-xs font-medium">
-                                  {formatDistanceToNow(new Date(favorite.created_at), { addSuffix: true })}
-                                </span>
-                              </div>
-                              <ExternalLink className="w-4 h-4 group-hover:text-white transition-colors" />
-                            </div>
-                          </Link>
-                        </div>
-                      </Card>
-                    )
-                  })}
-                </div>
-              )}
-
-              {/* List View */}
-              {viewMode === 'list' && (
-                <div className="space-y-4">
-                  {filteredFavorites.map((favorite) => {
-                    const Icon = getTargetIcon(favorite.target_type)
-
-                    return (
-                      <Card key={favorite.id} className="bg-white/5 border border-white/20 hover:border-white/40 transition-all duration-300 group">
-                        <div className="p-6">
-                          <div className="flex items-center gap-6">
-                            {/* Image/Icon */}
-                            <div className="relative w-20 h-20 bg-white/10 border border-white/20 flex-shrink-0">
-                              {favorite.target_image ? (
-                                <Image
-                                  src={favorite.target_image}
-                                  alt={favorite.target_name || ''}
-                                  fill
-                                  className="object-cover"
-                                />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center">
-                                  <Icon className="w-8 h-8 text-white/60" />
-                                </div>
-                              )}
-                            </div>
-
-                            {/* Content */}
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-start justify-between">
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-3 mb-2">
-                                    <Badge className="font-bold tracking-wider uppercase text-xs bg-white/10 text-white border-white/20">
-                                      {favorite.target_type}
-                                    </Badge>
-                                    <Link href={`/${favorite.target_type}/${favorite.target_id}`}>
-                                      <H3 className="hover:text-white/80 transition-colors">
-                                        {favorite.target_name || 'Unknown'}
-                                      </H3>
-                                    </Link>
-                                  </div>
-                                  
-                                  <div className="flex items-center gap-6 text-white/60 text-sm">
-                                    {favorite.target_location && (
-                                      <div className="flex items-center gap-2">
-                                        <MapPin className="w-4 h-4" />
-                                        <span>{favorite.target_location}</span>
-                                      </div>
-                                    )}
-                                    {favorite.target_capacity && (
-                                      <div className="flex items-center gap-2">
-                                        <Users className="w-4 h-4" />
-                                        <span>{favorite.target_capacity.toLocaleString()} capacity</span>
-                                      </div>
-                                    )}
-                                    <div className="flex items-center gap-2">
-                                      <Clock className="w-4 h-4" />
-                                      <span>{formatDistanceToNow(new Date(favorite.created_at), { addSuffix: true })}</span>
-                                    </div>
-                                  </div>
-
-                                  {favorite.target_genres && favorite.target_genres.length > 0 && (
-                                    <div className="flex flex-wrap gap-2 mt-3">
-                                      {favorite.target_genres.slice(0, 3).map((genre) => (
-                                        <div key={genre} className="bg-white/10 border border-white/20 px-2 py-1">
-                                          <span className="text-white/80 text-xs font-bold tracking-wider uppercase">
-                                            {genre}
-                                          </span>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  )}
-                                </div>
-
-                                {/* Action Buttons */}
-                                <div className="flex items-center gap-3 ml-4">
-                                  <Link href={`/${favorite.target_type}/${favorite.target_id}`}>
-                                    <button className="p-2 bg-white/10 hover:bg-white/20 border border-white/30 hover:border-white/60 text-white transition-all duration-200">
-                                      <ExternalLink className="w-4 h-4" />
-                                    </button>
-                                  </Link>
-                                  <button
-                                    onClick={() => handleRemoveFavorite(favorite.id, favorite.target_type, favorite.target_id)}
-                                    disabled={removingId === favorite.id}
-                                    className="p-2 bg-red-500/20 border border-red-500/40 hover:bg-red-500/30 text-red-400 transition-all duration-200 disabled:opacity-50"
-                                    title="Remove from favorites"
-                                  >
-                                    {removingId === favorite.id ? (
-                                      <div className="scale-50">
-                                        <ClassicLoader />
-                                      </div>
-                                    ) : (
-                                      <Trash2 className="w-4 h-4" />
-                                    )}
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </Card>
-                    )
-                  })}
-                </div>
-              )}
-
-              {/* Table View */}
-              {viewMode === 'table' && (
-                <Card className="bg-white/5 border border-white/20 overflow-hidden">
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead className="border-b border-white/20">
-                        <tr className="bg-white/5">
-                          <th className="text-left p-4 font-bold tracking-wider uppercase text-white text-sm">Type</th>
-                          <th className="text-left p-4 font-bold tracking-wider uppercase text-white text-sm">Name</th>
-                          <th className="text-left p-4 font-bold tracking-wider uppercase text-white text-sm">Location</th>
-                          <th className="text-left p-4 font-bold tracking-wider uppercase text-white text-sm">Details</th>
-                          <th className="text-left p-4 font-bold tracking-wider uppercase text-white text-sm">Added</th>
-                          <th className="text-left p-4 font-bold tracking-wider uppercase text-white text-sm">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {filteredFavorites.map((favorite) => {
-                          const Icon = getTargetIcon(favorite.target_type)
-                          
-                          return (
-                            <tr key={favorite.id} className="border-b border-white/10 hover:bg-white/5 transition-colors">
-                              <td className="p-4">
-                                <div className="flex items-center gap-2">
-                                  <Icon className="w-4 h-4 text-white/60" />
-                                  <Badge className="font-bold tracking-wider uppercase text-xs bg-white/10 text-white border-white/20">
-                                    {favorite.target_type}
-                                  </Badge>
-                                </div>
-                              </td>
-                              <td className="p-4">
-                                <Link href={`/${favorite.target_type}/${favorite.target_id}`}>
-                                  <span className="font-bold tracking-wider uppercase text-white hover:text-white/80 transition-colors">
-                                    {favorite.target_name || 'Unknown'}
-                                  </span>
-                                </Link>
-                              </td>
-                              <td className="p-4 text-white/60 text-sm">
-                                {favorite.target_location || '-'}
-                              </td>
-                              <td className="p-4 text-white/60 text-sm">
-                                {favorite.target_capacity && `${favorite.target_capacity.toLocaleString()} cap`}
-                                {favorite.target_genres && favorite.target_genres.length > 0 && (
-                                  <div className="flex gap-1 mt-1">
-                                    {favorite.target_genres.slice(0, 2).map((genre) => (
-                                      <span key={genre} className="text-xs bg-white/10 px-1 py-0.5 border border-white/20">
-                                        {genre}
-                                      </span>
-                                    ))}
-                                  </div>
-                                )}
-                              </td>
-                              <td className="p-4 text-white/60 text-sm">
-                                {formatDistanceToNow(new Date(favorite.created_at), { addSuffix: true })}
-                              </td>
-                              <td className="p-4">
-                                <div className="flex items-center gap-2">
-                                  <Link href={`/${favorite.target_type}/${favorite.target_id}`}>
-                                    <button className="p-1 text-white/60 hover:text-white transition-colors">
-                                      <ExternalLink className="w-4 h-4" />
-                                    </button>
-                                  </Link>
-                                  <button
-                                    onClick={() => handleRemoveFavorite(favorite.id, favorite.target_type, favorite.target_id)}
-                                    disabled={removingId === favorite.id}
-                                    className="p-1 text-red-400 hover:text-red-300 transition-colors disabled:opacity-50"
-                                    title="Remove from favorites"
-                                  >
-                                    {removingId === favorite.id ? (
-                                      <div className="scale-50">
-                                        <ClassicLoader />
-                                      </div>
-                                    ) : (
-                                      <Trash2 className="w-4 h-4" />
-                                    )}
-                                  </button>
-                                </div>
-                              </td>
-                            </tr>
-                          )
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                </Card>
-              )}
-            </>
-          )}
-        </div>
+        {/* Favorites grid */}
+        <motion.div
+          layout
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+        >
+          <AnimatePresence mode="popLayout">
+            {filteredAndSortedFavorites.map((favorite, index) => (
+              <motion.div
+                key={favorite.id}
+                layout
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ delay: index * 0.05, duration: 0.2 }}
+              >
+                <FavoriteCard
+                  favorite={favorite}
+                  isRemoving={removingId === favorite.id}
+                  onRemove={() => handleRemoveFavorite(
+                    favorite.id,
+                    favorite.target_type,
+                    favorite.target_id
+                  )}
+                />
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </motion.div>
       </div>
+    </div>
+  )
+}
+
+interface FavoriteCardProps {
+  favorite: Favorite
+  isRemoving: boolean
+  onRemove: () => void
+}
+
+function FavoriteCard({ favorite, isRemoving, onRemove }: FavoriteCardProps) {
+  const href = `/${favorite.target_type}/${favorite.target_id}`
+
+  return (
+    <div className={cn(
+      "group relative bg-neutral-900 border border-neutral-800 overflow-hidden transition-all duration-200",
+      "hover:border-neutral-700",
+      isRemoving && "opacity-50 pointer-events-none"
+    )}>
+      <Link href={href}>
+        {/* Image */}
+        <div className="relative aspect-[4/3] bg-neutral-800">
+          {favorite.target_image ? (
+            <Image
+              src={favorite.target_image}
+              alt={favorite.target_name || ''}
+              fill
+              className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-neutral-600 text-sm uppercase tracking-wider">
+                {favorite.target_type}
+              </span>
+            </div>
+          )}
+
+          {/* Type badge */}
+          <div className="absolute top-3 left-3">
+            <span className="bg-black/70 backdrop-blur-sm text-white text-xs font-medium px-2.5 py-1 uppercase tracking-wider">
+              {favorite.target_type}
+            </span>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-4">
+          <h3 className="text-white font-medium mb-1 truncate group-hover:text-neutral-200 transition-colors">
+            {favorite.target_name || 'Untitled'}
+          </h3>
+
+          {favorite.target_location && (
+            <p className="text-neutral-500 text-sm mb-2 truncate">
+              {favorite.target_location}
+            </p>
+          )}
+
+          {favorite.target_genres && favorite.target_genres.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mb-3">
+              {favorite.target_genres.slice(0, 2).map((genre) => (
+                <span
+                  key={genre}
+                  className="text-neutral-400 text-xs bg-neutral-800 px-2 py-0.5"
+                >
+                  {genre}
+                </span>
+              ))}
+            </div>
+          )}
+
+          <p className="text-neutral-600 text-xs">
+            Saved {formatDistanceToNow(new Date(favorite.created_at), { addSuffix: true })}
+          </p>
+        </div>
+      </Link>
+
+      {/* Remove button - visible on hover */}
+      <button
+        onClick={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          onRemove()
+        }}
+        disabled={isRemoving}
+        className={cn(
+          "absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity",
+          "bg-black/70 backdrop-blur-sm text-neutral-400 hover:text-white text-xs font-medium px-2.5 py-1",
+          "disabled:opacity-50"
+        )}
+      >
+        Remove
+      </button>
     </div>
   )
 }

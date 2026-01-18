@@ -1,15 +1,15 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { 
-  MapPin, 
-  Calendar, 
-  Star, 
-  Users, 
-  Eye, 
-  Heart, 
+import {
+  MapPin,
+  Calendar,
+  Star,
+  Users,
+  Eye,
+  Heart,
   MessageCircle,
   Settings,
   Share2,
@@ -23,6 +23,7 @@ import {
 import { formatDistanceToNow } from 'date-fns'
 import Image from 'next/image'
 import Link from 'next/link'
+import { FollowButton } from '@/components/social/FollowButton'
 
 interface ProfileData {
   id: string
@@ -42,7 +43,8 @@ interface ProfileStats {
   reviews_count: number
   favorites_count: number
   profile_views: number
-  connections_count: number
+  followers_count: number
+  following_count: number
 }
 
 interface ProfileHeaderProps {
@@ -127,9 +129,10 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                       </button>
                     </Link>
                   ) : (
-                    <button className="w-full bg-white text-black hover:bg-white/90 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200">
-                      CONNECT
-                    </button>
+                    <FollowButton
+                      userId={profile.id}
+                      className="w-full bg-white text-black hover:bg-white/90 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200"
+                    />
                   )}
                   <button 
                     onClick={handleShare}
@@ -220,7 +223,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
         {/* Stats Section */}
         {stats && (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-5 gap-6">
             <div className="bg-black border-2 border-white/20 p-6 text-center">
               <div className="text-3xl font-bold text-white mb-2">
                 {stats.reviews_count}
@@ -239,10 +242,18 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             </div>
             <div className="bg-black border-2 border-white/20 p-6 text-center">
               <div className="text-3xl font-bold text-white mb-2">
-                {stats.connections_count}
+                {stats.followers_count}
               </div>
               <div className="text-white/60 font-bold tracking-widest uppercase text-sm">
-                CONNECTIONS
+                FOLLOWERS
+              </div>
+            </div>
+            <div className="bg-black border-2 border-white/20 p-6 text-center">
+              <div className="text-3xl font-bold text-white mb-2">
+                {stats.following_count}
+              </div>
+              <div className="text-white/60 font-bold tracking-widest uppercase text-sm">
+                FOLLOWING
               </div>
             </div>
             <div className="bg-black border-2 border-white/20 p-6 text-center">

@@ -31,7 +31,8 @@ interface ProfileStats {
   reviews_count: number
   favorites_count: number
   profile_views: number
-  connections_count: number
+  followers_count: number
+  following_count: number
 }
 
 export default function ProfilePage() {
@@ -72,7 +73,7 @@ export default function ProfilePage() {
         setProfile(profileData)
 
         // Fetch profile stats
-        const [reviewsResult, favoritesResult, viewsResult, connectionsResult] = await Promise.all([
+        const [reviewsResult, favoritesResult, viewsResult, followersResult, followingResult] = await Promise.all([
           supabase
             .from('reviews')
             .select('id', { count: 'exact' })
@@ -89,6 +90,11 @@ export default function ProfilePage() {
             .from('user_connections')
             .select('id', { count: 'exact' })
             .eq('following_id', profileId)
+            .eq('status', 'accepted'),
+          supabase
+            .from('user_connections')
+            .select('id', { count: 'exact' })
+            .eq('follower_id', profileId)
             .eq('status', 'accepted')
         ])
 
@@ -96,7 +102,8 @@ export default function ProfilePage() {
           reviews_count: reviewsResult.count || 0,
           favorites_count: favoritesResult.count || 0,
           profile_views: viewsResult.count || 0,
-          connections_count: connectionsResult.count || 0
+          followers_count: followersResult.count || 0,
+          following_count: followingResult.count || 0
         })
 
         // Track profile view (if not own profile and user is authenticated)

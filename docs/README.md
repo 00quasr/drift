@@ -11,9 +11,9 @@ Welcome to the comprehensive documentation for the Drift platform - a web applic
 High-level project information and current status:
 
 - **[PROJECT_STATUS.md](./01-overview/PROJECT_STATUS.md)** - **MAIN STATUS** - Complete project overview and implementation status
-- **[RECENT_IMPLEMENTATIONS.md](./01-overview/RECENT_IMPLEMENTATIONS.md)** - Latest features and changes (Updated July 2025)
-- **[IMPLEMENTATION_PLAN_2025.md](./01-overview/IMPLEMENTATION_PLAN_2025.md)** - Strategic roadmap and milestones
-- **[NEXT_STEPS_ROADMAP.md](./01-overview/NEXT_STEPS_ROADMAP.md)** - Short-term action items and priorities
+- **[RECENT_IMPLEMENTATIONS.md](./01-overview/RECENT_IMPLEMENTATIONS.md)** - Historical: July 2025 implementations
+- **[IMPLEMENTATION_PLAN_2025.md](./01-overview/IMPLEMENTATION_PLAN_2025.md)** - Historical: 2025 roadmap (archived)
+- **[NEXT_STEPS_ROADMAP.md](./01-overview/NEXT_STEPS_ROADMAP.md)** - Historical: Next steps document (archived)
 
 ### 02. Features - Feature Documentation
 
@@ -82,9 +82,9 @@ Marketing strategy and design documentation:
 
 ### Getting Started
 
-1. **[Project Status](./01-overview/PROJECT_STATUS.md)** - Current implementation status
-2. **[Recent Updates](./01-overview/RECENT_IMPLEMENTATIONS.md)** - Latest features (July 2025)
-3. **[Development Guide](./06-development/development/DEVELOPMENT_GUIDE.md)** - Setup and workflow
+1. **[Project Status](./01-overview/PROJECT_STATUS.md)** - Current implementation status and known issues
+2. **[Development Guide](./06-development/development/DEVELOPMENT_GUIDE.md)** - Setup and workflow
+3. **[Linear Issues](https://linear.app/drift-yourself)** - Active task tracking
 
 ### By Role
 

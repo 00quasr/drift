@@ -1,4 +1,7 @@
 # Recent Implementations - July 2025
+
+> **ARCHIVE NOTICE**: This document is a historical record from July 2025. For current project status, see [PROJECT_STATUS.md](./PROJECT_STATUS.md). For active issues, see [Linear](https://linear.app/drift-yourself).
+
 ## Latest Features and Updates
 
 *Last Updated: July 28, 2025*

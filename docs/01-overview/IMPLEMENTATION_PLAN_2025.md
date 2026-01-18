@@ -1,4 +1,7 @@
 # Drift Platform - Complete Implementation Plan 2025
+
+> **ARCHIVE NOTICE**: This document is a historical record from July 2025. The numbered task lists and time-boxed weeks have expired. For current project status, see [PROJECT_STATUS.md](./PROJECT_STATUS.md). For active task tracking, see [Linear](https://linear.app/drift-yourself).
+
 ## Germany-First Electronic Music Discovery Platform
 
 *Last Updated: July 19, 2025*

@@ -22,6 +22,8 @@ This guide explains how to use the custom agents and skills configured for the D
 | **event-optimizer** | Performance optimization, UX improvements | `Use event-optimizer to analyze...` |
 | **security-auditor** | Security reviews, content moderation | `Use security-auditor to check...` |
 | **maintenance-agent** | Update agents/skills (monthly) | `Use maintenance-agent to review all agents` |
+| **linear-auditor** | Audit Linear issues against codebase | `Use linear-auditor to audit all tickets` |
+| **supabase-realtime-agent** | Supabase Realtime implementations | `Use supabase-realtime-agent to...` |
 
 ### Custom Skills (Knowledge Guides)
 
@@ -264,23 +266,23 @@ How do I create a migration for a new bookmarks table?
 - "Show me the design system"
 
 **What it teaches**:
-- 90s rave cyber aesthetic patterns
-- Color system (neon cyan, magenta, yellow)
-- Typography (UPPERCASE, tracking-wider, bold)
-- Spacing tokens (section/subsection/element/tight)
-- Component patterns (EntityCard, ClassicLoader, EntityViews)
+- Minimalist, clean design patterns
+- Limited color palette (neutrals + one accent)
+- Geist Sans typography with proper hierarchy
+- Generous spacing tokens
+- Component patterns (EntityCard, EntityViews)
 - shadcn/ui component usage
-- Framer Motion animations
+- Framer Motion animations (subtle, purposeful)
 - Form patterns with React Hook Form & Zod
 - Responsive design breakpoints
 
 **Design principles**:
-- Pure black backgrounds (#000000)
-- UPPERCASE text with wide letter spacing
-- Bold typography
-- Neon accent colors
-- Angular, geometric design
-- Glassmorphism effects
+- Clean, calm, professional aesthetic
+- Natural case text with proper hierarchy
+- Limited color palette
+- Generous whitespace
+- Typography hierarchy over boxes
+- Spacing over separators
 
 **Example questions**:
 ```

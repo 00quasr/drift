@@ -1,5 +1,7 @@
 # Drift Platform - Next Steps Roadmap to Groundbreaking Web App
 
+> **ARCHIVE NOTICE**: This document is a historical record. The time-boxed roadmap has expired. For current project status, see [PROJECT_STATUS.md](./PROJECT_STATUS.md). For active issues, see [Linear](https://linear.app/drift-yourself). Note: Design has evolved from "cyber-themed" to minimalist.
+
 ## Current Status Overview
 
 ### ✅ What We've Achieved So Far

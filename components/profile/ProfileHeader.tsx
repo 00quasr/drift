@@ -1,28 +1,11 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import {
-  MapPin,
-  Calendar,
-  Star,
-  Users,
-  Eye,
-  Heart,
-  MessageCircle,
-  Settings,
-  Share2,
-  UserPlus,
-  UserCheck,
-  User,
-  ExternalLink,
-  Globe,
-  Mail
-} from 'lucide-react'
+import React, { useState } from 'react'
 import { formatDistanceToNow } from 'date-fns'
 import Image from 'next/image'
 import Link from 'next/link'
+import { motion } from 'framer-motion'
+import { cn } from '@/lib/utils'
 import { FollowButton } from '@/components/social/FollowButton'
 
 interface ProfileData {
@@ -74,198 +57,190 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     }
   }
 
+  const socialPlatforms = profile.social_links
+    ? Object.entries(profile.social_links).filter(([_, url]) => url)
+    : []
+
   return (
-    <div className="min-h-screen bg-black pt-24 pb-16">
-      <div className="max-w-7xl mx-auto px-6">
-
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mb-16">
-          {/* Avatar Card */}
-          <div className="lg:col-span-1">
-            <div className="bg-black border-2 border-white/20 p-8 h-full">
-              <div className="flex flex-col items-center text-center space-y-6">
-                <div className="w-48 h-48 bg-white/5 border border-white/20 flex items-center justify-center overflow-hidden">
-                  {profile.avatar_url ? (
-                    <Image
-                      src={profile.avatar_url}
-                      alt={displayName}
-                      width={192}
-                      height={192}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <User className="w-24 h-24 text-white/60" />
-                  )}
+    <div className="min-h-screen bg-neutral-950 pt-24 pb-12">
+      <div className="max-w-4xl mx-auto px-6">
+        {/* Profile Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-12"
+        >
+          <div className="flex flex-col sm:flex-row gap-8 items-start">
+            {/* Avatar */}
+            <div className="relative w-32 h-32 sm:w-40 sm:h-40 bg-neutral-800 flex-shrink-0 overflow-hidden">
+              {profile.avatar_url ? (
+                <Image
+                  src={profile.avatar_url}
+                  alt={displayName}
+                  fill
+                  className="object-cover"
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-neutral-600 text-4xl font-light">
+                    {displayName.charAt(0).toUpperCase()}
+                  </span>
                 </div>
-
-                {/* Name and Info */}
-                <div className="space-y-3 w-full">
-                  <h1 className="text-2xl font-bold text-white tracking-wider uppercase">
-                    {displayName}
-                  </h1>
-                  
-                  {profile.location && (
-                    <div className="flex items-center justify-center gap-2 text-white/60">
-                      <MapPin className="w-4 h-4" />
-                      <span className="font-medium tracking-wider uppercase text-sm">
-                        {profile.location}
-                      </span>
-                    </div>
-                  )}
-
-                  {profile.is_verified && (
-                    <div className="inline-flex items-center gap-2 bg-white/10 border border-white/30 px-3 py-1">
-                      <span className="text-white font-bold tracking-widest uppercase text-xs">VERIFIED</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Action Buttons */}
-                <div className="w-full space-y-3">
-                  {isOwnProfile ? (
-                    <Link href="/settings/profile" className="block">
-                      <button className="w-full bg-white text-black hover:bg-white/90 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200">
-                        EDIT PROFILE
-                      </button>
-                    </Link>
-                  ) : (
-                    <FollowButton
-                      userId={profile.id}
-                      className="w-full bg-white text-black hover:bg-white/90 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200"
-                    />
-                  )}
-                  <button 
-                    onClick={handleShare}
-                    className="w-full border border-white/30 text-white hover:bg-white/10 font-bold tracking-wider uppercase py-3 px-6 transition-all duration-200"
-                  >
-                    {shareStatus === 'copied' ? 'COPIED!' : shareStatus === 'error' ? 'ERROR' : 'SHARE'}
-                  </button>
-                </div>
-
-                {/* Join Date */}
-                <div className="text-white/60 font-bold tracking-widest uppercase text-sm">
-                  JOINED {formatDistanceToNow(joinedDate, { addSuffix: true }).toUpperCase()}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Info Cards */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* About Section */}
-            <div className="bg-black border-2 border-white/20 p-8">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-3 h-3 bg-white animate-pulse" />
-                <h2 className="text-white font-bold tracking-widest uppercase text-lg">ABOUT</h2>
-              </div>
-              <p className="text-white/80 text-lg leading-relaxed font-medium">
-                {profile.bio || 'No biography available yet.'}
-              </p>
+              )}
             </div>
 
-            {/* Social Links Section */}
-            <div className="bg-black border-2 border-white/20 p-8">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-3 h-3 bg-white animate-pulse" />
-                <h2 className="text-white font-bold tracking-widest uppercase text-lg">CONNECT</h2>
-              </div>
-              <div className="space-y-4">
-                {profile.social_links && Object.keys(profile.social_links).length > 0 ? (
-                  Object.entries(profile.social_links).map(([platform, url]) => (
-                    url && (
-                      <a
-                        key={platform}
-                        href={typeof url === 'string' ? url : '#'}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-between p-4 border border-white/30 hover:border-white/60 hover:bg-white/5 transition-all duration-200 group"
-                      >
-                        <span className="text-white font-bold tracking-wider uppercase">
-                          {platform}
-                        </span>
-                        <ExternalLink className="w-5 h-5 text-white/60 group-hover:text-white transition-colors" />
-                      </a>
-                    )
-                  ))
-                ) : (
-                  <div className="text-center py-8">
-                    <p className="text-white/40 font-bold tracking-widest uppercase">
-                      NO SOCIAL LINKS ADDED
-                    </p>
-                  </div>
+            {/* Info */}
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-wrap items-center gap-3 mb-2">
+                <h1 className="text-3xl font-semibold tracking-tight text-white">
+                  {displayName}
+                </h1>
+                {profile.is_verified && (
+                  <span className="text-xs font-medium bg-white text-black px-2 py-0.5">
+                    Verified
+                  </span>
                 )}
               </div>
-            </div>
 
-            {/* Genres Section */}
-            {profile.favorite_genres && profile.favorite_genres.length > 0 && (
-              <div className="bg-black border-2 border-white/20 p-8">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-3 h-3 bg-white animate-pulse" />
-                  <h2 className="text-white font-bold tracking-widest uppercase text-lg">GENRES</h2>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {profile.favorite_genres.map((genre) => (
-                    <div
-                      key={genre}
-                      className="bg-white/10 border border-white/30 px-4 py-3 text-center"
-                    >
-                      <span className="text-white font-bold tracking-wider uppercase text-sm">
-                        {genre}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+              {profile.location && (
+                <p className="text-neutral-500 mb-4">
+                  {profile.location}
+                </p>
+              )}
 
-        {/* Stats Section */}
-        {stats && (
-          <div className="grid grid-cols-2 lg:grid-cols-5 gap-6">
-            <div className="bg-black border-2 border-white/20 p-6 text-center">
-              <div className="text-3xl font-bold text-white mb-2">
-                {stats.reviews_count}
-              </div>
-              <div className="text-white/60 font-bold tracking-widest uppercase text-sm">
-                REVIEWS
-              </div>
-            </div>
-            <div className="bg-black border-2 border-white/20 p-6 text-center">
-              <div className="text-3xl font-bold text-white mb-2">
-                {stats.favorites_count}
-              </div>
-              <div className="text-white/60 font-bold tracking-widest uppercase text-sm">
-                FAVORITES
-              </div>
-            </div>
-            <div className="bg-black border-2 border-white/20 p-6 text-center">
-              <div className="text-3xl font-bold text-white mb-2">
-                {stats.followers_count}
-              </div>
-              <div className="text-white/60 font-bold tracking-widest uppercase text-sm">
-                FOLLOWERS
-              </div>
-            </div>
-            <div className="bg-black border-2 border-white/20 p-6 text-center">
-              <div className="text-3xl font-bold text-white mb-2">
-                {stats.following_count}
-              </div>
-              <div className="text-white/60 font-bold tracking-widest uppercase text-sm">
-                FOLLOWING
-              </div>
-            </div>
-            <div className="bg-black border-2 border-white/20 p-6 text-center">
-              <div className="text-3xl font-bold text-white mb-2">
-                {stats.profile_views}
-              </div>
-              <div className="text-white/60 font-bold tracking-widest uppercase text-sm">
-                VIEWS
+              {/* Stats inline */}
+              {stats && (
+                <div className="flex flex-wrap gap-6 text-sm mb-6">
+                  <div>
+                    <span className="text-white font-medium">{stats.followers_count}</span>
+                    <span className="text-neutral-500 ml-1.5">followers</span>
+                  </div>
+                  <div>
+                    <span className="text-white font-medium">{stats.following_count}</span>
+                    <span className="text-neutral-500 ml-1.5">following</span>
+                  </div>
+                  <div>
+                    <span className="text-white font-medium">{stats.reviews_count}</span>
+                    <span className="text-neutral-500 ml-1.5">reviews</span>
+                  </div>
+                  <div>
+                    <span className="text-white font-medium">{stats.favorites_count}</span>
+                    <span className="text-neutral-500 ml-1.5">favorites</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="flex flex-wrap gap-3">
+                {isOwnProfile ? (
+                  <Link href="/settings/profile">
+                    <button className="bg-white text-black px-5 py-2 text-sm font-medium hover:bg-neutral-200 transition-colors">
+                      Edit profile
+                    </button>
+                  </Link>
+                ) : (
+                  <FollowButton
+                    userId={profile.id}
+                    className="bg-white text-black px-5 py-2 text-sm font-medium hover:bg-neutral-200 transition-colors"
+                  />
+                )}
+                <button
+                  onClick={handleShare}
+                  className={cn(
+                    "px-5 py-2 text-sm font-medium transition-colors border",
+                    shareStatus === 'copied'
+                      ? "border-green-600 text-green-500"
+                      : shareStatus === 'error'
+                      ? "border-red-600 text-red-500"
+                      : "border-neutral-700 text-neutral-300 hover:border-neutral-600 hover:text-white"
+                  )}
+                >
+                  {shareStatus === 'copied' ? 'Copied!' : shareStatus === 'error' ? 'Failed' : 'Share'}
+                </button>
               </div>
             </div>
           </div>
+        </motion.div>
+
+        {/* Bio Section */}
+        {profile.bio && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="mb-10"
+          >
+            <h2 className="text-sm font-medium text-neutral-500 uppercase tracking-wider mb-3">
+              About
+            </h2>
+            <p className="text-neutral-300 leading-relaxed max-w-2xl">
+              {profile.bio}
+            </p>
+          </motion.div>
         )}
+
+        {/* Genres */}
+        {profile.favorite_genres && profile.favorite_genres.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="mb-10"
+          >
+            <h2 className="text-sm font-medium text-neutral-500 uppercase tracking-wider mb-3">
+              Genres
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              {profile.favorite_genres.map((genre) => (
+                <span
+                  key={genre}
+                  className="text-sm text-neutral-300 bg-neutral-900 border border-neutral-800 px-3 py-1.5"
+                >
+                  {genre}
+                </span>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
+        {/* Social Links */}
+        {socialPlatforms.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="mb-10"
+          >
+            <h2 className="text-sm font-medium text-neutral-500 uppercase tracking-wider mb-3">
+              Links
+            </h2>
+            <div className="flex flex-wrap gap-3">
+              {socialPlatforms.map(([platform, url]) => (
+                <a
+                  key={platform}
+                  href={typeof url === 'string' ? url : '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-neutral-400 hover:text-white transition-colors underline underline-offset-4"
+                >
+                  {platform}
+                </a>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
+        {/* Member since */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 }}
+          className="pt-8 border-t border-neutral-800"
+        >
+          <p className="text-neutral-600 text-sm">
+            Member since {formatDistanceToNow(joinedDate, { addSuffix: true })}
+          </p>
+        </motion.div>
       </div>
     </div>
   )

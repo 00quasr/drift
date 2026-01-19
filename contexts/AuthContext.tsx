@@ -21,14 +21,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let mounted = true
-    
-    // Get initial user
+
+    // Get initial user - use getUser() which validates with server
     const initializeAuth = async () => {
       try {
-        // First check if there's an active session
-        const { data: { session } } = await supabase.auth.getSession()
-        
-        if (session?.user && mounted) {
+        // Use getUser() instead of getSession() for more reliable auth detection
+        // getUser() validates the session with the server
+        const { data: { user: authUser }, error } = await supabase.auth.getUser()
+
+        if (error) {
+          console.log('AuthContext: No valid session found')
+          if (mounted) {
+            setUser(null)
+            setLoading(false)
+          }
+          return
+        }
+
+        if (authUser && mounted) {
           const user = await authService.getCurrentUser()
           setUser(user)
         }
@@ -42,10 +52,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     initializeAuth()
 
     // Listen for auth changes
-    const { data: { subscription } } = authService.onAuthStateChange(async (user) => {
-      console.log('AuthContext: Auth state change:', user)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('AuthContext: Auth state change:', event, session?.user?.email)
       if (mounted) {
-        setUser(user)
+        if (session?.user) {
+          const user = await authService.getCurrentUser()
+          setUser(user)
+        } else {
+          setUser(null)
+        }
         setLoading(false)
       }
     })

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { Suspense, useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { HeroAuth } from "@/components/ui/hero-auth"
 import { useAuth } from "@/contexts/AuthContext"
@@ -19,7 +19,7 @@ interface RegisterFormData {
   role: UserRole
 }
 
-export default function SignInPage() {
+function SignInContent() {
   const [mode, setMode] = useState<'signin' | 'register'>('signin')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
@@ -163,5 +163,13 @@ export default function SignInPage() {
       error={error}
       success={success}
     />
+  )
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-neutral-950" />}>
+      <SignInContent />
+    </Suspense>
   )
 }

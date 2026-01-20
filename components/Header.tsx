@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Search, Menu, X, Bell, User, LogOut, ArrowRight } from 'lucide-react'
+import { Search, Menu, X, Bell, User, LogOut, ArrowRight, MessageSquare } from 'lucide-react'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { usePathname, useRouter } from 'next/navigation'
@@ -30,6 +30,32 @@ export default function Header() {
   const pathname = usePathname()
   const router = useRouter()
   const { user, signOut, loading } = useAuth()
+  const [unreadMessageCount, setUnreadMessageCount] = useState(0)
+
+  // Fetch unread message count
+  useEffect(() => {
+    if (!user) {
+      setUnreadMessageCount(0)
+      return
+    }
+
+    const fetchUnreadCount = async () => {
+      try {
+        const response = await fetch('/api/conversations/unread-count')
+        if (response.ok) {
+          const data = await response.json()
+          setUnreadMessageCount(data.count || 0)
+        }
+      } catch (error) {
+        console.error('Failed to fetch unread count:', error)
+      }
+    }
+
+    fetchUnreadCount()
+    // Refetch every 30 seconds
+    const interval = setInterval(fetchUnreadCount, 30000)
+    return () => clearInterval(interval)
+  }, [user])
 
   // Close search when clicking outside
   useEffect(() => {
@@ -259,7 +285,27 @@ export default function Header() {
             >
               <Search className="w-5 h-5" />
             </motion.button>
-            
+
+            {/* Messages - Only show when logged in */}
+            {user && (
+              <Link href="/messages">
+                <motion.button
+                  className="relative p-3 md:p-2.5 text-white/70 hover:text-white hover:bg-white/[0.04] rounded-lg backdrop-blur-sm transition-all duration-300 border border-white/[0.04] hover:border-white/[0.08] min-h-[44px] min-w-[44px] flex items-center justify-center"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <MessageSquare className="w-5 h-5" />
+                  {unreadMessageCount > 0 && (
+                    <div className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-white rounded-full flex items-center justify-center">
+                      <span className="text-[10px] font-bold text-black px-1">
+                        {unreadMessageCount > 99 ? '99+' : unreadMessageCount}
+                      </span>
+                    </div>
+                  )}
+                </motion.button>
+              </Link>
+            )}
+
             {/* Notifications - Only show when logged in */}
             {user && (
               <motion.button
@@ -354,14 +400,28 @@ export default function Header() {
                              </motion.div>
                             
                             <motion.div whileHover={{ x: 2 }} transition={{ duration: 0.2 }}>
-                              <Link 
-                                href="/favorites" 
+                              <Link
+                                href="/favorites"
                                 className="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-300 group"
                               >
                                 FAVORITES
                               </Link>
                             </motion.div>
-                            
+
+                            <motion.div whileHover={{ x: 2 }} transition={{ duration: 0.2 }}>
+                              <Link
+                                href="/messages"
+                                className="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-300 group relative"
+                              >
+                                MESSAGES
+                                {unreadMessageCount > 0 && (
+                                  <span className="ml-2 px-1.5 py-0.5 text-[10px] font-bold bg-white text-black rounded-full">
+                                    {unreadMessageCount > 99 ? '99+' : unreadMessageCount}
+                                  </span>
+                                )}
+                              </Link>
+                            </motion.div>
+
                             {/* Role-specific links */}
                             {user.role === 'artist' && (
                               <motion.div whileHover={{ x: 2 }} transition={{ duration: 0.2 }}>
@@ -750,14 +810,28 @@ export default function Header() {
                     
                     {/* Common user links */}
                     <Link href="/favorites">
-                      <button 
+                      <button
                         className="block w-full text-left px-4 py-4 text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-200 min-h-[48px] flex items-center"
                         onClick={() => setMobileMenuOpen(false)}
                       >
                         FAVORITES
                       </button>
                     </Link>
-                    
+
+                    <Link href="/messages">
+                      <button
+                        className="block w-full text-left px-4 py-4 text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-200 min-h-[48px] flex items-center justify-between"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <span>MESSAGES</span>
+                        {unreadMessageCount > 0 && (
+                          <span className="px-2 py-0.5 text-[10px] font-bold bg-white text-black rounded-full">
+                            {unreadMessageCount > 99 ? '99+' : unreadMessageCount}
+                          </span>
+                        )}
+                      </button>
+                    </Link>
+
                     <Link href="/settings/profile">
                       <button 
                         className="block w-full text-left px-4 py-4 text-white/80 hover:text-white hover:bg-white/[0.04] rounded-lg transition-all duration-200 min-h-[48px] flex items-center"

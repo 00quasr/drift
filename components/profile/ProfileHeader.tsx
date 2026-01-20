@@ -1,12 +1,15 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { formatDistanceToNow } from 'date-fns'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { FollowButton } from '@/components/social/FollowButton'
+import { useAuth } from '@/contexts/AuthContext'
+import { createClient } from '@/lib/supabase'
 
 interface ProfileData {
   id: string
@@ -41,9 +44,64 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   stats,
   isOwnProfile
 }) => {
+  const router = useRouter()
+  const { user } = useAuth()
   const displayName = profile.display_name || profile.full_name || 'Anonymous User'
   const joinedDate = new Date(profile.created_at)
   const [shareStatus, setShareStatus] = useState<'idle' | 'copied' | 'error'>('idle')
+  const [canMessage, setCanMessage] = useState(true)
+  const [isStartingChat, setIsStartingChat] = useState(false)
+
+  // Check if the user allows messages
+  useEffect(() => {
+    if (isOwnProfile || !profile.id) return
+
+    const checkCanMessage = async () => {
+      try {
+        const supabase = createClient()
+        const { data } = await supabase
+          .from('user_settings')
+          .select('allow_messages')
+          .eq('user_id', profile.id)
+          .single()
+
+        // Default to true if no settings found
+        setCanMessage(data?.allow_messages !== false)
+      } catch {
+        setCanMessage(true)
+      }
+    }
+
+    checkCanMessage()
+  }, [profile.id, isOwnProfile])
+
+  const handleStartChat = async () => {
+    if (!user) {
+      router.push(`/auth/signin?redirect=/profile/${profile.id}`)
+      return
+    }
+
+    setIsStartingChat(true)
+    try {
+      const response = await fetch('/api/conversations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          participantIds: [profile.id],
+          isGroup: false,
+        }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        router.push(`/messages/${data.id}`)
+      }
+    } catch (error) {
+      console.error('Failed to start chat:', error)
+    } finally {
+      setIsStartingChat(false)
+    }
+  }
 
   const handleShare = async () => {
     try {
@@ -139,10 +197,21 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
                     </button>
                   </Link>
                 ) : (
-                  <FollowButton
-                    userId={profile.id}
-                    className="bg-white text-black px-5 py-2 text-sm font-medium hover:bg-neutral-200 transition-colors"
-                  />
+                  <>
+                    <FollowButton
+                      userId={profile.id}
+                      className="bg-white text-black px-5 py-2 text-sm font-medium hover:bg-neutral-200 transition-colors"
+                    />
+                    {canMessage && (
+                      <button
+                        onClick={handleStartChat}
+                        disabled={isStartingChat}
+                        className="px-5 py-2 text-sm font-medium transition-colors border border-neutral-700 text-neutral-300 hover:border-neutral-600 hover:text-white disabled:opacity-50"
+                      >
+                        {isStartingChat ? 'Starting...' : 'Message'}
+                      </button>
+                    )}
+                  </>
                 )}
                 <button
                   onClick={handleShare}

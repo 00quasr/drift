@@ -93,12 +93,12 @@ export async function getEvents(filters?: {
     }
     
     // Transform the data to match our interface
-    const events: EventWithDetails[] = (data || []).map(event => ({
+    const events = (data || []).map(event => ({
       ...event,
       venue: event.venue,
       artists: event.event_artists?.map((ea: any) => ea.artist) || []
-    }))
-    
+    })) as unknown as EventWithDetails[]
+
     return events
   } catch (error) {
     console.error('Error in getEvents:', error)
@@ -189,14 +189,14 @@ export async function getUpcomingEvents(limit = 10): Promise<EventWithDetails[]>
     }
     
     // Transform the data and ensure events are truly upcoming
-    const events: EventWithDetails[] = (data || [])
+    const events = (data || [])
       .filter(event => new Date(event.start_date) > new Date()) // Double-check upcoming
       .map(event => ({
         ...event,
         venue: event.venue,
         artists: event.event_artists?.map((ea: any) => ea.artist) || []
-      }))
-    
+      })) as unknown as EventWithDetails[]
+
     return events
   } catch (error) {
     console.error('Error in getUpcomingEvents:', error)
@@ -227,7 +227,7 @@ export async function getTrendingEvents(limit = 10): Promise<EventWithDetails[]>
     }
     
     // Transform the data
-    const events: EventWithDetails[] = (data || []).map(event => ({
+    const events = (data || []).map(event => ({
       ...event,
       venue: event.venue,
       artists: event.event_artists?.map((ea: any) => ea.artist) || []
@@ -287,7 +287,7 @@ export async function searchEvents(query: string, filters?: {
     }
     
     // Transform the data
-    const events: EventWithDetails[] = (data || []).map(event => ({
+    const events = (data || []).map(event => ({
       ...event,
       venue: event.venue,
       artists: event.event_artists?.map((ea: any) => ea.artist) || []

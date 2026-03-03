@@ -64,7 +64,7 @@ export const ProfileEditForm: React.FC<ProfileEditFormProps> = ({
     setFormData(prev => ({
       ...prev,
       favorite_genres: prev.favorite_genres.includes(genre)
-        ? prev.favorite_genres.filter(g => g !== genre)
+        ? prev.favorite_genres.filter((g: string) => g !== genre)
         : [...prev.favorite_genres, genre]
     }))
   }
@@ -145,7 +145,7 @@ export const ProfileEditForm: React.FC<ProfileEditFormProps> = ({
           setModerationStatus(null)
         } catch (uploadError) {
           console.error('Upload error:', uploadError)
-          setUploadError(`Failed to upload image: ${uploadError.message}`)
+          setUploadError(`Failed to upload image: ${(uploadError as Error).message}`)
           // Continue with save even if upload fails
         }
         setUploading(false)

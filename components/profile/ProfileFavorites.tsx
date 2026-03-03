@@ -105,7 +105,7 @@ export const ProfileFavorites: React.FC<ProfileFavoritesProps> = ({
                     target_date: data.start_date,
                     target_image: data.images?.[0] || null,
                     target_genres: data.genres,
-                    target_location: data.venues ? `${data.venues.city}, ${data.venues.country}` : undefined
+                    target_location: data.venues ? `${(data.venues as any).city}, ${(data.venues as any).country}` : undefined
                   }
                 }
               } else if (favorite.target_type === 'artist') {

@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
       artists: 0,
       totalViews: 0,
       totalLikes: 0,
-      recentActivity: [],
+      recentActivity: [] as { action: string; description: string; time: string }[],
       pendingVerifications: 0
     }
 
@@ -109,7 +109,7 @@ export async function GET(request: NextRequest) {
 
       stats.recentActivity = recentActivity?.map(activity => ({
         action: `${activity.action.toUpperCase()} ${activity.content_type.toUpperCase()}`,
-        description: `Moderated by ${activity.profiles?.display_name || activity.profiles?.email || 'System'}`,
+        description: `Moderated by ${(activity.profiles as any)?.[0]?.display_name || (activity.profiles as any)?.[0]?.email || 'System'}`,
         time: new Date(activity.created_at).toLocaleDateString()
       })) || []
 

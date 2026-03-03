@@ -18,6 +18,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { ReviewModal } from '@/components/reviews/ReviewModal'
 import { favoritesService } from '@/lib/services/favorites'
+import ClassicLoader from '@/components/ui/loader'
 import { H1, H2, H3 } from "@/components/ui/typography"
 
 interface VenuePageProps {

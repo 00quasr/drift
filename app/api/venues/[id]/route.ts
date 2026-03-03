@@ -272,14 +272,31 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const supabase = await createClient()
-    
+    const authHeader = request.headers.get('Authorization')
+    const cookieStore = cookies()
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          get(name: string) {
+            return cookieStore.get(name)?.value
+          },
+        },
+        global: authHeader ? {
+          headers: {
+            Authorization: authHeader,
+          },
+        } : undefined,
+      }
+    )
+
     // Check authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (authError || !user) {
-      return NextResponse.json({ 
-        success: false, 
-        error: 'Authentication required' 
+      return NextResponse.json({
+        success: false,
+        error: 'Authentication required'
       }, { status: 401 })
     }
 
@@ -291,9 +308,9 @@ export async function DELETE(
       .single()
 
     if (profileError || !profile) {
-      return NextResponse.json({ 
-        success: false, 
-        error: 'Profile not found' 
+      return NextResponse.json({
+        success: false,
+        error: 'Profile not found'
       }, { status: 404 })
     }
 
@@ -305,9 +322,9 @@ export async function DELETE(
       .single()
 
     if (venueError) {
-      return NextResponse.json({ 
-        success: false, 
-        error: 'Venue not found' 
+      return NextResponse.json({
+        success: false,
+        error: 'Venue not found'
       }, { status: 404 })
     }
 

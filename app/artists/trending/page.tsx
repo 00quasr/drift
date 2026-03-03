@@ -87,7 +87,7 @@ export default function TrendingArtistsPage() {
           }))
           
           // Sort by trending score
-          trendingArtists.sort((a, b) => b.trending_score - a.trending_score)
+          trendingArtists.sort((a: any, b: any) => b.trending_score - a.trending_score)
           
           setArtists(trendingArtists)
         } else {

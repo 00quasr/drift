@@ -16,6 +16,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { ReviewModal } from '@/components/reviews/ReviewModal'
 import { favoritesService } from '@/lib/services/favorites'
+import ClassicLoader from '@/components/ui/loader'
 import { H1, H2, H3 } from "@/components/ui/typography"
 
 interface EventPageProps {
@@ -386,7 +387,7 @@ export default function EventPage({ params }: EventPageProps) {
                       {event.artists.length} PERFORMING
                     </div>
                     <div className="text-white/60 text-sm font-bold tracking-widest uppercase">
-                      {event.artists.slice(0, 3).map(a => a.name).join(', ')}
+                      {event.artists.slice(0, 3).map((a: any) => a.name).join(', ')}
                       {event.artists.length > 3 && ` +${event.artists.length - 3} MORE`}
                     </div>
                   </div>

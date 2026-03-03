@@ -45,7 +45,7 @@ export function VerificationForm({ requestedRole, onSuccess, onCancel }: Verific
     setFormData(prev => ({
       ...prev,
       [section]: {
-        ...prev[section],
+        ...(typeof prev[section] === 'object' ? prev[section] : {}),
         [field]: value
       }
     }))

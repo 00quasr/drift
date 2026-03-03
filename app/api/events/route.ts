@@ -31,22 +31,21 @@ export async function GET(request: NextRequest) {
 
     let data
     if (query) {
-      data = await searchEvents(query, { city: city || undefined, country: country || undefined, genres, limit, status: publicStatus })
+      data = await searchEvents(query, { city: city || undefined, country: country || undefined, genres, limit })
     } else if (type === 'upcoming') {
       data = await getUpcomingEvents(limit || 10)
     } else if (type === 'trending') {
       data = await getTrendingEvents(limit || 10)
     } else {
-      data = await getEvents({ 
-        city: city || undefined, 
-        country: country || undefined, 
+      data = await getEvents({
+        city: city || undefined,
+        country: country || undefined,
         venue_id: venue_id || undefined,
-        genres, 
+        genres,
         start_date: start_date || undefined,
         end_date: end_date || undefined,
-        limit, 
-        offset,
-        status: publicStatus 
+        limit,
+        offset
       })
     }
 

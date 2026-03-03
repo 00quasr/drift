@@ -216,10 +216,17 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       .eq('id', user.id)
       .single()
 
-    console.log('API UPDATE: Profile lookup result:', { 
-      profile, 
-      profileError: profileError ? profileError.message : null 
+    console.log('API UPDATE: Profile lookup result:', {
+      profile,
+      profileError: profileError ? profileError.message : null
     })
+
+    if (!profile) {
+      return NextResponse.json({
+        success: false,
+        error: 'User profile not found'
+      }, { status: 404 })
+    }
 
     // Check if user can edit this event
     const { data: existingEvent, error: fetchError } = await supabase
@@ -276,7 +283,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       }, { status: 400 })
     }
 
-    let moderation = { approved: true }
+    let moderation: { approved: boolean; reason?: string } = { approved: true }
     
     // Only moderate text content for full updates
     if (!isStatusOnlyUpdate) {

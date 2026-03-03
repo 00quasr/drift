@@ -15,7 +15,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
     // Public API - get published artist
     const { getArtistById } = await import('@/lib/services/artists')
-    const data = await getArtistById(params.id, 'published')
+    const data = await getArtistById(params.id)
     
     if (!data) {
       return NextResponse.json({ 

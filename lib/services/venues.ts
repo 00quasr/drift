@@ -391,7 +391,7 @@ export async function getTrendingVenues(limit = 10) {
     return sorted
   } catch (error) {
     console.error('Error in getTrendingVenues:', error)
-    throw error
+    return []
   }
 }
 

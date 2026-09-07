@@ -15,6 +15,7 @@ import {
   Mail,
   Lock,
   Trash2,
+  Download,
   Save,
   AlertCircle,
   ArrowLeft
@@ -49,6 +50,9 @@ export default function SettingsPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [activeTab, setActiveTab] = useState('notifications')
+  const [exporting, setExporting] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
 
   useEffect(() => {
     if (!loading && !user) {
@@ -109,6 +113,84 @@ export default function SettingsPage() {
       setError(error.message || 'Failed to save settings')
     } finally {
       setSaving(false)
+    }
+  }
+
+  // GDPR right of access: hand the user a JSON copy of everything we hold.
+  const handleExportData = async () => {
+    setExporting(true)
+    setError('')
+    setSuccess('')
+
+    try {
+      const { supabase } = await import('@/lib/auth')
+      const { data: { session } } = await supabase.auth.getSession()
+
+      const response = await fetch('/api/user/export', {
+        headers: {
+          ...(session?.access_token && {
+            'Authorization': `Bearer ${session.access_token}`
+          })
+        }
+      })
+
+      if (!response.ok) throw new Error('Failed to export your data')
+
+      const blob = await response.blob()
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `drift-data-export-${new Date().toISOString().slice(0, 10)}.json`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+
+      setSuccess('Your data has been downloaded.')
+      setTimeout(() => setSuccess(''), 3000)
+    } catch (err: any) {
+      console.error('Export error:', err)
+      setError(err.message || 'Failed to export your data')
+    } finally {
+      setExporting(false)
+    }
+  }
+
+  // GDPR right to erasure. Two-step: the first click arms the confirmation.
+  const handleDeleteAccount = async () => {
+    if (!confirmDelete) {
+      setConfirmDelete(true)
+      return
+    }
+
+    setDeleting(true)
+    setError('')
+
+    try {
+      const { supabase } = await import('@/lib/auth')
+      const { data: { session } } = await supabase.auth.getSession()
+
+      const response = await fetch('/api/user/delete', {
+        method: 'DELETE',
+        headers: {
+          ...(session?.access_token && {
+            'Authorization': `Bearer ${session.access_token}`
+          })
+        }
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) throw new Error(result.error || 'Failed to delete your account')
+
+      await supabase.auth.signOut()
+      router.push('/')
+    } catch (err: any) {
+      console.error('Account deletion error:', err)
+      setError(err.message || 'Failed to delete your account')
+      setConfirmDelete(false)
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -468,10 +550,37 @@ export default function SettingsPage() {
                         <span>Change Password</span>
                       </button>
 
-                      <button className="flex items-center space-x-2 px-4 py-2 border border-red-500/50 text-red-400 hover:border-red-500 hover:text-red-300 transition-colors font-bold tracking-wider uppercase">
-                        <Trash2 className="w-4 h-4" />
-                        <span>Delete Account</span>
+                      <button
+                        onClick={handleExportData}
+                        disabled={exporting}
+                        className="flex items-center space-x-2 px-4 py-2 border border-white/30 text-white hover:border-white/60 transition-colors font-bold tracking-wider uppercase disabled:opacity-50"
+                      >
+                        <Download className="w-4 h-4" />
+                        <span>{exporting ? 'Preparing...' : 'Download My Data'}</span>
                       </button>
+
+                      <button
+                        onClick={handleDeleteAccount}
+                        disabled={deleting}
+                        className="flex items-center space-x-2 px-4 py-2 border border-red-500/50 text-red-400 hover:border-red-500 hover:text-red-300 transition-colors font-bold tracking-wider uppercase disabled:opacity-50"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        <span>
+                          {deleting
+                            ? 'Deleting...'
+                            : confirmDelete
+                              ? 'Confirm Permanent Deletion'
+                              : 'Delete Account'}
+                        </span>
+                      </button>
+
+                      {confirmDelete && !deleting && (
+                        <p className="text-sm text-red-300/80 max-w-prose leading-6">
+                          This permanently deletes your profile, reviews, favourites and
+                          messages. Venues, events and artists you created stay on the
+                          platform but are no longer linked to you. This cannot be undone.
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>

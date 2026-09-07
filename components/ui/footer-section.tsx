@@ -33,6 +33,7 @@ const footerLinks: FooterSection[] = [
             { title: 'Support', href: '/support' },
             { title: 'Privacy Policy', href: '/privacy' },
             { title: 'Terms of Service', href: '/terms' },
+            { title: 'Impressum', href: '/impressum' },
         ],
     },
     {

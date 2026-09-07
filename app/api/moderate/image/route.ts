@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
+import { getUserFromRequest } from '@/lib/api-utils'
+import { checkRateLimit, getRateLimitHeaders, uploadRateLimit } from '@/lib/utils/rateLimit'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -7,6 +9,25 @@ const openai = new OpenAI({
 
 export async function POST(request: NextRequest) {
   try {
+    // Vision calls are the most expensive thing we do per request, so this endpoint
+    // is gated on a session and rate limited per user.
+    const user = await getUserFromRequest(request)
+
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: 'Authentication required' },
+        { status: 401 }
+      )
+    }
+
+    const rateLimit = await checkRateLimit(`moderate-image:${user.id}`, uploadRateLimit)
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        { success: false, error: 'Too many requests' },
+        { status: 429, headers: getRateLimitHeaders(rateLimit) }
+      )
+    }
+
     const { image, filename } = await request.json()
 
     if (!image) {

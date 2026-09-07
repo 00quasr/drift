@@ -1,5 +1,40 @@
 import { NextResponse } from 'next/server'
+import { createServerClient } from '@supabase/ssr'
 import { createClient } from '@/lib/supabase-server'
+
+/**
+ * Resolve the caller from the Authorization header.
+ *
+ * Browser code talks to these routes with `Bearer <access_token>` (see
+ * authService.getAccessToken), not cookies - and the client in
+ * lib/supabase-server.ts is a service-role client that never carries a session.
+ * So token verification has to go through an anon client with the header
+ * attached. Returns null when there is no valid session.
+ */
+export async function getUserFromRequest(request: Request) {
+  const authHeader = request.headers.get('authorization')
+  const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null
+
+  if (!token) return null
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() { return [] },
+        setAll() { /* no session persistence on the server */ },
+      },
+      global: {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    }
+  )
+
+  const { data: { user }, error } = await supabase.auth.getUser()
+
+  return error ? null : user
+}
 
 // Standard API response format
 export interface ApiResponse<T = any> {
@@ -35,10 +70,19 @@ export function withErrorHandling(handler: Function) {
     try {
       return await handler(...args)
     } catch (error) {
+      // Log the real error server-side; never surface internal messages to clients.
       console.error('API Error:', error)
-      if (error instanceof Error) {
-        return createErrorResponse(error.message, 500)
+
+      // requireAuth/requireRole signal authorization failures by throwing, so map
+      // those to the right status instead of a blanket 500.
+      const message = error instanceof Error ? error.message : ''
+      if (message === 'Authentication required') {
+        return createErrorResponse('Authentication required', 401)
       }
+      if (message === 'Insufficient permissions' || message === 'User profile not found') {
+        return createErrorResponse('Insufficient permissions', 403)
+      }
+
       return createErrorResponse('Internal server error', 500)
     }
   }

@@ -1,4 +1,14 @@
-import { supabase } from '@/lib/auth'
+import { supabase, authService } from '@/lib/auth'
+
+// The moderation endpoints require a session (they spend money on the OpenAI API),
+// and these routes authenticate by bearer token like the rest of the app.
+async function moderationHeaders(): Promise<Record<string, string>> {
+  const token = await authService.getAccessToken()
+  return {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  }
+}
 
 export async function uploadProfileImage(file: File, userId: string): Promise<string> {
   try {
@@ -133,11 +143,9 @@ export async function moderateImage(file: File): Promise<boolean> {
     const base64 = await fileToBase64(file)
     console.log('File converted to base64, size:', base64.length)
     
-    // Use absolute URL for server-side calls  
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
-    const url = `${baseUrl}/api/moderate/image`
-    
-    console.log('Sending moderation request to:', url)
+    // Same-origin relative URL: this module runs in the browser, so this keeps the
+    // session cookie attached and avoids depending on NEXT_PUBLIC_SITE_URL.
+    const url = '/api/moderate/image'
     
     // Add timeout to prevent hanging
     const controller = new AbortController()
@@ -146,9 +154,7 @@ export async function moderateImage(file: File): Promise<boolean> {
     try {
       const response = await fetch(url, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: await moderationHeaders(),
         body: JSON.stringify({
           image: base64,
           filename: file.name
@@ -181,15 +187,12 @@ export async function moderateImage(file: File): Promise<boolean> {
 
 export async function moderateText(text: string): Promise<{ approved: boolean; reason?: string }> {
   try {
-    // Use absolute URL for server-side calls
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
-    const url = `${baseUrl}/api/moderate/text`
+    // Same-origin relative URL - see moderateImage above.
+    const url = '/api/moderate/text'
     
     const response = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: await moderationHeaders(),
       body: JSON.stringify({ text })
     })
 

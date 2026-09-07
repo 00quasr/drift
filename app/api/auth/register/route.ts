@@ -1,8 +1,18 @@
 import { createClient } from '@/lib/supabase-server'
 import { NextRequest, NextResponse } from 'next/server'
+import { checkRateLimit, getClientIp, getRateLimitHeaders, strictRateLimit } from '@/lib/utils/rateLimit'
 
 export async function POST(request: NextRequest) {
   try {
+    // Throttle per IP so this endpoint can't be used to mass-create accounts.
+    const rateLimit = await checkRateLimit(`register:${getClientIp(request)}`, strictRateLimit)
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        { error: 'Too many attempts. Please try again later.' },
+        { status: 429, headers: getRateLimitHeaders(rateLimit) }
+      )
+    }
+
     const body = await request.json()
     const { email, password, full_name, role } = body
 
@@ -27,9 +37,11 @@ export async function POST(request: NextRequest) {
     })
 
     if (authError) {
+      // This is the admin API - its messages can carry internal detail, so log the
+      // real error and return something generic.
       console.error('Auth creation error:', authError)
       return NextResponse.json(
-        { error: authError.message },
+        { error: 'Registration failed' },
         { status: 400 }
       )
     }

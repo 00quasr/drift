@@ -83,6 +83,17 @@ export async function checkRateLimit(
   }
 }
 
+// Best-effort client IP for rate limiting unauthenticated routes. Behind Vercel the
+// first x-forwarded-for entry is the real client.
+export function getClientIp(request: Request): string {
+  const forwarded = request.headers.get('x-forwarded-for')
+  if (forwarded) {
+    const first = forwarded.split(',')[0]?.trim()
+    if (first) return first
+  }
+  return request.headers.get('x-real-ip') || 'unknown'
+}
+
 export function getRateLimitHeaders(result: {
   remaining: number
   reset: number

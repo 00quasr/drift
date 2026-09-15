@@ -69,13 +69,13 @@ export default function PrivacyPage() {
         </p>
       </LegalSection>
 
-      <LegalSection heading="Automated content moderation">
+      <LegalSection heading="Content moderation">
         <p>
-          Images and text you upload may be sent to OpenAI for automated
-          moderation before publication, to detect content that breaches our
-          rules. This check informs whether content is published; it does not
-          produce legal effects concerning you. You can contact us to have any
-          moderation decision reviewed by a person.
+          Content is not screened automatically before publication. Reviews and
+          listings can be reported by other users, and reported content is
+          assessed by a person on our team, who may remove it or suspend the
+          account responsible. You can contact us to have any such decision
+          reviewed.
         </p>
       </LegalSection>
 
@@ -87,10 +87,6 @@ export default function PrivacyPage() {
         <p>
           <strong className="text-white/90">Vercel</strong> — application hosting
           and delivery.
-        </p>
-        <p>
-          <strong className="text-white/90">OpenAI</strong> — automated content
-          moderation, as described above.
         </p>
         <p>
           <strong className="text-white/90">Mapbox</strong> — rendering venue

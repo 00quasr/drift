@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { validateProfileData } from '@/lib/services/profile'
-import { moderateText } from '@/lib/services/storage'
 
 export async function GET(request: NextRequest) {
   try {
@@ -134,26 +133,6 @@ export async function PUT(request: NextRequest) {
       }, { status: 400 })
     }
 
-    // Moderate text content if present
-    const { full_name, display_name, bio, location } = updateData
-    const textToModerate = [full_name, display_name, bio, location].filter(Boolean).join(' ')
-    
-    if (textToModerate.trim()) {
-      try {
-        const moderationResult = await moderateText(textToModerate)
-        if (!moderationResult.approved) {
-          return NextResponse.json({ 
-            success: false, 
-            error: 'Content was rejected by moderation',
-            reason: moderationResult.reason
-          }, { status: 422 })
-        }
-      } catch (moderationError) {
-        console.error('Moderation error:', moderationError)
-        // Continue with update if moderation fails
-      }
-    }
-    
     // Add updated timestamp
     const profileData = {
       ...updateData,

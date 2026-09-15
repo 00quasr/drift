@@ -20,7 +20,7 @@ import {
   ExternalLink,
   ArrowLeft
 } from 'lucide-react'
-import { uploadArtistImage, moderateImage, validateImageFile } from '@/lib/services/storage'
+import { uploadArtistImage, validateImageFile } from '@/lib/services/storage'
 import ImageGallery from '@/components/ui/ImageGallery'
 
 interface ArtistFormData {
@@ -172,11 +172,6 @@ export default function ArtistProfilePage() {
           throw new Error(validation.error)
         }
 
-        // Moderate content
-        const approved = await moderateImage(file)
-        if (!approved) {
-          throw new Error(`Image ${file.name} was rejected by content moderation`)
-        }
 
         // Generate temporary artist ID for storage path
         const tempArtistId = existingArtist?.id || crypto.randomUUID()

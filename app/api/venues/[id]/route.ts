@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { getVenueById, updateVenue, deleteVenue } from '@/lib/services/venues'
-import { moderateText } from '@/lib/services/storage'
 
 export async function GET(
   request: NextRequest,
@@ -183,16 +182,6 @@ export async function PUT(
       }, { status: 400 })
     }
 
-    // Moderate text content
-    const textToModerate = `${name} ${description}`
-    const moderation = await moderateText(textToModerate)
-    
-    if (!moderation.approved) {
-      return NextResponse.json({ 
-        success: false, 
-        error: `Content was rejected: ${moderation.reason || 'Inappropriate content detected'}` 
-      }, { status: 400 })
-    }
 
     // Enhanced venue data for CMS
     const venueData = {
@@ -243,7 +232,6 @@ export async function PUT(
           action: status !== previousStatus ? status : 'updated',
           moderator_id: user.id,
           metadata: {
-            moderation_result: moderation,
             user_role: profile.role,
             is_verified: profile.is_verified,
             previous_status: previousStatus,

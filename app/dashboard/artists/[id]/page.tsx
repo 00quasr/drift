@@ -20,7 +20,7 @@ import {
   Instagram,
   ExternalLink
 } from 'lucide-react'
-import { uploadArtistImage, moderateImage, validateImageFile } from '@/lib/services/storage'
+import { uploadArtistImage, validateImageFile } from '@/lib/services/storage'
 import ClassicLoader from '@/components/ui/loader'
 
 interface ArtistFormData {
@@ -152,11 +152,6 @@ export default function ArtistEditPage({ params }: ArtistEditPageProps) {
           throw new Error(validation.error)
         }
 
-        // Moderate content
-        const approved = await moderateImage(file)
-        if (!approved) {
-          throw new Error(`Image ${file.name} was rejected by content moderation`)
-        }
 
         // Upload to storage
         const imageUrl = await uploadArtistImage(file, artistId)

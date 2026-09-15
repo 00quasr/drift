@@ -1,14 +1,4 @@
-import { supabase, authService } from '@/lib/auth'
-
-// The moderation endpoints require a session (they spend money on the OpenAI API),
-// and these routes authenticate by bearer token like the rest of the app.
-async function moderationHeaders(): Promise<Record<string, string>> {
-  const token = await authService.getAccessToken()
-  return {
-    'Content-Type': 'application/json',
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  }
-}
+import { supabase } from '@/lib/auth'
 
 export async function uploadProfileImage(file: File, userId: string): Promise<string> {
   try {
@@ -135,84 +125,6 @@ export async function uploadArtistImage(file: File, artistId: string): Promise<s
   }
 }
 
-export async function moderateImage(file: File): Promise<boolean> {
-  try {
-    console.log('Starting moderation for:', file.name)
-    
-    // Convert file to base64 for OpenAI API
-    const base64 = await fileToBase64(file)
-    console.log('File converted to base64, size:', base64.length)
-    
-    // Same-origin relative URL: this module runs in the browser, so this keeps the
-    // session cookie attached and avoids depending on NEXT_PUBLIC_SITE_URL.
-    const url = '/api/moderate/image'
-    
-    // Add timeout to prevent hanging
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 30000) // 30 second timeout
-    
-    try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: await moderationHeaders(),
-        body: JSON.stringify({
-          image: base64,
-          filename: file.name
-        }),
-        signal: controller.signal
-      })
-
-      clearTimeout(timeoutId)
-      console.log('Moderation response status:', response.status)
-
-      const data = await response.json()
-      console.log('Moderation response data:', data)
-      
-      if (!response.ok) {
-        throw new Error(data.error || 'Moderation failed')
-      }
-
-      return data.approved
-    } catch (error: any) {
-      clearTimeout(timeoutId)
-      throw error
-    }
-  } catch (error: any) {
-    console.error('Moderation error:', error)
-    // In case of moderation service failure, default to approved
-    // You might want to change this behavior based on your requirements
-    return true
-  }
-}
-
-export async function moderateText(text: string): Promise<{ approved: boolean; reason?: string }> {
-  try {
-    // Same-origin relative URL - see moderateImage above.
-    const url = '/api/moderate/text'
-    
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: await moderationHeaders(),
-      body: JSON.stringify({ text })
-    })
-
-    const data = await response.json()
-    
-    if (!response.ok) {
-      throw new Error(data.error || 'Text moderation failed')
-    }
-
-    return {
-      approved: data.approved,
-      reason: data.reason
-    }
-  } catch (error: any) {
-    console.error('Text moderation error:', error)
-    // Default to approved if moderation fails
-    return { approved: true }
-  }
-}
-
 export async function deleteFile(bucket: string, path: string): Promise<void> {
   try {
     const { error } = await supabase.storage
@@ -226,21 +138,6 @@ export async function deleteFile(bucket: string, path: string): Promise<void> {
     console.error('Delete error:', error)
     throw new Error(error.message || 'Failed to delete file')
   }
-}
-
-// Helper function to convert file to base64
-function fileToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.readAsDataURL(file)
-    reader.onload = () => {
-      const result = reader.result as string
-      // Remove data URL prefix (data:image/jpeg;base64,)
-      const base64 = result.split(',')[1]
-      resolve(base64)
-    }
-    reader.onerror = error => reject(error)
-  })
 }
 
 // Utility functions for image validation

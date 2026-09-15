@@ -22,7 +22,7 @@ import {
   Camera,
   ArrowLeft
 } from 'lucide-react'
-import { uploadVenueImage, moderateImage, validateImageFile } from '@/lib/services/storage'
+import { uploadVenueImage, validateImageFile } from '@/lib/services/storage'
 import ImageGallery from '@/components/ui/ImageGallery'
 import { H1, H2, H3 } from "@/components/ui/typography"
 
@@ -213,11 +213,6 @@ export default function MyVenuePage() {
           throw new Error(validation.error)
         }
 
-        // Moderate content
-        const approved = await moderateImage(file)
-        if (!approved) {
-          throw new Error(`Image ${file.name} was rejected by content moderation`)
-        }
 
         // Generate temporary venue ID for storage path
         const tempVenueId = existingVenue?.id || crypto.randomUUID()

@@ -14,7 +14,7 @@ import {
   X,
   AlertCircle
 } from 'lucide-react'
-import { uploadVenueImage, moderateImage, validateImageFile } from '@/lib/services/storage'
+import { uploadVenueImage, validateImageFile } from '@/lib/services/storage'
 
 interface VenueFormData {
   name: string
@@ -80,11 +80,6 @@ export default function CreateVenuePage() {
           throw new Error(validation.error)
         }
 
-        // Moderate content
-        const approved = await moderateImage(file)
-        if (!approved) {
-          throw new Error(`Image ${file.name} was rejected by content moderation`)
-        }
 
         // Generate temporary venue ID for storage path
         const tempVenueId = crypto.randomUUID()

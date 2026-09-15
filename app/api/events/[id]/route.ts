@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
-import { moderateText } from '@/lib/services/storage'
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
@@ -283,21 +282,6 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       }, { status: 400 })
     }
 
-    let moderation: { approved: boolean; reason?: string } = { approved: true }
-    
-    // Only moderate text content for full updates
-    if (!isStatusOnlyUpdate) {
-      const textToModerate = `${title} ${description}`
-      moderation = await moderateText(textToModerate)
-      
-      if (!moderation.approved) {
-        return NextResponse.json({ 
-          success: false, 
-          error: `Content was rejected: ${moderation.reason || 'Inappropriate content detected'}` 
-        }, { status: 400 })
-      }
-    }
-
     // Create update data based on update type
     let updateData: any = {
       updated_by: user.id,
@@ -357,7 +341,6 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
           action: 'updated',
           moderator_id: user.id,
           metadata: {
-            moderation_result: moderation,
             user_role: profile.role,
             is_verified: profile.is_verified,
             changes: Object.keys(updateData)

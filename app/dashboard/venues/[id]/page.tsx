@@ -19,7 +19,7 @@ import {
   Trash2,
   Calendar
 } from 'lucide-react'
-import { uploadVenueImage, moderateImage, validateImageFile } from '@/lib/services/storage'
+import { uploadVenueImage, validateImageFile } from '@/lib/services/storage'
 import ClassicLoader from '@/components/ui/loader'
 
 interface VenueFormData {
@@ -127,11 +127,6 @@ export default function VenueEditPage({ params }: VenueEditPageProps) {
           throw new Error(validation.error)
         }
 
-        // Moderate content
-        const approved = await moderateImage(file)
-        if (!approved) {
-          throw new Error(`Image ${file.name} was rejected by content moderation`)
-        }
 
         // Upload to storage
         const imageUrl = await uploadVenueImage(file, venueId!)

@@ -19,7 +19,7 @@ import {
   ArrowLeft,
   Search
 } from 'lucide-react'
-import { uploadEventImage, moderateImage, validateImageFile } from '@/lib/services/storage'
+import { uploadEventImage, validateImageFile } from '@/lib/services/storage'
 import { H1, H2, H3 } from "@/components/ui/typography"
 
 interface EventFormData {
@@ -265,15 +265,6 @@ export default function CreateEventPage() {
           throw new Error(validation.error)
         }
         console.log(`File ${index + 1} validation passed`)
-
-        // Moderate content
-        console.log(`Starting moderation for file ${index + 1}`)
-        const approved = await moderateImage(file)
-        console.log(`File ${index + 1} moderation result:`, approved)
-        
-        if (!approved) {
-          throw new Error(`Image ${file.name} was rejected by content moderation`)
-        }
 
         // Generate temporary event ID for storage path
         const tempEventId = crypto.randomUUID()

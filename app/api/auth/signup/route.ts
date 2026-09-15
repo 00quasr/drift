@@ -1,9 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase-server'
 import { isValidEmail, isValidPassword } from '@/lib/services/auth'
+import { checkRateLimit, getClientIp, getRateLimitHeaders, strictRateLimit } from '@/lib/utils/rateLimit'
 
 export async function POST(request: NextRequest) {
   try {
+    // Throttle per IP so this endpoint can't be used to mass-create accounts.
+    const rateLimit = await checkRateLimit(`signup:${getClientIp(request)}`, strictRateLimit)
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        { success: false, error: 'Too many attempts. Please try again later.' },
+        { status: 429, headers: getRateLimitHeaders(rateLimit) }
+      )
+    }
+
     const body = await request.json()
     const { email, password, fullName, role } = body
 

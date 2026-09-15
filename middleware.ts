@@ -7,11 +7,16 @@ export async function middleware(request: NextRequest) {
   // Add secure CORS headers for API routes
   if (request.nextUrl.pathname.startsWith('/api/')) {
     const origin = request.headers.get('origin')
+    // Note: drift.vercel.app is NOT this app - that domain belongs to an unrelated
+    // project, so it must never be allowed with credentials. Production origins come
+    // from NEXT_PUBLIC_SITE_URL; preview deployments allow their own Vercel URL so
+    // branch deploys can call their own API.
+    const vercelUrl = process.env.NEXT_PUBLIC_VERCEL_URL
     const allowedOrigins = [
       'http://localhost:3000',
-      'http://localhost:3001', 
-      'https://drift.vercel.app',
-      process.env.NEXT_PUBLIC_SITE_URL
+      'http://localhost:3001',
+      process.env.NEXT_PUBLIC_SITE_URL,
+      vercelUrl ? `https://${vercelUrl}` : undefined
     ].filter(Boolean)
 
     const isAllowedOrigin = origin && allowedOrigins.includes(origin)

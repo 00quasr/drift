@@ -1,29 +1,82 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { z } from 'zod'
+import { checkRateLimit, getRateLimitHeaders, strictRateLimit } from '@/lib/utils/rateLimit'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+// Admin client with service role key. This bypasses RLS, so every code path below
+// must derive the target user from a verified access token - never from the body.
+//
+// Built per request rather than at module scope: constructing it on import makes
+// `next build` fail while collecting page data whenever the service role key is
+// absent, which is exactly the case in CI.
+function createAdminClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
-// Create admin client with service role key
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
+// Only the profile's display fields are accepted from the caller. The user id comes
+// from the verified bearer token and the role is fixed to 'fan' - role elevation must
+// go through the verification flow, never through a request body.
+const createProfileSchema = z.object({
+  full_name: z.string().trim().min(1).max(100).optional(),
+})
 
 export async function POST(request: NextRequest) {
   try {
-    const { user_id, email, full_name, role } = await request.json()
-
-    // Validate required fields
-    if (!user_id) {
+    const identifier = request.headers.get('x-forwarded-for') ?? 'unknown'
+    const rateLimit = await checkRateLimit(`create-profile:${identifier}`, strictRateLimit)
+    if (!rateLimit.success) {
       return NextResponse.json(
-        { error: 'User ID is required' },
+        { error: 'Too many requests' },
+        { status: 429, headers: getRateLimitHeaders(rateLimit) }
+      )
+    }
+
+    const supabaseAdmin = createAdminClient()
+
+    // Require a valid Supabase access token. The OAuth callback already sends one.
+    const authHeader = request.headers.get('authorization')
+    const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null
+
+    if (!token) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      )
+    }
+
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token)
+
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      )
+    }
+
+    const parsed = createProfileSchema.safeParse(await request.json())
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid request body' },
         { status: 400 }
       )
     }
+
+    // Callers may only ever create their own profile, as a fan.
+    const userId = user.id
+    const fullName = parsed.data.full_name
+      || user.user_metadata?.full_name
+      || user.user_metadata?.name
+      || 'User'
 
     // Check if profile already exists
     const { data: existingProfile } = await supabaseAdmin
       .from('profiles')
       .select('id')
-      .eq('id', user_id)
+      .eq('id', userId)
       .single()
 
     if (existingProfile) {
@@ -37,9 +90,9 @@ export async function POST(request: NextRequest) {
     const { data: newProfile, error } = await supabaseAdmin
       .from('profiles')
       .insert({
-        id: user_id,
-        full_name: full_name || 'User',
-        role: role || 'fan',
+        id: userId,
+        full_name: fullName,
+        role: 'fan',
         is_verified: false,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
@@ -50,7 +103,7 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error('Profile creation error:', error)
       return NextResponse.json(
-        { error: 'Failed to create profile', details: error.message },
+        { error: 'Failed to create profile' },
         { status: 500 }
       )
     }
@@ -59,7 +112,7 @@ export async function POST(request: NextRequest) {
     const { error: settingsError } = await supabaseAdmin
       .from('user_settings')
       .insert({
-        user_id: user_id,
+        user_id: userId,
         email_notifications: {
           marketing: false,
           new_events: true,
@@ -93,9 +146,9 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { 
-        message: 'Profile created successfully', 
-        profile: newProfile 
+      {
+        message: 'Profile created successfully',
+        profile: newProfile
       },
       { status: 201 }
     )

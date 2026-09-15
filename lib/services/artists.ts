@@ -207,7 +207,7 @@ export async function getTopRatedArtists(limit = 10) {
     return sorted
   } catch (error) {
     console.error('Error in getTopRatedArtists:', error)
-    throw error
+    return []
   }
 }
 

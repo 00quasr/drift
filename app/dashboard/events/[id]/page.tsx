@@ -24,7 +24,7 @@ import {
   Plus,
   Search
 } from 'lucide-react'
-import { uploadEventImage, moderateImage, validateImageFile } from '@/lib/services/storage'
+import { uploadEventImage, validateImageFile } from '@/lib/services/storage'
 import ClassicLoader from '@/components/ui/loader'
 
 interface EventFormData {
@@ -207,11 +207,6 @@ export default function EventEditPage({ params }: EventEditPageProps) {
           throw new Error(validation.error)
         }
 
-        // Moderate content
-        const approved = await moderateImage(file)
-        if (!approved) {
-          throw new Error(`Image ${file.name} was rejected by content moderation`)
-        }
 
         // Upload to storage
         const imageUrl = await uploadEventImage(file, eventId)

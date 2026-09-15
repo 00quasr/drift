@@ -15,7 +15,7 @@ import {
 } from 'lucide-react'
 import Image from 'next/image'
 import { supabase } from '@/lib/auth'
-import { uploadProfileImage, moderateImage } from '@/lib/services/storage'
+import { uploadProfileImage } from '@/lib/services/storage'
 import { useAuth } from '@/contexts/AuthContext'
 
 interface ProfileEditFormProps {
@@ -49,7 +49,6 @@ export const ProfileEditForm: React.FC<ProfileEditFormProps> = ({
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [uploadError, setUploadError] = useState('')
-  const [moderationStatus, setModerationStatus] = useState<'pending' | 'approved' | 'rejected' | null>(null)
   
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -86,7 +85,6 @@ export const ProfileEditForm: React.FC<ProfileEditFormProps> = ({
     // Reset states
     setUploadError('')
     setError('')
-    setModerationStatus(null)
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
@@ -101,30 +99,13 @@ export const ProfileEditForm: React.FC<ProfileEditFormProps> = ({
     }
 
     setAvatarFile(file)
-    
+
     // Create preview
     const reader = new FileReader()
     reader.onload = (e) => {
       setAvatarPreview(e.target?.result as string)
     }
     reader.readAsDataURL(file)
-
-    // Start content moderation
-    setModerationStatus('pending')
-    try {
-      const isApproved = await moderateImage(file)
-      setModerationStatus(isApproved ? 'approved' : 'rejected')
-      
-      if (!isApproved) {
-        setUploadError('Image was rejected by content moderation. Please choose a different image or try a different photo.')
-        console.log('Image rejected during moderation')
-        // Don't reset the file/preview so user can still see what was rejected
-      }
-    } catch (error) {
-      console.error('Moderation error:', error)
-      setUploadError('Moderation service temporarily unavailable. Image will be approved for now.')
-      setModerationStatus('approved') // Fallback to approved if moderation fails
-    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -135,14 +116,13 @@ export const ProfileEditForm: React.FC<ProfileEditFormProps> = ({
     try {
       let avatarUrl = profile.avatar_url
 
-      // Upload new avatar if selected and approved
-      if (avatarFile && moderationStatus === 'approved') {
+      // Upload new avatar if one was selected
+      if (avatarFile) {
         setUploading(true)
         try {
           avatarUrl = await uploadProfileImage(avatarFile, profile.id)
           // Clear the avatar file after successful upload
           setAvatarFile(null)
-          setModerationStatus(null)
         } catch (uploadError) {
           console.error('Upload error:', uploadError)
           setUploadError(`Failed to upload image: ${(uploadError as Error).message}`)
@@ -193,19 +173,6 @@ export const ProfileEditForm: React.FC<ProfileEditFormProps> = ({
     }
   }
 
-  const getModerationIcon = () => {
-    switch (moderationStatus) {
-      case 'pending':
-        return <span className="text-xs animate-pulse">...</span>
-      case 'approved':
-        return <Check className="w-4 h-4 text-green-400" />
-      case 'rejected':
-        return <X className="w-4 h-4 text-red-400" />
-      default:
-        return null
-    }
-  }
-
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
       {/* Avatar Upload Section */}
@@ -230,13 +197,6 @@ export const ProfileEditForm: React.FC<ProfileEditFormProps> = ({
                 <User className="w-16 h-16 text-white/60" />
               )}
             </div>
-            
-            {/* Moderation Status */}
-            {moderationStatus && (
-              <div className="absolute -top-2 -right-2 w-6 h-6 bg-black border border-white/20 flex items-center justify-center">
-                {getModerationIcon()}
-              </div>
-            )}
           </div>
 
           {/* Upload Controls */}
@@ -263,29 +223,7 @@ export const ProfileEditForm: React.FC<ProfileEditFormProps> = ({
             <div className="text-white/60 text-sm font-medium">
               <p>• Max size: 5MB</p>
               <p>• Formats: JPG, PNG, GIF</p>
-              <p>• Images are automatically moderated</p>
             </div>
-
-            {moderationStatus === 'pending' && (
-              <div className="flex items-center gap-2 text-yellow-400 text-sm font-medium">
-                <span className="animate-pulse">...</span>
-                CHECKING CONTENT...
-              </div>
-            )}
-
-            {moderationStatus === 'approved' && (
-              <div className="flex items-center gap-2 text-green-400 text-sm font-medium">
-                <Check className="w-4 h-4" />
-                IMAGE APPROVED
-              </div>
-            )}
-
-            {moderationStatus === 'rejected' && (
-              <div className="flex items-center gap-2 text-red-400 text-sm font-medium">
-                <X className="w-4 h-4" />
-                IMAGE REJECTED
-              </div>
-            )}
 
             {uploadError && (
               <div className="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/30 text-red-400 text-sm font-medium">
@@ -417,7 +355,7 @@ export const ProfileEditForm: React.FC<ProfileEditFormProps> = ({
       <div className="flex gap-4 pt-6 border-t border-white/20">
         <Button
           type="submit"
-          disabled={saving || uploading || moderationStatus === 'pending'}
+          disabled={saving || uploading}
           className="bg-white text-black hover:bg-white/90 font-bold tracking-wider uppercase flex-1"
         >
           {saving || uploading ? (
@@ -428,7 +366,7 @@ export const ProfileEditForm: React.FC<ProfileEditFormProps> = ({
             <>
               <Save className="w-4 h-4 mr-2" />
               SAVE CHANGES
-              {avatarFile && moderationStatus === 'approved' && (
+              {avatarFile && (
                 <span className="ml-2 text-xs">(+IMAGE)</span>
               )}
             </>

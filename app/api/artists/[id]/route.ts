@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
-import { moderateText } from '@/lib/services/storage'
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
@@ -247,16 +246,6 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       }, { status: 400 })
     }
 
-    // Moderate text content if changed
-    const textToModerate = `${name} ${bio}`
-    const moderation = await moderateText(textToModerate)
-    
-    if (!moderation.approved) {
-      return NextResponse.json({ 
-        success: false, 
-        error: `Content was rejected: ${moderation.reason || 'Inappropriate content detected'}` 
-      }, { status: 400 })
-    }
 
     // Update artist data
     const updateData = {
@@ -305,7 +294,6 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
           action: 'updated',
           moderator_id: user.id,
           metadata: {
-            moderation_result: moderation,
             user_role: profile.role,
             is_verified: profile.is_verified,
             changes: Object.keys(updateData)

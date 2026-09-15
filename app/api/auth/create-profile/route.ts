@@ -3,12 +3,18 @@ import { createClient } from '@supabase/supabase-js'
 import { z } from 'zod'
 import { checkRateLimit, getRateLimitHeaders, strictRateLimit } from '@/lib/utils/rateLimit'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-
 // Admin client with service role key. This bypasses RLS, so every code path below
 // must derive the target user from a verified access token - never from the body.
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
+//
+// Built per request rather than at module scope: constructing it on import makes
+// `next build` fail while collecting page data whenever the service role key is
+// absent, which is exactly the case in CI.
+function createAdminClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 // Only the profile's display fields are accepted from the caller. The user id comes
 // from the verified bearer token and the role is fixed to 'fan' - role elevation must
@@ -27,6 +33,8 @@ export async function POST(request: NextRequest) {
         { status: 429, headers: getRateLimitHeaders(rateLimit) }
       )
     }
+
+    const supabaseAdmin = createAdminClient()
 
     // Require a valid Supabase access token. The OAuth callback already sends one.
     const authHeader = request.headers.get('authorization')

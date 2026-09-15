@@ -41,7 +41,11 @@ export async function GET(request: NextRequest) {
       limit
     }
 
-    let results = {
+    let results: {
+      venues: any[]
+      events: any[]
+      artists: any[]
+    } = {
       venues: [],
       events: [],
       artists: []

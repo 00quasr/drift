@@ -307,7 +307,7 @@ export default function UsersPage() {
                         {listUser.role}
                       </div>
                       {listUser.is_verified && (
-                        <ShieldCheck className="w-4 h-4 text-emerald-400" title="Verified" />
+                        <ShieldCheck className="w-4 h-4 text-emerald-400" />
                       )}
                     </div>
 

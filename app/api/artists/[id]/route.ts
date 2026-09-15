@@ -15,7 +15,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
     // Public API - get published artist
     const { getArtistById } = await import('@/lib/services/artists')
-    const data = await getArtistById(params.id, 'published')
+    const data = await getArtistById(params.id)
     
     if (!data) {
       return NextResponse.json({ 
@@ -187,10 +187,17 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       .eq('id', user.id)
       .single()
 
-    console.log('API UPDATE: Profile lookup result:', { 
-      profile, 
-      profileError: profileError ? profileError.message : null 
+    console.log('API UPDATE: Profile lookup result:', {
+      profile,
+      profileError: profileError ? profileError.message : null
     })
+
+    if (!profile) {
+      return NextResponse.json({
+        success: false,
+        error: 'User profile not found'
+      }, { status: 404 })
+    }
 
     // Check if user can edit this artist
     const { data: existingArtist, error: fetchError } = await supabase

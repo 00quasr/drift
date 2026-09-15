@@ -1,17 +1,17 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useSearchParams } from 'next/navigation'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { VerificationForm } from '@/components/verification/VerificationForm'
-import { 
-  Clock, 
-  CheckCircle2, 
-  XCircle, 
-  FileText, 
+import {
+  Clock,
+  CheckCircle2,
+  XCircle,
+  FileText,
   AlertCircle,
   Plus,
   RefreshCw,
@@ -23,6 +23,14 @@ import { formatDistanceToNow } from 'date-fns'
 import { UserRole } from '@/lib/auth'
 
 export default function VerificationPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-black" />}>
+      <VerificationPageContent />
+    </Suspense>
+  )
+}
+
+function VerificationPageContent() {
   const { user } = useAuth()
   const searchParams = useSearchParams()
   const [requests, setRequests] = useState<VerificationRequest[]>([])

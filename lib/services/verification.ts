@@ -119,7 +119,7 @@ class VerificationService {
     if (!requests || requests.length === 0) return []
 
     // Get unique user IDs
-    const userIds = [...new Set(requests.map(r => r.user_id).filter(Boolean))]
+    const userIds = Array.from(new Set(requests.map(r => r.user_id).filter(Boolean)))
     
     // Fetch user profiles (without email since it's not in profiles table)
     const { data: profiles, error: profilesError } = await supabase
@@ -155,7 +155,7 @@ class VerificationService {
     if (!requests || requests.length === 0) return []
 
     // Get unique user IDs
-    const userIds = [...new Set(requests.map(r => r.user_id).filter(Boolean))]
+    const userIds = Array.from(new Set(requests.map(r => r.user_id).filter(Boolean)))
     
     // Fetch user profiles (without email since it's not in profiles table)
     const { data: profiles, error: profilesError } = await supabase

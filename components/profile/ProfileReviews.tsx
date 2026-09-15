@@ -103,7 +103,7 @@ export const ProfileReviews: React.FC<ProfileReviewsProps> = ({
                   targetSlug = data.slug
                   targetDate = data.start_date
                   if (data.venues) {
-                    targetLocation = `${data.venues.city}, ${data.venues.country}`
+                    targetLocation = `${(data.venues as any).city}, ${(data.venues as any).country}`
                   }
                 }
               } else if (review.target_type === 'artist') {

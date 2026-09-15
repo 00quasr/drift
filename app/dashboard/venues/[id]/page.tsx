@@ -134,7 +134,7 @@ export default function VenueEditPage({ params }: VenueEditPageProps) {
         }
 
         // Upload to storage
-        const imageUrl = await uploadVenueImage(file, params.id)
+        const imageUrl = await uploadVenueImage(file, venueId!)
         return imageUrl
       })
 
@@ -214,7 +214,7 @@ export default function VenueEditPage({ params }: VenueEditPageProps) {
 
     setSaving(true)
     try {
-      const response = await fetch(`/api/venues/${params.id}`, {
+      const response = await fetch(`/api/venues/${venueId}`, {
         method: 'DELETE'
       })
 

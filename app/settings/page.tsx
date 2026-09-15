@@ -393,7 +393,7 @@ export default function SettingsPage() {
                     </label>
                     <input
                       type="text"
-                      value={user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
+                      value={(user as any).created_at ? new Date((user as any).created_at).toLocaleDateString() : 'N/A'}
                       disabled
                       className="w-full bg-black/30 border border-white/20 text-white/60 p-3 cursor-not-allowed"
                     />

@@ -13,6 +13,7 @@ import ImageGallery from '@/components/ui/ImageGallery'
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { ReviewModal } from '@/components/reviews/ReviewModal'
+import ClassicLoader from '@/components/ui/loader'
 import { favoritesService } from '@/lib/services/favorites'
 import { H1, H2, H3, H4 } from "@/components/ui/typography"
 

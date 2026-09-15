@@ -129,7 +129,7 @@ export function EntityViews({
                 type="artist"
                 id={entity.id}
                 title={entityName}
-                imageUrl={imageUrl}
+                imageUrl={imageUrl || ''}
                 category={entity.genres?.[0] || 'Electronic'}
                 href={getEntityHref(entity)}
                 bio={entity.bio}
@@ -147,7 +147,7 @@ export function EntityViews({
                 type="venue"
                 id={entity.id}
                 title={entityName}
-                imageUrl={imageUrl}
+                imageUrl={imageUrl || ''}
                 category={entity.city || 'Unknown Location'}
                 href={getEntityHref(entity)}
                 city={entity.city || 'Unknown'}
@@ -163,7 +163,7 @@ export function EntityViews({
                 type="event"
                 id={entity.id}
                 title={entityName}
-                imageUrl={imageUrl}
+                imageUrl={imageUrl || ''}
                 category="EVENT"
                 href={getEntityHref(entity)}
                 artist={entity.artists?.[0]?.name || entity.artist || 'Various Artists'}
